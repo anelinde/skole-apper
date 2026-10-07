@@ -1,0 +1,5 @@
+# Bare selve appen publiseres. Bilder fra boka, PDF og instruksjonsfila blir liggende lokalt.
+*
+!.gitignore
+!index.html
+!tysk-trening.html
