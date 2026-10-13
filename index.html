@@ -40,8 +40,8 @@ a.app:hover{border-color:var(--brand)}
   <div class="grid">
     <a class="app" href="naturfag/">
       <span class="em">🔬</span><b>Naturfag</b>
-      <small>Øving til neste prøve</small>
-      <span class="tag new">Kommer snart</span>
+      <small>Nervesystemet, prøve uke 42</small>
+      <span class="tag new" id="nf-xp">Ny!</span>
     </a>
     <a class="app" href="tysk/">
       <span class="em">🇩🇪</span><b>Tysk</b>
@@ -55,6 +55,10 @@ a.app:hover{border-color:var(--brand)}
 try{
   const t = JSON.parse(localStorage.getItem('tyskTrening_v1') || 'null');
   if(t && t.xp) document.getElementById('tysk-xp').textContent = '⭐ ' + t.xp + ' XP';
+}catch(e){}
+try{
+  const n = JSON.parse(localStorage.getItem('naturfag_v1') || 'null');
+  if(n && n.xp) document.getElementById('nf-xp').textContent = '⭐ ' + n.xp + ' XP';
 }catch(e){}
 </script>
 </body>

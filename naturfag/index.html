@@ -6,34 +6,891 @@
 <title>Naturfag</title>
 <style>
 :root{
-  --bg:#f5f3ff; --card:#ffffff; --ink:#1f1b3a; --muted:#6b6790; --line:#e4e0f5; --brand:#6c4cf1;
-  --shadow:0 2px 0 rgba(31,27,58,.08), 0 8px 24px rgba(31,27,58,.06);
+  --bg:#f2f7f5; --card:#ffffff; --ink:#15302a; --muted:#5d746e; --line:#dbe7e3; --chip:#e4f1ed;
+  --brand:#0f8a6c; --brand-ink:#ffffff; --accent:#ff8a3d;
+  --ok:#14874a; --okbg:#e3f6ea; --bad:#c93a3a; --badbg:#fde9e9; --near:#b45309; --nearbg:#fff4e5;
+  --shadow:0 2px 0 rgba(21,48,42,.07), 0 8px 24px rgba(21,48,42,.06);
+  --fig-a:#8fb8ff; --fig-b:#ffd59a; --fig-c:#c9b6ff; --fig-d:#a6e3b8; --fig-e:#ffb3b3; --fig-line:#4b5d58;
 }
 @media (prefers-color-scheme: dark){
   :root{
-    --bg:#14122a; --card:#1f1c3b; --ink:#f1efff; --muted:#a8a3cc; --line:#34305a; --brand:#8f74ff;
+    --bg:#0f1a18; --card:#172623; --ink:#e8f4f0; --muted:#9db5ae; --line:#2a3f3a; --chip:#203531;
+    --brand:#2bb894; --brand-ink:#06201a; --accent:#ff9b57;
+    --ok:#46d68a; --okbg:#173a28; --bad:#ff7070; --badbg:#3d1d24; --near:#ffb35c; --nearbg:#3a2a14;
     --shadow:0 2px 0 rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+    --fig-a:#5a86cc; --fig-b:#b8924f; --fig-c:#7f6bc0; --fig-d:#4f9a68; --fig-e:#b86a6a; --fig-line:#c7d6d2;
   }
 }
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-main{max-width:720px;margin:0 auto;padding:24px 16px 48px}
-.back{color:var(--brand);font-weight:700;text-decoration:none}
-.card{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:32px 20px;text-align:center}
-.em{font-size:72px;line-height:1}
-h1{margin:12px 0 6px}
-p{color:var(--muted);margin:0}
+#app{max-width:720px;margin:0 auto;padding:16px 16px 150px}
+h1,h2,h3{line-height:1.2;margin:0}
+h2.sec{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:28px 0 10px}
+button{font:inherit;color:inherit;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.row.end{justify-content:flex-end}
+.btn{border:0;border-radius:14px;padding:13px 20px;font-weight:700;background:var(--chip);color:var(--ink);min-height:48px}
+.btn.primary{background:var(--brand);color:var(--brand-ink);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.btn.primary:active{transform:translateY(2px);box-shadow:none}
+.btn.ghost{background:transparent;border:2px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.icon{border:0;background:var(--chip);border-radius:12px;width:44px;height:44px;font-size:20px;display:grid;place-items:center;flex:none;text-decoration:none;color:inherit}
+
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{font-weight:800;font-size:22px;display:flex;align-items:center;gap:10px}
+.hero{display:grid;gap:10px}
+.lvl{display:flex;align-items:baseline;gap:10px}
+.lvlnum{font-size:28px;font-weight:800}
+.rank{font-weight:700;color:var(--brand)}
+.bar{height:14px;background:var(--chip);border-radius:99px;overflow:hidden}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--brand),var(--accent));border-radius:99px;transition:width .5s}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:var(--chip);border-radius:99px;padding:6px 12px;font-size:15px;font-weight:600}
+.pill.hot{background:var(--accent);color:#fff}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.topic{display:grid;gap:6px;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow)}
+.topic:hover{border-color:var(--brand)}
+.topic .em{font-size:30px}
+.topic b{font-size:18px}
+.topic small{color:var(--muted);font-size:14px}
+.topic .bar{height:8px;margin-top:4px}
+.topic.wide{grid-column:1/-1}
+.medals{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.medal{display:flex;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;background:var(--card);border:1px solid var(--line);font-size:14px}
+.medal .e{font-size:26px}
+.medal.locked{opacity:.4;filter:grayscale(1)}
+.medal b{display:block;font-size:14px}
+footer{margin-top:32px;text-align:center}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:14px}
+
+.sbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sbar .bar{flex:1}
+.combo{font-weight:800;min-width:56px;text-align:right}
+.combo.on{color:var(--accent)}
+.task{min-height:300px}
+.q-label{color:var(--muted);font-weight:600;font-size:15px;margin-bottom:8px}
+.q-big{font-size:26px;font-weight:800;margin:6px 0 18px}
+.q-text{font-size:20px;font-weight:700;margin:6px 0 14px}
+.opts{display:grid;gap:10px}
+.opt{text-align:left;padding:14px 16px;border-radius:14px;border:2px solid var(--line);background:var(--card);font-weight:600;min-height:54px}
+.opt:not(:disabled):hover{border-color:var(--brand)}
+.opt.right{border-color:var(--ok);background:var(--okbg)}
+.opt.wrong{border-color:var(--bad);background:var(--badbg)}
+.opt:disabled{cursor:default}
+.explain{margin-top:12px;background:var(--bg);border-radius:14px;padding:12px 14px}
+
+/* Begrepskort */
+.flash{text-align:center;padding:20px 8px}
+.flash .term{font-size:32px;font-weight:800;margin:10px 0}
+.flash .answer{font-size:19px;background:var(--bg);border-radius:14px;padding:14px;margin-top:14px;text-align:left}
+.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.rate .btn{padding:12px 6px;font-size:15px}
+
+/* Forklar */
+textarea{width:100%;min-height:170px;font:inherit;font-size:18px;padding:14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+textarea:focus{outline:none;border-color:var(--brand)}
+textarea:disabled{opacity:.85}
+.tip{font-size:14px;color:var(--muted);margin-top:6px}
+.concepts{list-style:none;padding:0;margin:12px 0;display:grid;gap:6px}
+.concepts li{display:flex;gap:8px;align-items:flex-start}
+.concepts li.done{color:var(--ok);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chip{background:var(--chip);border-radius:99px;padding:5px 11px;font-size:15px;font-weight:600}
+.model{background:var(--bg);border-radius:14px;padding:12px 14px;margin-top:6px}
+details{margin:10px 0}
+summary{cursor:pointer;font-weight:700;color:var(--brand)}
+.score{font-size:20px;font-weight:800;margin-top:10px}
+.spell{margin-top:12px}
+.spell .marked{background:var(--bg);border-radius:14px;padding:12px 14px;line-height:1.8;white-space:pre-wrap}
+.spell mark{background:var(--badbg);color:inherit;border-bottom:3px solid var(--bad);border-radius:3px;padding:0 2px}
+.spell ul{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:8px}
+.spell li{background:var(--bg);border-radius:12px;padding:10px 12px}
+.sugg{border:2px solid var(--ok);background:var(--okbg);color:var(--ok);border-radius:10px;padding:4px 10px;font-weight:800;margin:4px 6px 0 0}
+
+/* Rekkefølge */
+.steps{list-style:none;padding:0;margin:10px 0;display:grid;gap:8px;counter-reset:s}
+.steps li button,.bank button{width:100%;text-align:left;border:2px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;font-weight:600;min-height:52px}
+.steps li{counter-increment:s;display:flex;gap:10px;align-items:center}
+.steps li::before{content:counter(s);flex:none;width:30px;height:30px;border-radius:50%;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:800}
+.steps li.right button{border-color:var(--ok);background:var(--okbg)}
+.steps li.wrong button{border-color:var(--bad);background:var(--badbg)}
+.steps:empty::after{content:'Trykk på stegene under i riktig rekkefølge';color:var(--muted);display:block;border:2px dashed var(--line);border-radius:14px;padding:14px;text-align:center}
+.bank{display:grid;gap:8px}
+.bank button:hover{border-color:var(--brand)}
+
+/* Sorter */
+.sortcard{font-size:22px;font-weight:800;text-align:center;background:var(--bg);border-radius:16px;padding:26px 14px;margin:8px 0 14px;transition:background .2s}
+.sortcard.right{background:var(--okbg);color:var(--ok)}
+.sortcard.wrong{background:var(--badbg);color:var(--bad)}
+.buckets{display:grid;gap:10px}
+.buckets.n2{grid-template-columns:1fr 1fr}
+.buckets .btn{min-height:64px;font-size:16px}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:12px}
+.dots span{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.dots span.ok{background:var(--ok)}
+.dots span.bad{background:var(--bad)}
+
+/* Likning */
+.eq{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin:12px 0;font-weight:800;font-size:18px}
+.slot{min-width:92px;min-height:48px;border:2px dashed var(--line);border-radius:12px;display:grid;place-items:center;padding:6px 10px;background:var(--bg)}
+.slot.filled{border-style:solid;border-color:var(--brand);background:var(--card)}
+.slot.right{border-color:var(--ok);background:var(--okbg)}
+.slot.wrong{border-color:var(--bad);background:var(--badbg)}
+.arrow{display:grid;justify-items:center;font-size:14px;color:var(--muted);line-height:1.1}
+.arrow b{font-size:26px;color:var(--ink)}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.tile{border:2px solid var(--line);background:var(--card);border-radius:12px;padding:10px 14px;font-weight:800;font-size:17px;min-height:48px}
+.tile:disabled{opacity:.3}
+
+/* Figur */
+.fig{width:100%;height:auto;display:block;background:var(--bg);border-radius:14px;touch-action:manipulation}
+.fig .mk circle{fill:var(--brand);stroke:var(--card);stroke-width:3}
+.fig .mk text{fill:var(--brand-ink);font:800 15px system-ui,sans-serif;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.fig .mk.click{cursor:pointer}
+.fig .mk.right circle{fill:var(--ok)}
+.fig .mk.wrong circle{fill:var(--bad)}
+.fig .mk.ask circle{fill:var(--accent)}
+.figkey{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:4px 12px;margin-top:10px;font-size:15px}
+
+/* Tilbakemelding */
+.fb{position:fixed;left:0;right:0;bottom:0;padding:16px;border-top:3px solid;display:flex;justify-content:center;animation:up .2s ease-out;z-index:5}
+.fb .in{max-width:720px;width:100%;display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.fb.ok{background:var(--okbg);border-color:var(--ok)}
+.fb.bad{background:var(--badbg);border-color:var(--bad)}
+.fb.near{background:var(--nearbg);border-color:var(--accent)}
+.fb .msg{flex:1;min-width:220px;max-height:40vh;overflow:auto}
+.fb .title{font-size:21px;font-weight:800}
+.fb.ok .title{color:var(--ok)}
+.fb.bad .title{color:var(--bad)}
+.fb.near .title{color:var(--near)}
+.fb .xp{font-weight:800;color:var(--accent);margin-left:6px}
+
+.end{text-align:center;display:grid;gap:10px;justify-items:center}
+.end .big{font-size:72px}
+.end .stat{font-size:20px;font-weight:800}
+.newmedal{background:var(--chip);border-radius:14px;padding:10px 14px;font-weight:700}
+.review{text-align:left;width:100%;display:grid;gap:10px}
+.chal-top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:22px;margin-bottom:12px;gap:12px}
+.timer{font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+
+.conf{position:fixed;top:55vh;font-size:28px;pointer-events:none;z-index:10;animation:pop 1.1s ease-out forwards}
+@keyframes pop{0%{transform:translate(0,0) scale(.6);opacity:1}100%{transform:translate(var(--dx),-50vh) scale(1.2) rotate(var(--r));opacity:0}}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:480px){ .q-big{font-size:23px} .q-text{font-size:19px} .flash .term{font-size:27px} .sortcard{font-size:20px} }
 </style>
 </head>
 <body>
-<main>
-  <a class="back" href="../">← Alle fag</a>
-  <div class="card">
-    <div class="em">🔬</div>
-    <h1>Naturfag</h1>
-    <p>Kommer snart! Appen lages når pensum er klart.</p>
-  </div>
-</main>
+<div id="app"></div>
+<script src="nervesystemet.js"></script>
+<script>
+/* =====================================================================
+   NATURFAG – øve-app. Innholdet ligger i nervesystemet.js (window.PROVE).
+   ===================================================================== */
+const P = window.PROVE;
+const BEGREPER = P.begreper.map(([id,t,navn,fork]) => ({id,t,navn,fork}));
+const SANT = P.santusant.map(([id,t,p,sann,fork]) => ({id,t,p,sann,fork}));
+const TEMA = Object.fromEntries(P.temaer.map(t => [t.id, t]));
+const TEST_DATE = new Date(P.provedato + 'T00:00:00');
+const KIND_NAMES = {kort:'Begrepskort', begrepMc:'Begreper', match:'Finn parene', forklar:'Forklar', rekke:'Rekkefølge', sorter:'Sorter', hvorfor:'Hvorfor?', sant:'Sant eller usant', likning:'Likning', figur:'Figur'};
+
+/* ---------- Lagring ---------- */
+const KEY = P.lagringsnokkel;
+const DEFAULT = {xp:0, stats:{}, medals:[], sessions:0, topicDone:{}, best60:0, maxCombo:0, dayStreak:0, lastDay:null,
+  sound:true, forklarOk:0, figurOk:0, proveDone:0, drafts:{}};
+let S = load();
+function load(){
+  try{ const r = localStorage.getItem(KEY); if(r) return Object.assign(JSON.parse(JSON.stringify(DEFAULT)), JSON.parse(r)); }catch(e){}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function st(id){ return S.stats[id] || {w:3, s:0, n:0}; }
+function record(id, ok){
+  const x = st(id); x.n++;
+  if(ok){ x.s++; x.w = Math.max(1, x.w-1); } else { x.s = 0; x.w = Math.min(9, x.w+3); }
+  S.stats[id] = x;
+}
+function weightedPick(arr, n){
+  const a = arr.slice(), out = [];
+  while(out.length < n && a.length){
+    const tot = a.reduce((s,x) => s+st(x.id).w, 0);
+    let r = Math.random()*tot, i = 0;
+    for(; i < a.length-1; i++){ r -= st(a[i].id).w; if(r <= 0) break; }
+    out.push(a.splice(i,1)[0]);
+  }
+  return out;
+}
+
+/* ---------- Hjelpere ---------- */
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function lev(a, b){
+  const d = Array.from({length:a.length+1}, (_,i) => [i, ...Array(b.length).fill(0)]);
+  for(let j=1;j<=b.length;j++) d[0][j] = j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++)
+    d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+const RANKS = ['Nysgjerrig','Utforsker','Forsker','Nevro-nerd','Hjerneekspert','Professor','Nobelprisvinner'];
+function level(xp = S.xp){ return Math.floor(Math.sqrt(xp/30)) + 1; }
+function levelInfo(){ const l = level(), base = 30*(l-1)*(l-1), next = 30*l*l; return {l, rank:RANKS[Math.min(l-1, RANKS.length-1)], cur:S.xp-base, need:next-base}; }
+function dayKey(d = new Date()){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function markDay(){
+  const today = dayKey(); if(S.lastDay === today) return;
+  const y = new Date(); y.setDate(y.getDate()-1);
+  S.dayStreak = (S.lastDay === dayKey(y)) ? S.dayStreak+1 : 1; S.lastDay = today;
+}
+function streakNow(){ const y = new Date(); y.setDate(y.getDate()-1); return (S.lastDay === dayKey() || S.lastDay === dayKey(y)) ? S.dayStreak : 0; }
+function daysToTest(){ const t = new Date(); t.setHours(0,0,0,0); return Math.round((TEST_DATE - t)/864e5); }
+
+let actx;
+function beep(kind){
+  if(!S.sound) return;
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const notes = {ok:[660,880], bad:[260,200], win:[523,659,784,1046], tick:[520]}[kind];
+    notes.forEach((f,i) => {
+      const t0 = actx.currentTime + i*0.09, o = actx.createOscillator(), g = actx.createGain();
+      o.type = kind === 'bad' ? 'triangle' : 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.14, t0+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t0+0.2);
+      o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0+0.22);
+    });
+  }catch(e){}
+}
+function burst(n = 14){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const em = ['⭐','✨','🎉','🧠','⚡','🏆'];
+  for(let i=0;i<n;i++){
+    const s = document.createElement('span'); s.className = 'conf'; s.textContent = rnd(em);
+    s.style.left = (35 + Math.random()*30) + 'vw';
+    s.style.setProperty('--dx', (Math.random()*60-30) + 'vw');
+    s.style.setProperty('--r', (Math.random()*360-180) + 'deg');
+    s.style.animationDelay = (Math.random()*0.15) + 's';
+    document.body.append(s); setTimeout(() => s.remove(), 1400);
+  }
+}
+
+/* ---------- Medaljer ---------- */
+const MEDALS = [
+  {id:'first',  e:'🎉', name:'Første økt',        desc:'Fullfør en økt',                  test:()=>S.sessions>=1},
+  {id:'combo10',e:'🔥', name:'10 på rad',         desc:'10 riktige på rad',               test:()=>S.maxCombo>=10},
+  {id:'forklar',e:'✍️', name:'Forklaringsmester', desc:'10 gode forklaringer',            test:()=>S.forklarOk>=10},
+  {id:'figur',  e:'🔬', name:'Figurekspert',      desc:'5 figurer uten feil',             test:()=>S.figurOk>=5},
+  {id:'prove',  e:'📝', name:'Prøveklar',         desc:'2 prøvetreninger',                test:()=>S.proveDone>=2},
+  {id:'lyn',    e:'⚡', name:'Begrepsjeger',      desc:'15 riktige på 60 sekunder',       test:()=>S.best60>=15},
+  {id:'alle',   e:'🧭', name:'Hele pensum',       desc:'En økt i hvert tema',             test:()=>P.temaer.every(t => S.topicDone[t.id])},
+  {id:'days3',  e:'📅', name:'3 dager på rad',    desc:'Øv tre dager på rad',             test:()=>S.dayStreak>=3},
+  {id:'xp500',  e:'💎', name:'500 XP',            desc:'Samle 500 XP',                    test:()=>S.xp>=500},
+  {id:'xp1000', e:'👑', name:'1000 XP',           desc:'Samle 1000 XP',                   test:()=>S.xp>=1000},
+];
+function checkMedals(){ const n = []; MEDALS.forEach(m => { if(!S.medals.includes(m.id) && m.test()){ S.medals.push(m.id); n.push(m); } }); return n; }
+
+/* =====================================================================
+   FIGURER (egne tegninger)
+   ===================================================================== */
+const FIG = {
+  nervecelle:{vb:'0 0 600 220', svg:`
+    <g stroke="var(--fig-line)" stroke-width="5" stroke-linecap="round" fill="none">
+      <path d="M100 95 L40 50 L18 42 M40 50 L36 22 M70 72 L62 40"/>
+      <path d="M95 135 L42 170 L20 168 M42 170 L44 198"/>
+      <path d="M128 76 L120 30 M120 30 L100 14 M120 30 L140 12"/>
+      <path d="M130 156 L132 200"/>
+    </g>
+    <line x1="168" y1="115" x2="545" y2="115" stroke="var(--fig-line)" stroke-width="7"/>
+    <g fill="var(--fig-b)" stroke="var(--fig-line)" stroke-width="2">
+      <rect x="240" y="101" width="52" height="28" rx="13"/><rect x="298" y="101" width="52" height="28" rx="13"/>
+      <rect x="356" y="101" width="52" height="28" rx="13"/><rect x="414" y="101" width="52" height="28" rx="13"/><rect x="472" y="101" width="52" height="28" rx="13"/>
+    </g>
+    <g stroke="var(--fig-line)" stroke-width="5" stroke-linecap="round"><path d="M545 115 L574 86 M545 115 L582 115 M545 115 L574 144"/></g>
+    <g fill="var(--fig-e)" stroke="var(--fig-line)" stroke-width="2"><circle cx="576" cy="84" r="8"/><circle cx="584" cy="115" r="8"/><circle cx="576" cy="146" r="8"/></g>
+    <circle cx="130" cy="115" r="44" fill="var(--fig-c)" stroke="var(--fig-line)" stroke-width="3"/>
+    <circle cx="125" cy="110" r="16" fill="var(--fig-a)" stroke="var(--fig-line)" stroke-width="2"/>`},
+  synapse:{vb:'0 0 300 340', svg:`
+    <path d="M110 0 L110 70 Q40 90 50 150 Q55 190 100 195 L200 195 Q245 190 250 150 Q260 90 190 70 L190 0 Z" fill="var(--fig-c)" stroke="var(--fig-line)" stroke-width="3"/>
+    <g fill="var(--fig-b)" stroke="var(--fig-line)" stroke-width="2">
+      <circle cx="120" cy="130" r="16"/><circle cx="165" cy="118" r="15"/><circle cx="195" cy="155" r="14"/><circle cx="145" cy="168" r="13"/></g>
+    <g fill="var(--fig-e)"><circle cx="114" cy="126" r="3"/><circle cx="124" cy="135" r="3"/><circle cx="161" cy="114" r="3"/><circle cx="170" cy="122" r="3"/><circle cx="192" cy="151" r="3"/><circle cx="198" cy="160" r="3"/><circle cx="142" cy="165" r="3"/>
+      <circle cx="120" cy="212" r="4"/><circle cx="150" cy="220" r="4"/><circle cx="178" cy="208" r="4"/><circle cx="205" cy="222" r="4"/><circle cx="96" cy="222" r="4"/></g>
+    <path d="M40 236 L260 236 L260 340 L40 340 Z" fill="var(--fig-d)" stroke="var(--fig-line)" stroke-width="3"/>
+    <g fill="none" stroke="var(--fig-line)" stroke-width="3"><path d="M88 236 v-8 m-6 0 h12"/><path d="M128 236 v-8 m-6 0 h12"/><path d="M168 236 v-8 m-6 0 h12"/><path d="M208 236 v-8 m-6 0 h12"/></g>
+    <path d="M176 8 v38" stroke="var(--fig-line)" stroke-width="3" marker-end="url(#pil)"/>`},
+  hjerne:{vb:'0 0 400 380', svg:`
+    <path d="M236 195 L276 195 L266 305 L240 305 Z" fill="var(--fig-b)" stroke="var(--fig-line)" stroke-width="3"/>
+    <rect x="238" y="300" width="26" height="78" rx="8" fill="var(--fig-b)" stroke="var(--fig-line)" stroke-width="3"/>
+    <ellipse cx="314" cy="228" rx="52" ry="32" fill="var(--fig-c)" stroke="var(--fig-line)" stroke-width="3"/>
+    <g stroke="var(--fig-line)" stroke-width="2" fill="none"><path d="M272 222 Q314 210 356 222"/><path d="M276 236 Q314 226 352 236"/><path d="M286 248 Q314 242 342 248"/></g>
+    <path d="M60 170 C40 80 140 20 240 30 C330 40 380 110 360 180 C350 205 315 210 290 196 L240 200 C170 225 72 225 60 170 Z" fill="var(--fig-e)" stroke="var(--fig-line)" stroke-width="7"/>
+    <g stroke="var(--fig-line)" stroke-width="2.5" fill="none" opacity=".7">
+      <path d="M100 80 q20 20 0 40 q-20 20 0 40"/><path d="M150 50 q25 25 0 50 q-25 25 0 50"/><path d="M210 40 q20 30 0 60 q-20 30 0 60"/>
+      <path d="M270 50 q20 25 0 50 q-20 25 0 50"/><path d="M320 80 q15 20 0 40 q-15 20 0 40"/></g>`},
+  plantecelle:{vb:'0 0 400 300', svg:`
+    <rect x="8" y="8" width="384" height="284" rx="20" fill="none" stroke="var(--fig-d)" stroke-width="12"/>
+    <rect x="32" y="32" width="336" height="236" rx="14" fill="var(--bg)" stroke="var(--fig-line)" stroke-width="2.5"/>
+    <rect x="100" y="80" width="180" height="140" rx="40" fill="var(--fig-a)" stroke="var(--fig-line)" stroke-width="2.5" opacity=".9"/>
+    <circle cx="310" cy="110" r="30" fill="var(--fig-c)" stroke="var(--fig-line)" stroke-width="2.5"/><circle cx="316" cy="104" r="9" fill="var(--fig-line)" opacity=".5"/>
+    <g fill="var(--fig-d)" stroke="var(--fig-line)" stroke-width="2"><ellipse cx="80" cy="235" rx="26" ry="13"/><ellipse cx="75" cy="72" rx="24" ry="12"/><ellipse cx="200" cy="248" rx="24" ry="11"/></g>
+    <g stroke="var(--fig-line)" stroke-width="1.5" opacity=".6"><path d="M62 235 h36 M60 72 h30 M184 248 h32"/></g>
+    <ellipse cx="320" cy="240" rx="28" ry="14" fill="var(--fig-b)" stroke="var(--fig-line)" stroke-width="2"/>
+    <path d="M298 240 q6 -8 10 0 q6 8 10 0 q6 -8 10 0 q6 8 10 0" fill="none" stroke="var(--fig-line)" stroke-width="1.5"/>`},
+  dyrecelle:{vb:'0 0 400 300', svg:`
+    <ellipse cx="200" cy="150" rx="175" ry="125" fill="var(--bg)" stroke="var(--fig-line)" stroke-width="3"/>
+    <circle cx="190" cy="140" r="40" fill="var(--fig-c)" stroke="var(--fig-line)" stroke-width="2.5"/><circle cx="198" cy="132" r="11" fill="var(--fig-line)" opacity=".5"/>
+    <ellipse cx="295" cy="215" rx="30" ry="15" fill="var(--fig-b)" stroke="var(--fig-line)" stroke-width="2"/>
+    <path d="M272 215 q6 -8 10 0 q6 8 10 0 q6 -8 10 0 q6 8 10 0" fill="none" stroke="var(--fig-line)" stroke-width="1.5"/>
+    <ellipse cx="300" cy="100" rx="22" ry="11" fill="var(--fig-b)" stroke="var(--fig-line)" stroke-width="2"/>
+    <g fill="var(--fig-line)" opacity=".35"><circle cx="90" cy="120" r="3"/><circle cx="140" cy="230" r="3"/><circle cx="250" cy="70" r="3"/><circle cx="330" cy="160" r="3"/><circle cx="80" cy="190" r="3"/></g>`},
+  refleksbue:{vb:'0 0 460 360', svg:`
+    <ellipse cx="370" cy="130" rx="72" ry="60" fill="var(--fig-c)" stroke="var(--fig-line)" stroke-width="3"/>
+    <path d="M340 105 q30 25 0 50 M400 105 q-30 25 0 50" fill="none" stroke="var(--fig-line)" stroke-width="10" opacity=".35"/>
+    <ellipse cx="140" cy="335" rx="62" ry="20" fill="var(--fig-e)" stroke="var(--fig-line)" stroke-width="3"/>
+    <polyline points="50,290 120,220 220,150 322,116" fill="none" stroke="var(--fig-a)" stroke-width="6" stroke-linecap="round" marker-end="url(#pil)"/>
+    <polyline points="322,116 350,132 322,150" fill="none" stroke="var(--fig-line)" stroke-width="4" stroke-dasharray="4 4"/>
+    <polyline points="322,150 270,220 200,290 175,325" fill="none" stroke="var(--fig-e)" stroke-width="6" stroke-linecap="round" marker-end="url(#pil)"/>
+    <path d="M50 274 l5 11 l12 2 l-9 8 l2 12 l-10 -6 l-10 6 l2 -12 l-9 -8 l12 -2 z" fill="var(--fig-b)" stroke="var(--fig-line)" stroke-width="2"/>`},
+};
+function figSvg(g, mode){
+  const f = FIG[g.svg];
+  return `<svg class="fig" viewBox="${f.vb}" role="img" aria-label="${esc(g.tittel)}">
+    <defs><marker id="pil" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--fig-line)"/></marker></defs>
+    ${f.svg}
+    ${g.deler.map(([nr,,x,y]) => `<g class="mk ${mode === 'click' ? 'click' : ''}" data-nr="${nr}" transform="translate(${x} ${y})"><circle r="15"/><text>${nr}</text></g>`).join('')}
+  </svg>`;
+}
+
+/* =====================================================================
+   STAVEKONTROLL AV FAGORD (lokal, ingen nettjeneste)
+   Den norske LanguageTool-kontrollen ble testet og forkastet: den merket
+   riktige ord (noe, noen) som feil og slapp gjennom ekte feil. Her sjekkes
+   derfor bare fagordene, mot lista i nervesystemet.js.
+   ===================================================================== */
+const FAGORD = P.fagord;                    // godkjente stammer
+const FAGBASE = P.fagordVisning.filter(f => f.length >= 5);
+const IKKE = P.ikkeFagord;
+// Avstand som også teller ombytting av to naboboksstaver som én feil
+function osa(a, b){
+  const d = Array.from({length:a.length+1}, (_,i) => [i, ...Array(b.length).fill(0)]);
+  for(let j=1;j<=b.length;j++) d[0][j] = j;
+  for(let i=1;i<=a.length;i++) for(let j=1;j<=b.length;j++){
+    d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1));
+    if(i>1 && j>1 && a[i-1] === b[j-2] && a[i-2] === b[j-1]) d[i][j] = Math.min(d[i][j], d[i-2][j-2]+1);
+  }
+  return d[a.length][b.length];
+}
+function fagordCheck(t){
+  const out = [], re = /\p{L}+/gu; let m;
+  while((m = re.exec(t))){
+    const word = m[0], w = word.toLowerCase();
+    if(w.length < 5 || FAGORD.some(f => w.startsWith(f)) || FAGBASE.some(f => w.startsWith(f)) || IKKE.some(x => w.startsWith(x))) continue;
+    let hit = null;
+    for(const f of FAGBASE){
+      if(w.slice(0,2) !== f.slice(0,2)) continue;
+      for(const L of [f.length-1, f.length, f.length+1]){
+        if(L > w.length || L < 4) continue;
+        const part = w.slice(0,L);
+        if(L === f.length-1 && f.startsWith(part)) continue;   // ordet bare fortsetter annerledes, f.eks. «reflek-tere»
+        if(osa(part, f) === 1){ hit = f; break; }
+      }
+      if(hit) break;
+    }
+    if(hit) out.push({offset:m.index, length:word.length, base:hit});
+  }
+  return out;
+}
+
+/* =====================================================================
+   BEGREPSSJEKK for forklaringer
+   ===================================================================== */
+function words(t){ return t.toLowerCase().replace(/[^\p{L}\p{N}₀-₉ ]+/gu,' ').split(/\s+/).filter(Boolean); }
+function hasStem(t, ws, stem){
+  stem = stem.toLowerCase();
+  if(stem.length < 4) return ws.some(w => w.startsWith(stem));
+  if(stem === 'sympatisk') return /(?<!para)sympatisk/.test(t.toLowerCase());
+  if(t.toLowerCase().includes(stem)) return true;
+  if(stem.length >= 6) return ws.some(w => w.length >= stem.length-1 && lev(w.slice(0, stem.length), stem) <= 1);
+  return false;
+}
+function conceptCheck(task, text){
+  text = text.replace(/[₀-₉]/g, c => String('₀₁₂₃₄₅₆₇₈₉'.indexOf(c)));
+  const ws = words(text);
+  return task.begreper.map(([navn, ...stems]) => ({navn, ok: stems.some(s => hasStem(text, ws, s))}));
+}
+
+/* =====================================================================
+   OPPGAVETYPER – hver kaller finish({ok, near, rec, xp, answer, note})
+   ===================================================================== */
+const inTopic = (arr, topic) => topic === 'mix' || topic === 'prove' || topic === 'kort' ? arr : arr.filter(x => x.t === topic);
+function pool(kind, topic){
+  switch(kind){
+    case 'kort': case 'begrepMc': case 'match': return inTopic(BEGREPER, topic);
+    case 'forklar': return inTopic(P.forklar, topic);
+    case 'rekke': return inTopic(P.rekkefolge, topic);
+    case 'sorter': return inTopic(P.sorter, topic);
+    case 'hvorfor': return inTopic(P.hvorfor, topic);
+    case 'sant': return inTopic(SANT, topic);
+    case 'likning': return inTopic(P.likninger, topic);
+    case 'figur': return inTopic(P.figurer, topic);
+  }
+  return [];
+}
+function mc(el, head, options, correct, cb){
+  el.innerHTML = head + `<div class="opts">${options.map((o,i) => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join('')}</div><div class="after"></div>`;
+  const btns = [...el.querySelectorAll('.opt')];
+  btns.forEach(b => b.onclick = () => {
+    const ok = options[+b.dataset.i] === correct;
+    btns.forEach(x => { x.disabled = true; if(options[+x.dataset.i] === correct) x.classList.add('right'); });
+    if(!ok) b.classList.add('wrong');
+    cb(ok, el.querySelector('.after'));
+  });
+}
+function otherBegreper(item, n, sameTopic = true){
+  let src = BEGREPER.filter(b => b.id !== item.id && (!sameTopic || b.t === item.t));
+  if(src.length < n) src = BEGREPER.filter(b => b.id !== item.id);
+  return shuffle(src).slice(0, n);
+}
+
+const RUN = {
+  kort(el, b, finish){
+    el.innerHTML = `<div class="flash">
+        <div class="q-label">${TEMA[b.t].e} ${esc(TEMA[b.t].navn)}</div>
+        <div class="term">${esc(b.navn)}</div>
+        <div class="muted">Forklar for deg selv, gjerne høyt: hva betyr dette?</div>
+        <div class="row" style="justify-content:center"><button class="btn primary" id="show">Vis svaret</button></div>
+        <div class="reveal" hidden><div class="answer">${esc(b.fork)}</div>
+          <div class="q-label" style="margin-top:14px">Hvor godt kunne du det?</div>
+          <div class="rate"><button class="btn" data-r="2">😃 Kunne det</button><button class="btn" data-r="1">🤔 Delvis</button><button class="btn" data-r="0">😬 Ikke ennå</button></div></div>
+      </div>`;
+    $('#show').onclick = () => { $('#show').hidden = true; el.querySelector('.reveal').hidden = false; };
+    el.querySelectorAll('[data-r]').forEach(x => x.onclick = () => {
+      const r = +x.dataset.r; el.querySelectorAll('[data-r]').forEach(y => y.disabled = true);
+      finish({ok: r > 0, near: r === 1, rec:[[b.id, r === 2]], xp: [1,4,8][r], silent:true,
+        note: r === 2 ? 'Bra! Kortet kommer sjeldnere.' : r === 1 ? 'Kortet kommer igjen snart.' : 'Helt greit! Kortet kommer igjen snart, så lærer du det.'});
+    });
+  },
+  begrepMc(el, b, finish){
+    const others = otherBegreper(b, 3);
+    if(Math.random() < .6){
+      const opts = shuffle([b.navn, ...others.map(o => o.navn)]);
+      mc(el, `<div class="q-label">Hvilket begrep passer med forklaringen?</div><div class="q-text">${esc(b.fork)}</div>`, opts, b.navn,
+        ok => finish({ok, rec:[[b.id,ok]], answer:b.navn}));
+    } else {
+      const opts = shuffle([b.fork, ...others.map(o => o.fork)]);
+      mc(el, `<div class="q-label">Hva betyr begrepet?</div><div class="q-big">${esc(b.navn)}</div>`, opts, b.fork,
+        ok => finish({ok, rec:[[b.id,ok]], answer:b.fork}));
+    }
+  },
+  match(el, _, finish, topic){
+    const items = weightedPick(pool('match', topic), 4);
+    const L = shuffle(items), R = shuffle(items), missed = new Set();
+    let sel = null, done = 0, mistakes = 0;
+    el.innerHTML = `<div class="q-label">Finn parene: trykk på et begrep og forklaringen som hører til</div>
+      <div class="opts">${L.map(v => `<button class="opt" data-s="L" data-id="${v.id}" style="text-align:center;font-weight:800">${esc(v.navn)}</button>`).join('')}</div>
+      <div class="q-label" style="margin-top:14px">Forklaringer</div>
+      <div class="opts">${R.map(v => `<button class="opt" data-s="R" data-id="${v.id}" style="font-size:15px">${esc(v.fork)}</button>`).join('')}</div>`;
+    el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      if(b.disabled) return;
+      if(!sel || sel.dataset.s === b.dataset.s){ if(sel) sel.style.borderColor = ''; sel = b; b.style.borderColor = 'var(--brand)'; return; }
+      if(sel.dataset.id === b.dataset.id){
+        [sel, b].forEach(x => { x.style.borderColor = ''; x.classList.add('right'); x.disabled = true; });
+        done++; beep('tick'); sel = null;
+        if(done === items.length) finish({ok: mistakes <= 1, rec: items.map(v => [v.id, !missed.has(v.id)]), xp: Math.max(4, 12 - mistakes*2),
+          note: mistakes ? `${mistakes} feil underveis.` : 'Ingen feil! 💪'});
+      } else {
+        mistakes++; missed.add(sel.dataset.id); missed.add(b.dataset.id); beep('bad');
+        const a = sel; [a, b].forEach(x => { x.style.borderColor = ''; x.classList.add('wrong'); });
+        setTimeout(() => [a, b].forEach(x => x.classList.remove('wrong')), 500); sel = null;
+      }
+    });
+  },
+  forklar(el, f, finish, topic){
+    const prove = topic === 'prove';
+    el.innerHTML = `<div class="q-label">${TEMA[f.t].e} Forklar med egne ord${prove ? ' · prøvetrening' : ''}</div>
+      <div class="q-text">${esc(f.spm)}</div>
+      <textarea id="txt" placeholder="Skriv forklaringen din her …"></textarea>
+      <div class="tip">Tips: Bruk fagbegreper. Du kan også snakke inn svaret med mikrofonen på tastaturet. Minst ${f.min} fagbegreper gir full pott.</div>
+      <div class="hintbox"></div>
+      <div class="row end">${prove ? '' : '<button class="btn ghost" id="hint">💡 Vis begreper</button>'}<button class="btn primary" id="check">Sjekk forklaringen</button></div>
+      <div id="result"></div>`;
+    const ta = $('#txt'); let hint = false, tries = 0, best = 0;
+    ta.value = S.drafts[f.id] || '';
+    ta.addEventListener('input', () => { S.drafts[f.id] = ta.value; save(); });
+    if($('#hint')) $('#hint').onclick = e => { hint = true; e.target.disabled = true;
+      el.querySelector('.hintbox').innerHTML = `<div class="chips">${shuffle(f.begreper.map(b => b[0])).map(n => `<span class="chip">${esc(n)}</span>`).join('')}</div>`; };
+    const check = () => {
+      const text = ta.value.trim();
+      if(text.split(/\s+/).length < 4){ ta.focus(); $('#result').innerHTML = '<p class="muted">Skriv litt mer først, minst én hel setning.</p>'; return; }
+      tries++;
+      const res = conceptCheck(f, text), found = res.filter(r => r.ok).length;
+      best = Math.max(best, found);
+      const ok = found >= f.min;
+      ta.disabled = true; $('#check').disabled = true; if($('#hint')) $('#hint').disabled = true;
+      $('#result').innerHTML = `
+        <div class="score">${ok ? '✅' : '🔶'} Du brukte ${found} av ${res.length} viktige begreper${ok ? '. Kjempebra!' : ` (minst ${f.min} for full pott)`}</div>
+        <ul class="concepts">${res.map(r => `<li class="${r.ok ? 'done' : ''}">${r.ok ? '✅' : '⬜'} ${esc(r.navn)}</li>`).join('')}</ul>
+        <details ${ok ? '' : 'open'}><summary>Se et eksempel på et godt svar</summary><div class="model">${esc(f.modell)}</div></details>
+        <div class="spell" id="spell"></div>
+        <div class="row end">${ok ? '' : '<button class="btn" id="improve">✏️ Forbedre svaret</button>'}<button class="btn primary" id="done">Ferdig ✓</button></div>`;
+      if($('#improve')) $('#improve').onclick = () => { ta.disabled = false; $('#check').disabled = false; $('#result').innerHTML = ''; ta.focus(); };
+      $('#done').onclick = () => {
+        $('#done').disabled = true;
+        if(ok) S.forklarOk++;
+        delete S.drafts[f.id];
+        finish({ok, near: !ok && found > 0, rec:[[f.id, ok]], xp: found*3 + (ok ? 10 : 0) - (hint ? 5 : 0) + (tries > 1 && ok ? 3 : 0), silent:true, forklar:{spm:f.spm, found, total:res.length, ok},
+          note: ok ? 'Godt forklart med fagbegreper!' : 'Les eksempelsvaret og legg merke til begrepene du manglet. Oppgaven kommer igjen.'});
+      };
+      const sp = fagordCheck(text), box = $('#spell');
+      if(sp.length){
+        let html = '', pos = 0;
+        sp.forEach(m => { html += esc(text.slice(pos, m.offset)) + `<mark>${esc(text.substr(m.offset, m.length))}</mark>`; pos = m.offset + m.length; });
+        html += esc(text.slice(pos));
+        box.innerHTML = `<div class="q-label">Sjekk stavingen av fagordene:</div><div class="marked">${html}</div>
+          <ul>${sp.map(m => `<li><b style="color:var(--bad)">${esc(text.substr(m.offset, m.length))}</b>: mente du fagordet <span class="sugg">${esc(m.base)}</span>? Sjekk stavingen.</li>`).join('')}</ul>`;
+      }
+    };
+    $('#check').onclick = check;
+  },
+  rekke(el, r, finish){
+    let bank = shuffle(r.steg.map((s,i) => ({s,i})));
+    if(bank.every((x,k) => x.i === k)) bank = bank.reverse();
+    let line = [], locked = false;
+    el.innerHTML = `<div class="q-label">${TEMA[r.t].e} Beskriv prosessen</div><div class="q-text">${esc(r.tittel)}</div>
+      <ol class="steps"></ol><div class="bank"></div>
+      <div class="row end"><button class="btn ghost" id="reset">↺ Start på nytt</button><button class="btn primary" id="check" disabled>Sjekk</button></div>`;
+    const steps = el.querySelector('.steps'), bk = el.querySelector('.bank'), chk = $('#check');
+    const draw = () => {
+      steps.innerHTML = line.map((x,k) => `<li><button data-k="${k}">${esc(x.s)}</button></li>`).join('');
+      bk.innerHTML = bank.map((x,k) => `<button data-k="${k}">${esc(x.s)}</button>`).join('');
+      steps.querySelectorAll('button').forEach(b => b.onclick = () => { if(locked) return; bank.push(...line.splice(+b.dataset.k,1)); draw(); });
+      bk.querySelectorAll('button').forEach(b => b.onclick = () => { if(locked) return; line.push(...bank.splice(+b.dataset.k,1)); beep('tick'); draw(); });
+      chk.disabled = bank.length > 0 || locked;
+    };
+    $('#reset').onclick = () => { if(locked) return; bank = shuffle(bank.concat(line)); line = []; draw(); };
+    chk.onclick = () => {
+      locked = true;
+      const right = line.filter((x,k) => x.i === k).length, ok = right === line.length;
+      [...steps.children].forEach((li,k) => li.classList.add(line[k].i === k ? 'right' : 'wrong'));
+      el.querySelectorAll('button').forEach(b => b.disabled = true);
+      finish({ok, near: !ok && right >= line.length - 2, rec:[[r.id, ok]], xp: right*2 + (ok ? 6 : 0),
+        note: ok ? '' : '<b>Riktig rekkefølge:</b><ol style="margin:6px 0 0;padding-left:22px">' + r.steg.map(s => `<li>${esc(s)}</li>`).join('') + '</ol>'});
+    };
+    draw();
+  },
+  sorter(el, s, finish){
+    const per = Math.min(6, s.ting.length);
+    const items = shuffle(s.ting).slice(0, per);
+    let i = 0, mistakes = 0; const res = [];
+    el.innerHTML = `<div class="q-label">${TEMA[s.t].e} Sorter</div><div class="q-text">${esc(s.tittel)}</div>
+      <div class="sortcard"></div><div class="buckets ${s.kurver.length === 2 ? 'n2' : ''}">${s.kurver.map((k,j) => `<button class="btn" data-j="${j}">${esc(k)}</button>`).join('')}</div>
+      <div class="dots">${items.map(() => '<span></span>').join('')}</div><div class="explain" hidden></div>`;
+    const card = el.querySelector('.sortcard'), dots = [...el.querySelectorAll('.dots span')], bs = [...el.querySelectorAll('.buckets .btn')];
+    const show = () => { card.className = 'sortcard'; card.textContent = items[i][0]; bs.forEach(b => b.disabled = false); };
+    bs.forEach(b => b.onclick = () => {
+      const ok = +b.dataset.j === items[i][1];
+      bs.forEach(x => x.disabled = true);
+      card.classList.add(ok ? 'right' : 'wrong'); dots[i].className = ok ? 'ok' : 'bad';
+      if(!ok){ mistakes++; card.textContent = `${items[i][0]} → ${s.kurver[items[i][1]]}`; beep('bad'); } else beep('tick');
+      res.push([items[i][0], ok]);
+      setTimeout(() => {
+        i++;
+        if(i < items.length) return show();
+        const ok2 = mistakes <= 1;
+        finish({ok: ok2, near: !ok2 && mistakes <= 2, rec:[[s.id, ok2]], xp: (items.length - mistakes)*2 + (mistakes ? 0 : 5),
+          note: mistakes ? 'Disse var feil: ' + items.filter((x,k) => !res[k][1]).map(x => `<b>${esc(x[0])}</b> → ${esc(s.kurver[x[1]])}`).join(', ') : 'Alle riktige! 💪'});
+      }, ok ? 450 : 1400);
+    });
+    show();
+  },
+  hvorfor(el, h, finish){
+    const opts = shuffle(h.svar);
+    mc(el, `<div class="q-label">${TEMA[h.t].e} Hvorfor? Hva skjer?</div><div class="q-text">${esc(h.spm)}</div>`, opts, h.svar[0],
+      ok => finish({ok, rec:[[h.id,ok]], answer: ok ? null : h.svar[0], note: '💡 ' + esc(h.fork)}));
+  },
+  sant(el, u, finish){
+    el.innerHTML = `<div class="q-label">${TEMA[u.t].e} Sant eller usant?</div><div class="q-text">${esc(u.p)}</div>
+      <div class="buckets n2"><button class="btn" data-v="1" style="min-height:70px;font-size:20px">✅ Sant</button><button class="btn" data-v="0" style="min-height:70px;font-size:20px">❌ Usant</button></div>`;
+    el.querySelectorAll('[data-v]').forEach(b => b.onclick = () => {
+      const ok = (b.dataset.v === '1') === u.sann;
+      el.querySelectorAll('[data-v]').forEach(x => x.disabled = true);
+      b.style.outline = `3px solid var(${ok ? '--ok' : '--bad'})`;
+      finish({ok, rec:[[u.id,ok]], answer: ok ? null : (u.sann ? 'Sant' : 'Usant'), note: '💡 ' + esc(u.fork)});
+    });
+  },
+  likning(el, l, finish){
+    const slots = [...l.inn.map(() => 'inn'), ...l.ut.map(() => 'ut')], fill = slots.map(() => null);
+    const tiles = shuffle([...l.inn, ...l.ut, ...l.lure]);
+    el.innerHTML = `<div class="q-label">${TEMA[l.t].e} Bygg likningen</div><div class="q-text">${esc(l.tittel)}</div>
+      <div class="eq"></div><div class="tiles">${tiles.map((t,k) => `<button class="tile" data-k="${k}">${esc(t)}</button>`).join('')}</div>
+      <div class="row end"><button class="btn primary" id="check" disabled>Sjekk</button></div>`;
+    const eq = el.querySelector('.eq'), tb = [...el.querySelectorAll('.tile')];
+    let locked = false;
+    const draw = () => {
+      const part = (side) => slots.map((s,k) => s === side ? k : -1).filter(k => k >= 0)
+        .map(k => `<div class="slot ${fill[k] !== null ? 'filled' : ''}" data-k="${k}">${fill[k] !== null ? esc(tiles[fill[k]]) : ''}</div>`).join('<span>+</span>');
+      eq.innerHTML = part('inn') + `<div class="arrow">${l.over ? esc(l.over) : '&nbsp;'}<b>→</b></div>` + part('ut');
+      eq.querySelectorAll('.slot').forEach(s => s.onclick = () => { if(locked) return; const k = +s.dataset.k; if(fill[k] !== null){ tb[fill[k]].disabled = false; fill[k] = null; draw(); } });
+      $('#check').disabled = fill.some(f => f === null) || locked;
+    };
+    tb.forEach(b => b.onclick = () => {
+      if(locked) return; const k = fill.indexOf(null); if(k < 0) return;
+      fill[k] = +b.dataset.k; b.disabled = true; beep('tick'); draw();
+    });
+    $('#check').onclick = () => {
+      locked = true;
+      const got = side => slots.map((s,k) => s === side ? tiles[fill[k]] : null).filter(x => x !== null);
+      const same = (a, b) => a.length === b.length && a.slice().sort().join('|') === b.slice().sort().join('|');
+      const okIn = same(got('inn'), l.inn), okUt = same(got('ut'), l.ut), ok = okIn && okUt;
+      eq.querySelectorAll('.slot').forEach(s => { const k = +s.dataset.k; const want = slots[k] === 'inn' ? l.inn : l.ut; s.classList.add(want.includes(tiles[fill[k]]) ? 'right' : 'wrong'); });
+      tb.forEach(b => b.disabled = true);
+      finish({ok, near: !ok && (okIn || okUt), rec:[[l.id, ok]], xp: ok ? 12 : (okIn || okUt) ? 4 : 0,
+        answer: ok ? null : `${l.inn.join(' + ')} → ${l.ut.join(' + ')}`, note: l.over ? `Fotosyntesen trenger ${l.over}, som klorofyllet fanger opp.` : 'Energien som frigjøres, bruker cellene til alt de gjør.'});
+    };
+    draw();
+  },
+  figur(el, g, finish){
+    const qs = shuffle(g.deler).slice(0, 3).map((d,k) => ({d, mode: k % 2 === 0 ? 'name' : 'click'}));
+    let qi = 0, mistakes = 0;
+    const ask = () => {
+      const q = qs[qi], [nr, navn] = q.d;
+      el.innerHTML = `<div class="q-label">${TEMA[g.t].e} Figur: ${esc(g.tittel)} · ${qi+1} av ${qs.length}</div>
+        ${q.mode === 'name' ? `<div class="q-text">Hva heter delen med nummer ${nr}?</div>` : `<div class="q-text">Trykk på: ${esc(navn)}</div>`}
+        ${figSvg(g, q.mode === 'click' ? 'click' : '')}<div class="qbox"></div>`;
+      if(q.mode === 'name') el.querySelector(`.mk[data-nr="${nr}"]`).classList.add('ask');
+      const next = ok => {
+        if(!ok) mistakes++;
+        beep(ok ? 'tick' : 'bad');
+        const nb = document.createElement('div'); nb.className = 'row end';
+        nb.innerHTML = `<button class="btn primary">${qi < qs.length - 1 ? 'Neste ➜' : 'Ferdig ✓'}</button>`;
+        el.append(nb);
+        const b = nb.querySelector('button'); b.focus();
+        b.onclick = () => {
+          b.disabled = true; qi++;
+          if(qi < qs.length) return ask();
+          const ok2 = mistakes === 0; if(ok2) S.figurOk++;
+          el.querySelectorAll('.mk').forEach(m => m.classList.remove('ask','right','wrong'));
+          el.querySelector('.qbox').innerHTML = `<div class="figkey">${g.deler.map(([n,nm]) => `<div><b>${n}</b> ${esc(nm)}</div>`).join('')}</div>`;
+          nb.remove();
+          finish({ok: mistakes <= 1, near: mistakes === 1, rec:[[g.id, ok2]], xp: (3 - mistakes)*4 + (ok2 ? 4 : 0), silent:true,
+            note: ok2 ? 'Alle riktige! Se navnene på alle delene i figuren.' : `${mistakes} feil. Se navnene på alle delene i figuren over.`});
+        };
+      };
+      if(q.mode === 'name'){
+        const names = shuffle([navn, ...shuffle(g.deler.filter(d => d[0] !== nr)).slice(0,3).map(d => d[1])]);
+        const box = el.querySelector('.qbox');
+        box.innerHTML = `<div class="opts" style="margin-top:12px">${names.map(n => `<button class="opt">${esc(n)}</button>`).join('')}</div>`;
+        box.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+          const ok = b.textContent === navn;
+          box.querySelectorAll('.opt').forEach(x => { x.disabled = true; if(x.textContent === navn) x.classList.add('right'); });
+          if(!ok) b.classList.add('wrong');
+          next(ok);
+        });
+      } else {
+        let done = false;
+        el.querySelectorAll('.mk').forEach(m => m.addEventListener('click', () => {
+          if(done) return; done = true;
+          const ok = +m.dataset.nr === nr;
+          m.classList.add(ok ? 'right' : 'wrong');
+          if(!ok){ el.querySelector(`.mk[data-nr="${nr}"]`).classList.add('right');
+            el.querySelector('.qbox').innerHTML = `<p class="muted">Du trykket på ${esc(g.deler.find(d => d[0] === +m.dataset.nr)[1])}. Riktig er nummer ${nr}.</p>`; }
+          next(ok);
+        }));
+      }
+    };
+    ask();
+  },
+};
+
+/* =====================================================================
+   ØKTER
+   ===================================================================== */
+const MODES = {
+  tema:  {kinds:['kort','begrepMc','forklar','forklar','rekke','sorter','hvorfor','hvorfor','sant','likning','figur','match'], total:8},
+  mix:   {kinds:['kort','begrepMc','forklar','forklar','rekke','sorter','hvorfor','hvorfor','sant','likning','figur','match'], total:10},
+  prove: {kinds:['forklar'], total:4},
+  kort:  {kinds:['kort'], total:10},
+};
+const ONCE = ['match','likning','figur','rekke','sorter'];
+const RETRY = ['kort','begrepMc','hvorfor','sant','forklar'];
+let SES = null;
+function startSession(topic){
+  const mode = MODES[topic] || MODES.tema;
+  SES = {topic, mode, i:0, total:mode.total, correct:0, combo:0, xp:0, lastKind:null, recent:[], retry:[], kindCount:{}, startLevel:level(), forklar:[]};
+  nextTask();
+}
+function chooseTask(){
+  const kinds = SES.mode.kinds.filter(k => (k !== SES.lastKind || SES.mode.kinds.length === 1) &&
+    !(ONCE.includes(k) && SES.kindCount[k]) && pool(k, SES.topic).length >= (k === 'match' ? 4 : 1));
+  for(let tries = 0; tries < 30; tries++){
+    const k = rnd(kinds);
+    if(k === 'match') return {kind:k, item:null};
+    const p = pool(k, SES.topic).filter(x => !SES.recent.includes(x.id));
+    if(p.length) return {kind:k, item:weightedPick(p,1)[0]};
+  }
+  const k = rnd(kinds); return {kind:k, item: k === 'match' ? null : rnd(pool(k, SES.topic))};
+}
+function nextTask(){
+  $('.fb')?.remove();
+  if(SES.i >= SES.total && SES.retry.length && SES.total < SES.mode.total + 3 && SES.topic !== 'prove'){ SES.total++; SES.retry[0].due = 0; }
+  if(SES.i >= SES.total) return endSession();
+  const di = SES.retry.findIndex(r => r.due <= SES.i);
+  const task = di >= 0 ? SES.retry.splice(di,1)[0] : chooseTask();
+  SES.current = task; SES.lastKind = task.kind; SES.kindCount[task.kind] = (SES.kindCount[task.kind]||0) + 1;
+  if(task.item){ SES.recent.push(task.item.id); SES.recent = SES.recent.slice(-6); }
+  app.innerHTML = `
+    <div class="sbar"><button class="icon" id="quit" aria-label="Avslutt">✕</button>
+      <div class="bar"><div style="width:${100*SES.i/SES.total}%"></div></div>
+      <div class="combo ${SES.combo >= 3 ? 'on' : ''}">${SES.combo >= 2 ? '🔥 '+SES.combo : ''}</div></div>
+    ${SES.i >= SES.mode.total ? '<p class="muted" style="margin:-6px 0 10px">🔁 Ekstrarunde: noe du bommet på</p>' : ''}
+    <div class="card task" id="task"></div>`;
+  $('#quit').onclick = () => { if(confirm('Avslutte økta? XP-en du har fått, beholder du.')){ save(); renderHome(); } };
+  RUN[task.kind]($('#task'), task.item, onResult, SES.topic);
+  window.scrollTo(0,0);
+}
+const PRAISE = ['Riktig!','Supert!','Bra jobba!','Kjempebra!','Helt rått!','Akkurat!'];
+const COMFORT = ['Ikke helt','Nesten!','Godt forsøk','Ikke denne gangen'];
+function onResult(res){
+  (res.rec||[]).forEach(([id,ok]) => record(id, ok));
+  if(res.forklar) SES.forklar.push(res.forklar);
+  let gained = Math.max(0, res.xp ?? (res.ok ? 10 : 0));
+  if(res.ok && !res.near){ SES.correct++; SES.combo++; S.maxCombo = Math.max(S.maxCombo, SES.combo); if(SES.combo >= 3) gained += 5; }
+  else if(!res.ok){ SES.combo = 0; }
+  if(!res.silent) beep(res.ok ? 'ok' : 'bad');
+  if(res.ok && ([3,5,10,15].includes(SES.combo) || res.xp >= 20)) burst();
+  if((!res.ok || res.near) && SES.current.item && RETRY.includes(SES.current.kind) && SES.topic !== 'prove')
+    SES.retry.push({kind:SES.current.kind, item:SES.current.item, due:SES.i+3});
+  SES.xp += gained; S.xp += gained; SES.i++; save();
+  const fb = document.createElement('div');
+  fb.className = 'fb ' + (res.near ? 'near' : res.ok ? 'ok' : 'bad');
+  fb.innerHTML = `<div class="in"><div class="msg">
+      <div class="title">${res.near ? 'Nesten!' : res.ok ? rnd(PRAISE) : rnd(COMFORT)}${gained ? `<span class="xp">+${gained} XP</span>` : ''}${res.ok && !res.near && SES.combo >= 3 ? ` <span class="xp">🔥 ${SES.combo} på rad!</span>` : ''}</div>
+      ${res.answer ? `<div>Riktig svar: <b>${esc(res.answer)}</b></div>` : ''}
+      ${res.note ? `<div>${res.note}</div>` : ''}
+    </div><button class="btn primary" id="next">Fortsett ➜</button></div>`;
+  document.body.append(fb);
+  const nb = $('#next'); nb.onclick = nextTask; nb.focus();
+}
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && !e.defaultPrevented && $('#next') && document.activeElement?.id !== 'next' && document.activeElement?.tagName !== 'TEXTAREA'){ e.preventDefault(); nextTask(); }
+});
+function endSession(){
+  $('.fb')?.remove();
+  S.sessions++;
+  if(SES.topic === 'prove') S.proveDone++;
+  S.topicDone[SES.topic] = (S.topicDone[SES.topic]||0) + 1;
+  markDay(); const newM = checkMedals(); save();
+  const up = level() > SES.startLevel, L = levelInfo(), pct = SES.correct / SES.total;
+  beep('win'); burst(up || newM.length ? 30 : 16);
+  const review = SES.forklar.length ? `<div class="review"><div class="q-label">Forklaringene dine</div>${SES.forklar.map(f =>
+    `<div class="explain">${f.ok ? '✅' : '🔶'} ${esc(f.spm)}<br><span class="muted">${f.found} av ${f.total} begreper</span></div>`).join('')}</div>` : '';
+  app.innerHTML = `<div class="card end">
+      <div class="big">${pct >= .85 ? '🏆' : pct >= .6 ? '🌟' : '💪'}</div>
+      <h2>${pct >= .85 ? 'Helt rått!' : pct >= .6 ? 'Kjempebra jobba!' : 'Bra! Det du bommet på, kommer igjen.'}</h2>
+      <div class="stat">${SES.correct} av ${SES.total} helt riktige</div>
+      <div class="stat" style="color:var(--accent)">+${SES.xp} XP</div>
+      ${up ? `<div class="newmedal">⬆️ Nytt nivå: ${L.l} – ${L.rank}!</div>` : ''}
+      ${newM.map(m => `<div class="newmedal">${m.e} Ny medalje: ${m.name}</div>`).join('')}
+      ${review}
+      <div class="row"><button class="btn primary" id="again">En runde til</button><button class="btn" id="home">Hjem</button></div>
+    </div>`;
+  const t = SES.topic; $('#again').onclick = () => startSession(t); $('#home').onclick = renderHome; $('#again').focus();
+}
+
+/* ---------- 60 sekunder: begrepsjakt ---------- */
+let CH = null;
+function stopChallenge(){ if(CH){ clearInterval(CH.timer); CH = null; } }
+function startChallenge(){
+  stopChallenge(); CH = {score:0, left:60, timer:null, startLevel:level()};
+  app.innerHTML = `<div class="sbar"><button class="icon" id="quit" aria-label="Avslutt">✕</button><div class="bar"><div id="tbar" style="width:100%"></div></div></div>
+    <div class="chal-top"><span class="timer" id="time">⏱ 60</span><span>⭐ <span id="score">0</span></span></div><div class="card task" id="task"></div>`;
+  $('#quit').onclick = () => { stopChallenge(); renderHome(); };
+  CH.timer = setInterval(() => {
+    CH.left--; $('#time').textContent = '⏱ ' + CH.left; $('#tbar').style.width = (100*CH.left/60) + '%';
+    if(CH.left <= 10) $('#time').classList.add('low');
+    if(CH.left <= 0) endChallenge();
+  }, 1000);
+  chalQ();
+}
+function chalQ(){
+  if(!CH) return;
+  const b = rnd(BEGREPER), others = otherBegreper(b, 3);
+  mc($('#task'), `<div class="q-label">Hvilket begrep?</div><div class="q-text">${esc(b.fork)}</div>`, shuffle([b.navn, ...others.map(o => o.navn)]), b.navn, ok => {
+    if(!CH) return; record(b.id, ok);
+    if(ok){ CH.score++; $('#score').textContent = CH.score; beep('ok'); } else beep('bad');
+    setTimeout(chalQ, ok ? 300 : 1100);
+  });
+}
+function endChallenge(){
+  const c = CH; stopChallenge();
+  const rec = c.score > S.best60, xp = c.score * 3;
+  if(rec) S.best60 = c.score; S.xp += xp; markDay();
+  const newM = checkMedals(); save(); beep('win'); burst(rec ? 30 : 14);
+  app.innerHTML = `<div class="card end"><div class="big">${rec ? '🏆' : '⚡'}</div><h2>${rec ? 'Ny rekord!' : 'Tiden er ute!'}</h2>
+    <div class="stat">${c.score} riktige på 60 sekunder</div><div class="muted">Rekorden din: ${S.best60}</div>
+    <div class="stat" style="color:var(--accent)">+${xp} XP</div>
+    ${newM.map(m => `<div class="newmedal">${m.e} Ny medalje: ${m.name}</div>`).join('')}
+    <div class="row"><button class="btn primary" id="again">Prøv igjen</button><button class="btn" id="home">Hjem</button></div></div>`;
+  $('#again').onclick = startChallenge; $('#home').onclick = renderHome; $('#again').focus();
+}
+
+/* =====================================================================
+   FORSIDE
+   ===================================================================== */
+function topicIds(t){
+  return [...BEGREPER, ...P.forklar, ...P.rekkefolge, ...P.sorter, ...P.hvorfor, ...SANT, ...P.likninger, ...P.figurer].filter(x => x.t === t).map(x => x.id);
+}
+function mastery(t){ const ids = topicIds(t); return ids.length ? Math.round(100 * ids.filter(id => st(id).s >= 1).length / ids.length) : 0; }
+function renderHome(){
+  stopChallenge();
+  const L = levelInfo(), d = daysToTest(), streak = streakNow();
+  const countdown = d > 1 ? `⏳ ${d} dager til prøven` : d === 1 ? '⏳ Prøven er i morgen!' : d === 0 ? '🍀 Prøven er i dag. Lykke til!' : '';
+  app.innerHTML = `
+    <header class="top">
+      <div class="brand"><a class="icon" href="../" aria-label="Alle fag">←</a> 🔬 Naturfag</div>
+      <button class="icon" id="snd" aria-label="Lyd av/på">${S.sound ? '🔊' : '🔇'}</button>
+    </header>
+    <section class="card hero">
+      <div class="muted" style="font-weight:700">${esc(P.tittel)}</div>
+      <div class="lvl"><span class="lvlnum">Nivå ${L.l}</span><span class="rank">${L.rank}</span></div>
+      <div class="bar"><div style="width:${Math.min(100, 100*L.cur/L.need)}%"></div></div>
+      <small class="muted">${S.xp} XP · ${L.need - L.cur} XP til neste nivå</small>
+      <div class="pills">
+        ${streak ? `<span class="pill hot">🔥 ${streak} ${streak === 1 ? 'dag' : 'dager'} på rad</span>` : '<span class="pill">🔥 Start en streak i dag!</span>'}
+        ${countdown ? `<span class="pill">${countdown}</span>` : ''}
+      </div>
+    </section>
+
+    <h2 class="sec">Spesialøkter</h2>
+    <div class="grid">
+      <button class="topic" data-topic="mix"><span class="em">🎲</span><b>Blandet</b><small>Litt av alt. Best rett før prøven!</small></button>
+      <button class="topic" data-topic="prove"><span class="em">📝</span><b>Prøvetrening</b><small>4 forklaringsoppgaver som på prøven, uten hint</small></button>
+      <button class="topic" data-topic="kort"><span class="em">🃏</span><b>Begrepskort</b><small>Forklar begrepet for deg selv, og sjekk svaret</small></button>
+      <button class="topic" id="chal"><span class="em">⚡</span><b>60 sekunder</b><small>Begrepsjakt mot klokka${S.best60 ? ' · rekord ' + S.best60 : ''}</small></button>
+    </div>
+
+    <h2 class="sec">Øv på tema</h2>
+    <div class="grid">
+      ${P.temaer.map(t => `<button class="topic" data-topic="${t.id}"><span class="em">${t.e}</span><b>${esc(t.navn)}</b><small>${esc(t.desc)}</small>${t.kilde ? `<small style="color:var(--near)">ℹ️ ${esc(t.kilde)}</small>` : ''}
+        <div class="bar"><div style="width:${mastery(t.id)}%"></div></div><small>${mastery(t.id)} % øvd riktig</small></button>`).join('')}
+    </div>
+
+    <h2 class="sec">Medaljer (${S.medals.length}/${MEDALS.length})</h2>
+    <div class="medals">${MEDALS.map(m => `<div class="medal ${S.medals.includes(m.id) ? '' : 'locked'}"><span class="e">${m.e}</span><span><b>${m.name}</b><span class="muted">${m.desc}</span></span></div>`).join('')}</div>
+    <footer><button class="link" id="reset">Nullstill all fremgang i naturfag</button></footer>`;
+  $('#snd').onclick = () => { S.sound = !S.sound; save(); renderHome(); };
+  app.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => startSession(b.dataset.topic));
+  $('#chal').onclick = startChallenge;
+  $('#reset').onclick = () => { if(confirm('Vil du slette all fremgang i naturfag?')){ S = JSON.parse(JSON.stringify(DEFAULT)); save(); renderHome(); } };
+  window.scrollTo(0,0);
+}
+renderHome();
+</script>
 </body>
 </html>
