@@ -1,5 +1,13 @@
-# Bare selve appen publiseres. Bilder fra boka, PDF og instruksjonsfila blir liggende lokalt.
+# Hviteliste: bare det som står her, blir publisert.
+# Bokbilder, PDF-er (kilder/) og instruksjonsfiler (CLAUDE.md) blir liggende lokalt.
 *
+!*/
 !.gitignore
 !index.html
 !tysk-trening.html
+!tysk/index.html
+!naturfag/*.html
+!naturfag/*.js
+!naturfag/*.css
+!naturfag/*.json
+kilder/

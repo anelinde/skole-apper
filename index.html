@@ -1,4 +1,61 @@
 <!doctype html>
-<html lang="no"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tysk-trening</title><meta http-equiv="refresh" content="0; url=tysk-trening.html"></head>
-<body><a href="tysk-trening.html">Åpne Tysk-trening</a></body></html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skole-apper</title>
+<style>
+:root{
+  --bg:#f5f3ff; --card:#ffffff; --ink:#1f1b3a; --muted:#6b6790; --line:#e4e0f5; --chip:#efeafe;
+  --brand:#6c4cf1; --accent:#ff8a3d;
+  --shadow:0 2px 0 rgba(31,27,58,.08), 0 8px 24px rgba(31,27,58,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14122a; --card:#1f1c3b; --ink:#f1efff; --muted:#a8a3cc; --line:#34305a; --chip:#2c2852;
+    --brand:#8f74ff; --accent:#ff9b57;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:720px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:28px;margin:0 0 4px}
+.lead{color:var(--muted);margin:0 0 24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.app{display:grid;gap:6px;padding:20px;border-radius:20px;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow);color:inherit;text-decoration:none}
+a.app:hover{border-color:var(--brand)}
+.app .em{font-size:40px;line-height:1}
+.app b{font-size:20px}
+.app small{color:var(--muted);font-size:15px}
+.tag{justify-self:start;background:var(--chip);border-radius:99px;padding:4px 10px;font-size:13px;font-weight:700}
+.tag.new{background:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+<main>
+  <h1>📚 Skole-apper</h1>
+  <p class="lead">Velg hva du vil øve på.</p>
+  <div class="grid">
+    <a class="app" href="naturfag/">
+      <span class="em">🔬</span><b>Naturfag</b>
+      <small>Øving til neste prøve</small>
+      <span class="tag new">Kommer snart</span>
+    </a>
+    <a class="app" href="tysk/">
+      <span class="em">🇩🇪</span><b>Tysk</b>
+      <small>haben &amp; sein, været, ferien</small>
+      <span class="tag" id="tysk-xp">Prøve uke 42</span>
+    </a>
+  </div>
+</main>
+<script>
+// Viser XP fra tysk-appen hvis den finnes på denne enheten
+try{
+  const t = JSON.parse(localStorage.getItem('tyskTrening_v1') || 'null');
+  if(t && t.xp) document.getElementById('tysk-xp').textContent = '⭐ ' + t.xp + ' XP';
+}catch(e){}
+</script>
+</body>
+</html>
