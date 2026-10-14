@@ -95,6 +95,18 @@ textarea{width:100%;min-height:170px;font:inherit;font-size:18px;padding:14px;bo
 textarea:focus{outline:none;border-color:var(--brand)}
 textarea:disabled{opacity:.85}
 .tip{font-size:14px;color:var(--muted);margin-top:6px}
+.guard{font-size:14px;color:var(--near);font-weight:700;margin-top:6px}
+.guard:empty{display:none}
+input.answer{width:100%;font:inherit;font-size:20px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+input.answer:focus{outline:none;border-color:var(--brand)}
+input.answer.right{border-color:var(--ok);background:var(--okbg)}
+input.answer.wrong{border-color:var(--bad);background:var(--badbg)}
+.startline{font-size:20px;font-weight:800;margin:6px 0 10px}
+.blank{display:inline-block;min-width:110px;border-bottom:3px solid var(--brand);margin:0 4px}
+.glist{display:grid;gap:8px}
+.gitem{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.gitem b{font-size:17px}
+.gitem .st{float:right;font-size:14px}
 .concepts{list-style:none;padding:0;margin:12px 0;display:grid;gap:6px}
 .concepts li{display:flex;gap:8px;align-items:flex-start}
 .concepts li.done{color:var(--ok);font-weight:700}
@@ -408,6 +420,46 @@ function fagordCheck(t){
 }
 
 /* =====================================================================
+   SKRIVETRENING: han skal skrive selv (de skriver for hånd på prøven).
+   Autokorrektur og stavehjelp er skrudd av, og store tekstbiter som limes
+   inn eller kommer fra diktering på én gang, blir avvist.
+   ===================================================================== */
+const WRITE_ATTR = 'autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false"';
+function guardInput(inp, msgEl){
+  inp.addEventListener('beforeinput', e => {
+    const t = e.inputType || '';
+    if(/^insertFrom(Paste|Drop|Yank)/.test(t) || t === 'insertReplacementText' && (e.data || '').length > 25 || (e.data && e.data.length > 25)){
+      e.preventDefault();
+      if(msgEl) msgEl.textContent = '✍️ Skriv svaret selv med tastaturet. På prøven skriver du for hånd!';
+    }
+  });
+  inp.addEventListener('paste', e => { e.preventDefault(); if(msgEl) msgEl.textContent = '✍️ Innliming er skrudd av. Skriv svaret selv!'; });
+}
+function spellHtml(text){
+  const sp = fagordCheck(text); if(!sp.length) return '';
+  let html = '', pos = 0;
+  sp.forEach(m => { html += esc(text.slice(pos, m.offset)) + `<mark>${esc(text.substr(m.offset, m.length))}</mark>`; pos = m.offset + m.length; });
+  html += esc(text.slice(pos));
+  return `<div class="spell"><div class="q-label">Sjekk stavingen av fagordene:</div><div class="marked">${html}</div>
+    <ul>${sp.map(m => `<li><b style="color:var(--bad)">${esc(text.substr(m.offset, m.length))}</b>: mente du fagordet <span class="sugg">${esc(m.base)}</span>? Sjekk stavingen.</li>`).join('')}</ul></div>`;
+}
+const normA = s => s.toLowerCase().replace(/[.,!?;:«»"()]/g,'').replace(/\s+/g,' ').trim();
+function begrepSvar(b){
+  const n = b.navn.toLowerCase(), out = new Set([n]);
+  const m = n.match(/^(.*?)\s*\((.*)\)$/);
+  if(m){ out.add(m[1].trim()); out.add(m[2].trim()); }
+  [...out].forEach(x => { const y = x.replace(/^(det|den) /,''); out.add(y); });
+  return [...out];
+}
+// Ett-ords-svar: riktig, nesten (skrivefeil) eller feil
+function gradeWord(input, answers){
+  const a = normA(input); if(!a) return null;
+  if(answers.some(x => normA(x) === a)) return 'ok';
+  if(answers.some(x => { const y = normA(x); return osa(a, y) <= (y.length >= 6 ? 2 : 1); })) return 'near';
+  return 'bad';
+}
+
+/* =====================================================================
    BEGREPSSJEKK for forklaringer
    ===================================================================== */
 function words(t){ return t.toLowerCase().replace(/[^\p{L}\p{N}₀-₉ ]+/gu,' ').split(/\s+/).filter(Boolean); }
@@ -428,7 +480,7 @@ function conceptCheck(task, text){
 /* =====================================================================
    OPPGAVETYPER – hver kaller finish({ok, near, rec, xp, answer, note})
    ===================================================================== */
-const inTopic = (arr, topic) => topic === 'mix' || topic === 'prove' || topic === 'kort' ? arr : arr.filter(x => x.t === topic);
+const inTopic = (arr, topic) => ['mix','prove','kort','skriv'].includes(topic) ? arr : arr.filter(x => x.t === topic);
 function pool(kind, topic){
   switch(kind){
     case 'kort': case 'begrepMc': case 'match': return inTopic(BEGREPER, topic);
@@ -439,6 +491,11 @@ function pool(kind, topic){
     case 'sant': return inTopic(SANT, topic);
     case 'likning': return inTopic(P.likninger, topic);
     case 'figur': return inTopic(P.figurer, topic);
+    case 'kortsvar': return inTopic(P.kortsvar, topic);
+    case 'fullfor': return inTopic(P.fullfor, topic);
+    case 'brukord': return inTopic(P.brukord, topic);
+    case 'fyllinn': return inTopic(P.fyllinn, topic);
+    case 'skrivBegrep': return inTopic(BEGREPER, topic).map(b => ({id:'sb-'+b.id, t:b.t, b}));
   }
   return [];
 }
@@ -515,12 +572,14 @@ const RUN = {
     const prove = topic === 'prove';
     el.innerHTML = `<div class="q-label">${TEMA[f.t].e} Forklar med egne ord${prove ? ' · prøvetrening' : ''}</div>
       <div class="q-text">${esc(f.spm)}</div>
-      <textarea id="txt" placeholder="Skriv forklaringen din her …"></textarea>
-      <div class="tip">Tips: Bruk fagbegreper. Du kan også snakke inn svaret med mikrofonen på tastaturet. Minst ${f.min} fagbegreper gir full pott.</div>
+      <textarea id="txt" ${WRITE_ATTR} placeholder="Skriv forklaringen din her …"></textarea>
+      <div class="guard"></div>
+      <div class="tip">Skriv selv, og bruk fagbegreper. Minst ${f.min} fagbegreper gir full pott.</div>
       <div class="hintbox"></div>
       <div class="row end">${prove ? '' : '<button class="btn ghost" id="hint">💡 Vis begreper</button>'}<button class="btn primary" id="check">Sjekk forklaringen</button></div>
       <div id="result"></div>`;
     const ta = $('#txt'); let hint = false, tries = 0, best = 0;
+    guardInput(ta, el.querySelector('.guard'));
     ta.value = S.drafts[f.id] || '';
     ta.addEventListener('input', () => { S.drafts[f.id] = ta.value; save(); });
     if($('#hint')) $('#hint').onclick = e => { hint = true; e.target.disabled = true;
@@ -557,6 +616,34 @@ const RUN = {
       }
     };
     $('#check').onclick = check;
+  },
+  kortsvar(el, k, finish, topic){
+    shortWrite(el, k, finish, {head:`<div class="q-label">${TEMA[k.t].e} Svar kort med fagbegreper</div><div class="q-text">${esc(k.spm)}</div>`,
+      begreper:k.begreper, min:k.min, eks:k.modell, orden:k.orden, hint: topic !== 'prove'});
+  },
+  fullfor(el, v, finish){
+    shortWrite(el, v, finish, {head:`<div class="q-label">${TEMA[v.t].e} Fullfør setningen med fagbegreper</div><div class="startline">${esc(v.start)}</div>`,
+      begreper:v.begreper, min:v.min, eks:v.eks, placeholder:'Skriv resten av setningen …', hint:true});
+  },
+  brukord(el, z, finish){
+    shortWrite(el, z, finish, {head:`<div class="q-label">${TEMA[z.t].e} Skriv 1–2 setninger der du bruker alle ordene</div>
+      <div class="chips">${z.ord.map(o => `<span class="chip">${esc(o[0])}</span>`).join('')}</div>`,
+      begreper:z.ord, min:z.ord.length, eks:z.eks, minWords:6});
+  },
+  fyllinn(el, y, finish){
+    const [a, b] = y.s.split('___');
+    el.innerHTML = `<div class="q-label">${TEMA[y.t].e} Skriv inn fagordet som mangler</div>
+      <div class="q-text">${esc(a)}<span class="blank"></span>${esc(b)}</div>
+      <input class="answer" ${WRITE_ATTR} placeholder="Skriv fagordet …"><div class="guard"></div>
+      <div class="row end"><button class="btn primary" id="check">Sjekk</button></div>`;
+    oneWord(el, y.id, y.svar, finish, () => y.s.replace('___', y.svar[0]));
+  },
+  skrivBegrep(el, sb, finish){
+    el.innerHTML = `<div class="q-label">${TEMA[sb.t].e} Skriv fagordet som passer med forklaringen</div>
+      <div class="q-text">${esc(sb.b.fork)}</div>
+      <input class="answer" ${WRITE_ATTR} placeholder="Skriv fagordet …"><div class="guard"></div>
+      <div class="row end"><button class="btn primary" id="check">Sjekk</button></div>`;
+    oneWord(el, sb.id, begrepSvar(sb.b), finish, () => sb.b.navn);
   },
   rekke(el, r, finish){
     let bank = shuffle(r.steg.map((s,i) => ({s,i})));
@@ -708,17 +795,64 @@ const RUN = {
   },
 };
 
+function oneWord(el, id, answers, finish, fasit){
+  const inp = el.querySelector('input'); guardInput(inp, el.querySelector('.guard'));
+  const check = () => {
+    const g = gradeWord(inp.value, answers); if(!g || inp.disabled) return;
+    inp.disabled = true; $('#check').disabled = true;
+    inp.classList.add(g === 'ok' ? 'right' : 'wrong');
+    finish({ok: g !== 'bad', near: g === 'near', rec:[[id, g === 'ok']], xp: g === 'ok' ? 10 : g === 'near' ? 4 : 0,
+      answer: g === 'ok' ? null : fasit(), note: g === 'near' ? 'Nesten! Se nøye på skrivemåten, og øv på å stave fagordet riktig.' : ''});
+  };
+  $('#check').onclick = check;
+  inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); check(); } });
+  inp.focus();
+}
+function shortWrite(el, item, finish, c){
+  el.innerHTML = c.head + `<textarea id="txt" rows="3" style="min-height:110px" ${WRITE_ATTR} placeholder="${c.placeholder || 'Skriv svaret ditt her …'}"></textarea>
+    <div class="guard"></div><div class="hintbox"></div>
+    <div class="row end">${c.hint ? '<button class="btn ghost" id="hint">💡 Hint</button>' : ''}<button class="btn primary" id="check">Sjekk</button></div><div id="result"></div>`;
+  const ta = $('#txt'); guardInput(ta, el.querySelector('.guard')); let hint = false;
+  if($('#hint')) $('#hint').onclick = e => { hint = true; e.target.disabled = true;
+    el.querySelector('.hintbox').innerHTML = `<div class="chips">${c.begreper.map(b => `<span class="chip">${esc(b[0])}</span>`).join('')}</div>`; };
+  $('#check').onclick = () => {
+    const text = ta.value.trim();
+    if(text.split(/\s+/).filter(Boolean).length < (c.minWords || 2)){ ta.focus(); $('#result').innerHTML = '<p class="muted">Skriv litt mer først.</p>'; return; }
+    const res = conceptCheck({begreper:c.begreper}, text), found = res.filter(r => r.ok).length;
+    let ordenOk = true;
+    if(c.orden){
+      const t = text.toLowerCase(), first = arr => Math.min(...arr.map(w => { const i = t.indexOf(w); return i < 0 ? Infinity : i; }));
+      const lastFor = Math.max(...c.orden.for.map(w => t.indexOf(w)));
+      ordenOk = lastFor >= 0 && lastFor < first(c.orden.etter);
+    }
+    const ok = found >= c.min && ordenOk;
+    ta.disabled = true; $('#check').disabled = true; if($('#hint')) $('#hint').disabled = true;
+    $('#result').innerHTML = `<div class="score">${ok ? '✅' : '🔶'} ${found} av ${res.length} fagbegreper${ok ? '' : ` (trenger ${c.min})`}</div>
+      <ul class="concepts">${res.map(r => `<li class="${r.ok ? 'done' : ''}">${r.ok ? '✅' : '⬜'} ${esc(r.navn)}</li>`).join('')}</ul>
+      ${c.orden && !ordenOk ? '<p style="color:var(--bad);font-weight:700">Husk rekkefølgen: det som brukes opp, står før pilen (→).</p>' : ''}
+      <div class="q-label">Eksempel på et godt svar:</div><div class="model">${esc(c.eks)}</div>
+      ${spellHtml(text)}
+      <div class="row end"><button class="btn primary" id="done">Ferdig ✓</button></div>`;
+    $('#done').onclick = () => { $('#done').disabled = true;
+      finish({ok, near: !ok && found > 0, rec:[[item.id, ok]], xp: found*3 + (ok ? 6 : 0) - (hint ? 3 : 0), silent:true,
+        forklar: c.min >= 3 ? {spm: item.spm || item.start, found, total: res.length, ok} : null,
+        note: ok ? 'Bra skrevet med fagbegreper!' : 'Se på eksempelet og begrepene du manglet. Oppgaven kommer igjen.'}); };
+  };
+}
+
 /* =====================================================================
    ØKTER
    ===================================================================== */
+const WRITE_KINDS = ['forklar','kortsvar','fullfor','brukord','fyllinn','skrivBegrep'];
 const MODES = {
-  tema:  {kinds:['kort','begrepMc','forklar','forklar','rekke','sorter','hvorfor','hvorfor','sant','likning','figur','match'], total:8},
-  mix:   {kinds:['kort','begrepMc','forklar','forklar','rekke','sorter','hvorfor','hvorfor','sant','likning','figur','match'], total:10},
-  prove: {kinds:['forklar'], total:4},
+  tema:  {kinds:['kort','forklar','forklar','kortsvar','kortsvar','fullfor','fullfor','brukord','fyllinn','skrivBegrep','begrepMc','rekke','sorter','hvorfor','sant','likning','figur','match'], total:10},
+  mix:   {kinds:['kort','forklar','forklar','kortsvar','kortsvar','fullfor','fullfor','brukord','fyllinn','skrivBegrep','begrepMc','rekke','sorter','hvorfor','sant','likning','figur','match'], total:12},
+  skriv: {kinds:['kortsvar','kortsvar','fullfor','fullfor','brukord','fyllinn','skrivBegrep','forklar'], total:8},
+  prove: {kinds:['forklar','kortsvar'], total:5},
   kort:  {kinds:['kort'], total:10},
 };
-const ONCE = ['match','likning','figur','rekke','sorter'];
-const RETRY = ['kort','begrepMc','hvorfor','sant','forklar'];
+const ONCE = ['match','likning','figur','rekke','sorter','begrepMc','sant'];
+const RETRY = ['kort','begrepMc','hvorfor','sant','forklar','kortsvar','fullfor','brukord','fyllinn','skrivBegrep'];
 let SES = null;
 function startSession(topic){
   const mode = MODES[topic] || MODES.tema;
@@ -844,7 +978,7 @@ function endChallenge(){
    FORSIDE
    ===================================================================== */
 function topicIds(t){
-  return [...BEGREPER, ...P.forklar, ...P.rekkefolge, ...P.sorter, ...P.hvorfor, ...SANT, ...P.likninger, ...P.figurer].filter(x => x.t === t).map(x => x.id);
+  return [...BEGREPER, ...P.forklar, ...P.kortsvar, ...P.fullfor, ...P.brukord, ...P.fyllinn, ...P.rekkefolge, ...P.sorter, ...P.hvorfor, ...SANT, ...P.likninger, ...P.figurer].filter(x => x.t === t).map(x => x.id);
 }
 function mastery(t){ const ids = topicIds(t); return ids.length ? Math.round(100 * ids.filter(id => st(id).s >= 1).length / ids.length) : 0; }
 function renderHome(){
@@ -870,9 +1004,11 @@ function renderHome(){
     <h2 class="sec">Spesialøkter</h2>
     <div class="grid">
       <button class="topic" data-topic="mix"><span class="em">🎲</span><b>Blandet</b><small>Litt av alt. Best rett før prøven!</small></button>
-      <button class="topic" data-topic="prove"><span class="em">📝</span><b>Prøvetrening</b><small>4 forklaringsoppgaver som på prøven, uten hint</small></button>
+      <button class="topic" data-topic="skriv"><span class="em">✍️</span><b>Skrivetrening</b><small>Korte skriveoppgaver med fagbegreper</small></button>
+      <button class="topic" data-topic="prove"><span class="em">📝</span><b>Prøvetrening</b><small>5 skriveoppgaver som på prøven, uten hint</small></button>
       <button class="topic" data-topic="kort"><span class="em">🃏</span><b>Begrepskort</b><small>Forklar begrepet for deg selv, og sjekk svaret</small></button>
       <button class="topic" id="chal"><span class="em">⚡</span><b>60 sekunder</b><small>Begrepsjakt mot klokka${S.best60 ? ' · rekord ' + S.best60 : ''}</small></button>
+      <button class="topic" id="glist"><span class="em">📒</span><b>Begrepslista</b><small>Se over alle fagbegrepene</small></button>
     </div>
 
     <h2 class="sec">Øv på tema</h2>
@@ -887,7 +1023,18 @@ function renderHome(){
   $('#snd').onclick = () => { S.sound = !S.sound; save(); renderHome(); };
   app.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => startSession(b.dataset.topic));
   $('#chal').onclick = startChallenge;
+  $('#glist').onclick = renderGlossary;
   $('#reset').onclick = () => { if(confirm('Vil du slette all fremgang i naturfag?')){ S = JSON.parse(JSON.stringify(DEFAULT)); save(); renderHome(); } };
+  window.scrollTo(0,0);
+}
+function renderGlossary(){
+  app.innerHTML = `<div class="sbar"><button class="icon" id="back" aria-label="Tilbake">←</button><b style="font-size:20px">📒 Begrepslista</b></div>
+    <p class="muted" style="margin-top:0">Alle fagbegrepene fra pensum. ✅ = du har svart riktig på dem i appen. 🔁 = øv mer.</p>
+    ${P.temaer.map(t => { const bs = BEGREPER.filter(b => b.t === t.id); return bs.length ? `<h2 class="sec">${t.e} ${esc(t.navn)}</h2><div class="glist">${bs.map(b => {
+      const x = st(b.id), y = st('sb-'+b.id), seen = x.n + y.n, good = x.s >= 1 || y.s >= 1;
+      return `<div class="gitem"><span class="st">${seen ? (good ? '✅' : '🔁') : ''}</span><b>${esc(cap(b.navn))}</b><div class="muted">${esc(b.fork)}</div></div>`; }).join('')}</div>` : ''; }).join('')}
+    <div class="row"><button class="btn primary" id="practice">🃏 Øv på begrepskort</button></div>`;
+  $('#back').onclick = renderHome; $('#practice').onclick = () => startSession('kort');
   window.scrollTo(0,0);
 }
 renderHome();
