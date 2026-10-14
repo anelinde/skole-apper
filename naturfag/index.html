@@ -845,14 +845,15 @@ function shortWrite(el, item, finish, c){
    ===================================================================== */
 const WRITE_KINDS = ['forklar','kortsvar','fullfor','brukord','fyllinn','skrivBegrep'];
 const MODES = {
-  tema:  {kinds:['kort','forklar','forklar','kortsvar','kortsvar','fullfor','fullfor','brukord','fyllinn','skrivBegrep','begrepMc','rekke','sorter','hvorfor','sant','likning','figur','match'], total:10},
-  mix:   {kinds:['kort','forklar','forklar','kortsvar','kortsvar','fullfor','fullfor','brukord','fyllinn','skrivBegrep','begrepMc','rekke','sorter','hvorfor','sant','likning','figur','match'], total:12},
+  // Selvvurdering (kort) er begrenset: han skal heller skrive selv.
+  tema:  {kinds:['kort','forklar','forklar','kortsvar','kortsvar','fullfor','fullfor','brukord','fyllinn','skrivBegrep','begrepMc','rekke','sorter','hvorfor','sant','likning','figur','match'], total:10, max:{kort:1}},
+  mix:   {kinds:['kort','forklar','forklar','kortsvar','kortsvar','fullfor','fullfor','brukord','fyllinn','skrivBegrep','begrepMc','rekke','sorter','hvorfor','sant','likning','figur','match'], total:12, max:{kort:1}},
   skriv: {kinds:['kortsvar','kortsvar','fullfor','fullfor','brukord','fyllinn','skrivBegrep','forklar'], total:8},
   prove: {kinds:['forklar','kortsvar'], total:5},
-  kort:  {kinds:['kort'], total:10},
+  kort:  {kinds:['skrivBegrep','kort'], total:10, repeat:true, max:{kort:3}},
 };
 const ONCE = ['match','likning','figur','rekke','sorter','begrepMc','sant'];
-const RETRY = ['kort','begrepMc','hvorfor','sant','forklar','kortsvar','fullfor','brukord','fyllinn','skrivBegrep'];
+const RETRY = ['begrepMc','hvorfor','sant','forklar','kortsvar','fullfor','brukord','fyllinn','skrivBegrep'];
 let SES = null;
 function startSession(topic){
   const mode = MODES[topic] || MODES.tema;
@@ -860,7 +861,8 @@ function startSession(topic){
   nextTask();
 }
 function chooseTask(){
-  const kinds = SES.mode.kinds.filter(k => (k !== SES.lastKind || SES.mode.kinds.length === 1) &&
+  const kinds = SES.mode.kinds.filter(k => (k !== SES.lastKind || SES.mode.repeat || SES.mode.kinds.length === 1) &&
+    !(SES.mode.max && SES.mode.max[k] !== undefined && (SES.kindCount[k]||0) >= SES.mode.max[k]) &&
     !(ONCE.includes(k) && SES.kindCount[k]) && pool(k, SES.topic).length >= (k === 'match' ? 4 : 1));
   for(let tries = 0; tries < 30; tries++){
     const k = rnd(kinds);
@@ -900,6 +902,9 @@ function onResult(res){
   if(res.ok && ([3,5,10,15].includes(SES.combo) || res.xp >= 20)) burst();
   if((!res.ok || res.near) && SES.current.item && RETRY.includes(SES.current.kind) && SES.topic !== 'prove')
     SES.retry.push({kind:SES.current.kind, item:SES.current.item, due:SES.i+3});
+  // Et begrepskort han ikke kunne, kommer igjen som skriveoppgave (ikke som nytt selvvurderingskort)
+  if((!res.ok || res.near) && SES.current.kind === 'kort'){ const b = SES.current.item;
+    SES.retry.push({kind:'skrivBegrep', item:{id:'sb-'+b.id, t:b.t, b}, due:SES.i+3}); }
   SES.xp += gained; S.xp += gained; SES.i++; save();
   const fb = document.createElement('div');
   fb.className = 'fb ' + (res.near ? 'near' : res.ok ? 'ok' : 'bad');
@@ -1006,7 +1011,7 @@ function renderHome(){
       <button class="topic" data-topic="mix"><span class="em">🎲</span><b>Blandet</b><small>Litt av alt. Best rett før prøven!</small></button>
       <button class="topic" data-topic="skriv"><span class="em">✍️</span><b>Skrivetrening</b><small>Korte skriveoppgaver med fagbegreper</small></button>
       <button class="topic" data-topic="prove"><span class="em">📝</span><b>Prøvetrening</b><small>5 skriveoppgaver som på prøven, uten hint</small></button>
-      <button class="topic" data-topic="kort"><span class="em">🃏</span><b>Begrepskort</b><small>Forklar begrepet for deg selv, og sjekk svaret</small></button>
+      <button class="topic" data-topic="kort"><span class="em">🔤</span><b>Begreper</b><small>Les forklaringen og skriv fagordet selv</small></button>
       <button class="topic" id="chal"><span class="em">⚡</span><b>60 sekunder</b><small>Begrepsjakt mot klokka${S.best60 ? ' · rekord ' + S.best60 : ''}</small></button>
       <button class="topic" id="glist"><span class="em">📒</span><b>Begrepslista</b><small>Se over alle fagbegrepene</small></button>
     </div>
@@ -1033,7 +1038,7 @@ function renderGlossary(){
     ${P.temaer.map(t => { const bs = BEGREPER.filter(b => b.t === t.id); return bs.length ? `<h2 class="sec">${t.e} ${esc(t.navn)}</h2><div class="glist">${bs.map(b => {
       const x = st(b.id), y = st('sb-'+b.id), seen = x.n + y.n, good = x.s >= 1 || y.s >= 1;
       return `<div class="gitem"><span class="st">${seen ? (good ? '✅' : '🔁') : ''}</span><b>${esc(cap(b.navn))}</b><div class="muted">${esc(b.fork)}</div></div>`; }).join('')}</div>` : ''; }).join('')}
-    <div class="row"><button class="btn primary" id="practice">🃏 Øv på begrepskort</button></div>`;
+    <div class="row"><button class="btn primary" id="practice">✍️ Øv på begrepene</button></div>`;
   $('#back').onclick = renderHome; $('#practice').onclick = () => startSession('kort');
   window.scrollTo(0,0);
 }
