@@ -186,6 +186,21 @@ summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .end .stat{font-size:20px;font-weight:800}
 .newmedal{background:var(--chip);border-radius:14px;padding:10px 14px;font-weight:700}
 .review{text-align:left;width:100%;display:grid;gap:10px}
+.goalbar{height:10px;background:var(--chip);border-radius:99px;overflow:hidden;margin:-4px 0 12px}
+.goalbar>div{height:100%;background:var(--accent);transition:width .3s}
+.goalbar.done>div{background:var(--ok)}
+.jflash{min-height:26px;font-weight:800;margin-top:10px}
+.jflash.ok{color:var(--ok)} .jflash.bad{color:var(--bad)} .jflash.near{color:var(--near)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;margin:6px 0 10px}
+.jrow{display:flex;gap:10px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+.jrow .mk2{font-size:20px;line-height:1.2;flex:none;width:26px;text-align:center}
+.jrow.now-ok{border-color:var(--ok);background:var(--okbg)}
+.jrow.now-bad{border-color:var(--bad);background:var(--badbg)}
+.jrow.missing{opacity:.75}
+.jrow b{display:block}
+.jrow small{color:var(--muted)}
+.toggle{display:flex;align-items:center;gap:8px;font-weight:700;margin:10px 0}
+.fullpott{background:linear-gradient(90deg,var(--accent),var(--brand));color:#fff;border-radius:16px;padding:14px;font-size:20px;font-weight:800;text-align:center}
 .chal-top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:22px;margin-bottom:12px;gap:12px}
 .timer{font-variant-numeric:tabular-nums}
 .timer.low{color:var(--bad)}
@@ -214,7 +229,7 @@ const KIND_NAMES = {kort:'Begrepskort', begrepMc:'Begreper', match:'Finn parene'
 /* ---------- Lagring ---------- */
 const KEY = P.lagringsnokkel;
 const DEFAULT = {xp:0, stats:{}, medals:[], sessions:0, topicDone:{}, best60:0, maxCombo:0, dayStreak:0, lastDay:null,
-  sound:true, forklarOk:0, figurOk:0, proveDone:0, drafts:{}};
+  sound:true, forklarOk:0, figurOk:0, proveDone:0, drafts:{}, jakt:{}};
 let S = load();
 function load(){
   try{ const r = localStorage.getItem(KEY); if(r) return Object.assign(JSON.parse(JSON.stringify(DEFAULT)), JSON.parse(r)); }catch(e){}
@@ -299,7 +314,9 @@ const MEDALS = [
   {id:'forklar',e:'✍️', name:'Forklaringsmester', desc:'10 gode forklaringer',            test:()=>S.forklarOk>=10},
   {id:'figur',  e:'🔬', name:'Figurekspert',      desc:'5 figurer uten feil',             test:()=>S.figurOk>=5},
   {id:'prove',  e:'📝', name:'Prøveklar',         desc:'2 prøvetreninger',                test:()=>S.proveDone>=2},
-  {id:'lyn',    e:'⚡', name:'Begrepsjeger',      desc:'15 riktige på 60 sekunder',       test:()=>S.best60>=15},
+  {id:'lyn',    e:'⚡', name:'Begrepsjeger',      desc:'Nå målet i Begrepsjakt: velg',    test:()=>(S.jakt.velg?.best||0)>=JAKT.velg.mal || S.best60>=15},
+  {id:'jaktvelg',e:'🎯', name:'Begrepsmester',    desc:'Full pott i Begrepsjakt: velg',   test:()=>!!S.jakt.velg?.full},
+  {id:'jaktskriv',e:'⌨️', name:'Staveekspert',    desc:'Full pott i Begrepsjakt: skriv',  test:()=>!!S.jakt.skriv?.full},
   {id:'alle',   e:'🧭', name:'Hele pensum',       desc:'En økt i hvert tema',             test:()=>P.temaer.every(t => S.topicDone[t.id])},
   {id:'days3',  e:'📅', name:'3 dager på rad',    desc:'Øv tre dager på rad',             test:()=>S.dayStreak>=3},
   {id:'xp500',  e:'💎', name:'500 XP',            desc:'Samle 500 XP',                    test:()=>S.xp>=500},
@@ -942,41 +959,125 @@ function endSession(){
   const t = SES.topic; $('#again').onclick = () => startSession(t); $('#home').onclick = renderHome; $('#again').focus();
 }
 
-/* ---------- 60 sekunder: begrepsjakt ---------- */
+/* ---------- BEGREPSJAKT på tid (alle begrepene) ----------
+   velg: les forklaringen, velg fagordet. skriv: les forklaringen, skriv fagordet.
+   Full pott = alle begrepene klart, gjerne over flere runder. */
+const JAKT = {
+  velg:  {e:'⚡', navn:'Begrepsjakt: velg',  tid:60,  mal:15, desc:'Les forklaringen og velg riktig fagord'},
+  skriv: {e:'⌨️', navn:'Begrepsjakt: skriv', tid:120, mal:10, desc:'Les forklaringen og skriv fagordet selv'},
+};
+const mmss = t => Math.floor(t/60) + ':' + String(t % 60).padStart(2,'0');
+function jaktState(m){ return S.jakt[m] = S.jakt[m] || {done:[], runder:0, best:0, full:false}; }
 let CH = null;
 function stopChallenge(){ if(CH){ clearInterval(CH.timer); CH = null; } }
-function startChallenge(){
-  stopChallenge(); CH = {score:0, left:60, timer:null, startLevel:level()};
+function startChallenge(mode = 'velg'){
+  stopChallenge();
+  const J = JAKT[mode], js = jaktState(mode);
+  // De som ikke er klart ennå, kommer først
+  const notDone = shuffle(BEGREPER.filter(b => !js.done.includes(b.id))), done = shuffle(BEGREPER.filter(b => js.done.includes(b.id)));
+  CH = {mode, score:0, left:J.tid, timer:null, startLevel:level(), queue:[...notDone, ...done], qi:0, right:new Set(), wrong:new Set(), goalHit:false};
   app.innerHTML = `<div class="sbar"><button class="icon" id="quit" aria-label="Avslutt">✕</button><div class="bar"><div id="tbar" style="width:100%"></div></div></div>
-    <div class="chal-top"><span class="timer" id="time">⏱ 60</span><span>⭐ <span id="score">0</span></span></div><div class="card task" id="task"></div>`;
-  $('#quit').onclick = () => { stopChallenge(); renderHome(); };
+    <div class="chal-top"><span class="timer" id="time">⏱ ${mmss(J.tid)}</span><span>🎯 <span id="score">0</span> / ${J.mal}</span></div>
+    <div class="goalbar" id="goal"><div style="width:0%"></div></div>
+    <div class="card task" id="task"></div>`;
+  $('#quit').onclick = () => { if(confirm('Avslutte runden? Det du har klart, blir lagret.')) endChallenge(); };
   CH.timer = setInterval(() => {
-    CH.left--; $('#time').textContent = '⏱ ' + CH.left; $('#tbar').style.width = (100*CH.left/60) + '%';
+    CH.left--; $('#time').textContent = '⏱ ' + mmss(Math.max(0, CH.left)); $('#tbar').style.width = (100*CH.left/J.tid) + '%';
     if(CH.left <= 10) $('#time').classList.add('low');
     if(CH.left <= 0) endChallenge();
   }, 1000);
+  if(mode === 'skriv') setupSkrivJakt();
   chalQ();
+}
+function nextBegrep(){ if(CH.qi >= CH.queue.length){ CH.queue = shuffle(BEGREPER); CH.qi = 0; } return CH.queue[CH.qi++]; }
+function jaktAnswer(b, ok){
+  const js = jaktState(CH.mode);
+  record(CH.mode === 'skriv' ? 'sb-'+b.id : b.id, ok);
+  if(ok){ CH.right.add(b.id); CH.wrong.delete(b.id); if(!js.done.includes(b.id)) js.done.push(b.id); CH.score++; beep('ok'); }
+  else { if(!CH.right.has(b.id)) CH.wrong.add(b.id); beep('bad'); }
+  save();
+  const J = JAKT[CH.mode];
+  $('#score').textContent = CH.score;
+  $('#goal').firstElementChild.style.width = Math.min(100, 100*CH.score/J.mal) + '%';
+  if(CH.score >= J.mal && !CH.goalHit){ CH.goalHit = true; $('#goal').classList.add('done'); burst(20); }
 }
 function chalQ(){
   if(!CH) return;
-  const b = rnd(BEGREPER), others = otherBegreper(b, 3);
-  mc($('#task'), `<div class="q-label">Hvilket begrep?</div><div class="q-text">${esc(b.fork)}</div>`, shuffle([b.navn, ...others.map(o => o.navn)]), b.navn, ok => {
-    if(!CH) return; record(b.id, ok);
-    if(ok){ CH.score++; $('#score').textContent = CH.score; beep('ok'); } else beep('bad');
-    setTimeout(chalQ, ok ? 300 : 1100);
-  });
+  const b = nextBegrep(); CH.cur = b;
+  if(CH.mode === 'velg'){
+    mc($('#task'), `<div class="q-label">Hvilket fagbegrep passer?</div><div class="q-text">${esc(b.fork)}</div>`,
+      shuffle([b.navn, ...otherBegreper(b, 3).map(o => o.navn)]), b.navn, ok => {
+        if(!CH) return; jaktAnswer(b, ok); setTimeout(chalQ, ok ? 300 : 1100);
+      });
+  } else {
+    $('#jq').textContent = b.fork; const inp = $('#jinp'); inp.value = ''; inp.disabled = false; inp.focus();
+  }
+}
+function setupSkrivJakt(){
+  $('#task').innerHTML = `<div class="q-label">Skriv fagordet som passer</div><div class="q-text" id="jq"></div>
+    <input class="answer" id="jinp" ${WRITE_ATTR} placeholder="Skriv fagordet …"><div class="guard"></div>
+    <div class="jflash" id="jflash"></div>
+    <div class="row end"><button class="btn ghost" id="jskip">Hopp over</button><button class="btn primary" id="jok">Sjekk</button></div>`;
+  const inp = $('#jinp'); guardInput(inp, $('#task .guard'));
+  const flash = (cls, html) => { const f = $('#jflash'); f.className = 'jflash ' + cls; f.innerHTML = html; };
+  const submit = skip => {
+    if(!CH || inp.disabled) return;
+    const b = CH.cur, g = skip ? 'bad' : gradeWord(inp.value, begrepSvar(b));
+    if(!g) return inp.focus();
+    inp.disabled = true;
+    jaktAnswer(b, g === 'ok');
+    if(g === 'ok') flash('ok', '✅ Riktig!');
+    else if(g === 'near') flash('near', `Nesten! Riktig skrivemåte: <b>${esc(b.navn)}</b>`);
+    else flash('bad', `${skip ? 'Hoppet over.' : 'Feil.'} Riktig: <b>${esc(b.navn)}</b>`);
+    setTimeout(() => { if(CH){ flash('', ''); chalQ(); } }, g === 'ok' ? 350 : 1600);
+  };
+  $('#jok').onclick = () => submit(false);
+  $('#jskip').onclick = () => submit(true);
+  inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); submit(false); } });
 }
 function endChallenge(){
-  const c = CH; stopChallenge();
-  const rec = c.score > S.best60, xp = c.score * 3;
-  if(rec) S.best60 = c.score; S.xp += xp; markDay();
-  const newM = checkMedals(); save(); beep('win'); burst(rec ? 30 : 14);
-  app.innerHTML = `<div class="card end"><div class="big">${rec ? '🏆' : '⚡'}</div><h2>${rec ? 'Ny rekord!' : 'Tiden er ute!'}</h2>
-    <div class="stat">${c.score} riktige på 60 sekunder</div><div class="muted">Rekorden din: ${S.best60}</div>
-    <div class="stat" style="color:var(--accent)">+${xp} XP</div>
-    ${newM.map(m => `<div class="newmedal">${m.e} Ny medalje: ${m.name}</div>`).join('')}
-    <div class="row"><button class="btn primary" id="again">Prøv igjen</button><button class="btn" id="home">Hjem</button></div></div>`;
-  $('#again').onclick = startChallenge; $('#home').onclick = renderHome; $('#again').focus();
+  const c = CH; if(!c) return; stopChallenge();
+  const J = JAKT[c.mode], js = jaktState(c.mode);
+  js.runder++;
+  const rec = c.score > js.best; if(rec) js.best = c.score;
+  if(c.mode === 'velg') S.best60 = Math.max(S.best60, c.score);
+  let xp = c.score * 3 + (c.score >= J.mal ? 15 : 0), full = false;
+  if(!js.full && js.done.length >= BEGREPER.length){ js.full = true; full = true; xp += 100; }
+  S.xp += xp; markDay();
+  const newM = checkMedals(); save(); beep('win'); burst(full ? 40 : c.score >= J.mal ? 24 : 10);
+  renderJaktResult(c, {xp, rec, full, newM});
+}
+function renderJaktResult(c, r){
+  const J = JAKT[c.mode], js = jaktState(c.mode), total = BEGREPER.length, n = js.done.length;
+  const status = b => c.right.has(b.id) ? ['now-ok','✅','Riktig nå'] : c.wrong.has(b.id) ? ['now-bad','❌','Feil nå'] : js.done.includes(b.id) ? ['','✔️','Klart før'] : ['missing','⬜','Ikke klart ennå'];
+  const list = onlyMissing => P.temaer.map(t => {
+    const bs = BEGREPER.filter(b => b.t === t.id && (!onlyMissing || !js.done.includes(b.id) || c.wrong.has(b.id)));
+    return bs.length ? `<h2 class="sec">${t.e} ${esc(t.navn)}</h2><div class="glist">${bs.map(b => { const [cls, mk, txt] = status(b);
+      return `<div class="jrow ${cls}"><span class="mk2" title="${txt}">${mk}</span><div><b>${esc(cap(b.navn))}</b><small>${esc(b.fork)}</small></div></div>`; }).join('')}</div>` : '';
+  }).join('');
+  app.innerHTML = `<div class="card end">
+      <div class="big">${r.full ? '🏆' : c.score >= J.mal ? '🎯' : J.e}</div>
+      <h2>${c.score >= J.mal ? 'Målet er nådd!' : 'Tiden er ute!'}</h2>
+      <div class="stat">${c.score} riktige på ${J.tid >= 120 ? J.tid/60 + ' minutter' : J.tid + ' sekunder'} · mål ${J.mal}</div>
+      <div class="muted">Rekorden din: ${js.best}${r.rec && js.runder > 1 ? ' (ny rekord!)' : ''} · runde ${js.runder}</div>
+      <div class="stat" style="color:var(--accent)">+${r.xp} XP</div>
+      ${r.newM.map(m => `<div class="newmedal">${m.e} Ny medalje: ${m.name}</div>`).join('')}
+    </div>
+    ${js.full ? `<div class="fullpott" style="margin-top:14px">🏆 Full pott! Du har klart alle ${total} begrepene.</div>` : ''}
+    <div class="card" style="margin-top:14px">
+      <div style="font-weight:800;font-size:18px">Klart totalt: ${n} av ${total} begreper</div>
+      <div class="bar" style="margin:8px 0"><div style="width:${100*n/total}%"></div></div>
+      <div class="muted">${js.full ? 'Du kan starte jakten på nytt for å øve mer.' : `For full pott må du klare alle ${total}. Ta flere runder. De du ikke har klart, kommer først.`}</div>
+      <div class="row"><button class="btn primary" id="again">Ny runde</button><button class="btn" id="home">Hjem</button>${js.full ? '<button class="btn ghost" id="reset">Start jakten på nytt</button>' : ''}</div>
+    </div>
+    <h2 class="sec">Begrepslista</h2>
+    <div class="legend"><span>✅ Riktig nå</span><span>❌ Feil nå</span><span>✔️ Klart før</span><span>⬜ Ikke klart ennå</span></div>
+    <label class="toggle"><input type="checkbox" id="onlymiss"> Vis bare de jeg mangler eller hadde feil</label>
+    <div id="jlist">${list(false)}</div>`;
+  $('#onlymiss').onchange = e => { $('#jlist').innerHTML = list(e.target.checked); };
+  $('#again').onclick = () => startChallenge(c.mode); $('#home').onclick = renderHome;
+  if($('#reset')) $('#reset').onclick = () => { if(confirm('Starte jakten på nytt? Medaljen beholder du.')){ js.done = []; js.full = false; save(); startChallenge(c.mode); } };
+  window.scrollTo(0,0);
 }
 
 /* =====================================================================
@@ -1012,7 +1113,9 @@ function renderHome(){
       <button class="topic" data-topic="skriv"><span class="em">✍️</span><b>Skrivetrening</b><small>Korte skriveoppgaver med fagbegreper</small></button>
       <button class="topic" data-topic="prove"><span class="em">📝</span><b>Prøvetrening</b><small>5 skriveoppgaver som på prøven, uten hint</small></button>
       <button class="topic" data-topic="kort"><span class="em">🔤</span><b>Begreper</b><small>Les forklaringen og skriv fagordet selv</small></button>
-      <button class="topic" id="chal"><span class="em">⚡</span><b>60 sekunder</b><small>Begrepsjakt mot klokka${S.best60 ? ' · rekord ' + S.best60 : ''}</small></button>
+      ${Object.entries(JAKT).map(([m,J]) => { const js = jaktState(m); return `<button class="topic" data-jakt="${m}"><span class="em">${J.e}</span><b>${J.navn}</b>
+        <small>${J.desc}. Mål: ${J.mal} på ${J.tid >= 120 ? J.tid/60 + ' min' : J.tid + ' sek'}${js.best ? ' · rekord ' + js.best : ''}</small>
+        <div class="bar"><div style="width:${100*js.done.length/BEGREPER.length}%"></div></div><small>${js.full ? '🏆 Full pott!' : `${js.done.length} av ${BEGREPER.length} begreper klart`}</small></button>`; }).join('')}
       <button class="topic" id="glist"><span class="em">📒</span><b>Begrepslista</b><small>Se over alle fagbegrepene</small></button>
     </div>
 
@@ -1027,7 +1130,7 @@ function renderHome(){
     <footer><button class="link" id="reset">Nullstill all fremgang i naturfag</button></footer>`;
   $('#snd').onclick = () => { S.sound = !S.sound; save(); renderHome(); };
   app.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => startSession(b.dataset.topic));
-  $('#chal').onclick = startChallenge;
+  app.querySelectorAll('[data-jakt]').forEach(b => b.onclick = () => startChallenge(b.dataset.jakt));
   $('#glist').onclick = renderGlossary;
   $('#reset').onclick = () => { if(confirm('Vil du slette all fremgang i naturfag?')){ S = JSON.parse(JSON.stringify(DEFAULT)); save(); renderHome(); } };
   window.scrollTo(0,0);
