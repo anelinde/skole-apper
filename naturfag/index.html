@@ -186,6 +186,16 @@ summary{cursor:pointer;font-weight:700;color:var(--brand)}
 .end .stat{font-size:20px;font-weight:800}
 .newmedal{background:var(--chip);border-radius:14px;padding:10px 14px;font-weight:700}
 .review{text-align:left;width:100%;display:grid;gap:10px}
+.steps5{display:flex;gap:6px;margin:-6px 0 12px;flex-wrap:wrap}
+.steps5 span{font-size:13px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--chip);color:var(--muted)}
+.steps5 span.now{background:var(--brand);color:var(--brand-ink)}
+.steps5 span.done{background:var(--okbg);color:var(--ok)}
+.plan{list-style:none;padding:0;margin:12px 0;display:grid;gap:10px;counter-reset:p}
+.plan li{counter-increment:p;display:grid;grid-template-columns:34px 1fr;gap:4px 10px;align-items:start}
+.plan li::before{content:counter(p);grid-row:span 2;width:30px;height:30px;border-radius:50%;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:800}
+.plan li small{color:var(--muted)}
+.studycard{background:var(--bg);border-radius:14px;padding:12px 14px;margin:8px 0}
+.studycard b{font-size:19px;display:block}
 .goalbar{height:10px;background:var(--chip);border-radius:99px;overflow:hidden;margin:-4px 0 12px}
 .goalbar>div{height:100%;background:var(--accent);transition:width .3s}
 .goalbar.done>div{background:var(--ok)}
@@ -315,6 +325,7 @@ const MEDALS = [
   {id:'figur',  e:'🔬', name:'Figurekspert',      desc:'5 figurer uten feil',             test:()=>S.figurOk>=5},
   {id:'prove',  e:'📝', name:'Prøveklar',         desc:'2 prøvetreninger',                test:()=>S.proveDone>=2},
   {id:'lyn',    e:'⚡', name:'Begrepsjeger',      desc:'Nå målet i Begrepsjakt: velg',    test:()=>(S.jakt.velg?.best||0)>=JAKT.velg.mal || S.best60>=15},
+  {id:'mester',  e:'🧠', name:'Smart elev',       desc:'3 smarte økter',                  test:()=>(S.topicDone.mester||0)>=3},
   {id:'jaktvelg',e:'🎯', name:'Begrepsmester',    desc:'Full pott i Begrepsjakt: velg',   test:()=>!!S.jakt.velg?.full},
   {id:'jaktskriv',e:'⌨️', name:'Staveekspert',    desc:'Full pott i Begrepsjakt: skriv',  test:()=>!!S.jakt.skriv?.full},
   {id:'alle',   e:'🧭', name:'Hele pensum',       desc:'En økt i hvert tema',             test:()=>P.temaer.every(t => S.topicDone[t.id])},
@@ -483,7 +494,7 @@ function words(t){ return t.toLowerCase().replace(/[^\p{L}\p{N}₀-₉ ]+/gu,' '
 function hasStem(t, ws, stem){
   stem = stem.toLowerCase();
   if(stem.length < 4) return ws.some(w => w.startsWith(stem));
-  if(stem === 'sympatisk') return /(?<!para)sympatisk/.test(t.toLowerCase());
+  if(stem.startsWith('sympati')) return new RegExp('(?<!para)' + stem).test(t.toLowerCase());
   if(t.toLowerCase().includes(stem)) return true;
   if(stem.length >= 6) return ws.some(w => w.length >= stem.length-1 && lev(w.slice(0, stem.length), stem) <= 1);
   return false;
@@ -633,6 +644,42 @@ const RUN = {
       }
     };
     $('#check').onclick = check;
+  },
+  dump(el, d, finish){
+    const t = TEMA[d.t], tema = BEGREPER.filter(b => b.t === d.t);
+    let left = 120;
+    el.innerHTML = `<div class="q-label">Steg 1: Hent fram · ${t.e} ${esc(t.navn)}</div>
+      <div class="q-text">Skriv alt du husker om ${esc(t.navn.toLowerCase())}. Bruk så mange fagbegreper du kan.</div>
+      <div class="chal-top" style="font-size:18px;margin-bottom:6px"><span class="timer" id="dt">⏱ 2:00</span><span class="muted" style="font-size:14px">Stikkord holder!</span></div>
+      <textarea id="txt" ${WRITE_ATTR} placeholder="Skriv det du husker …"></textarea><div class="guard"></div>
+      <div class="row end"><button class="btn primary" id="check">Ferdig ✓</button></div><div id="result"></div>`;
+    const ta = $('#txt'); guardInput(ta, el.querySelector('.guard')); ta.focus();
+    const timer = setInterval(() => {
+      if(!ta.isConnected){ clearInterval(timer); return; }
+      left--; $('#dt').textContent = '⏱ ' + Math.floor(left/60) + ':' + String(left % 60).padStart(2,'0');
+      if(left <= 15) $('#dt').classList.add('low');
+      if(left <= 0){ clearInterval(timer); done(); }
+    }, 1000);
+    const done = () => {
+      clearInterval(timer); if(ta.disabled) return;
+      const text = ta.value.trim(); ta.disabled = true; $('#check').disabled = true;
+      const found = tema.filter(b => begrepFound(text, b)), missing = tema.filter(b => !found.includes(b));
+      $('#result').innerHTML = `<div class="score">${found.length ? '✅' : '🔶'} Du fikk med ${found.length} av ${tema.length} fagbegreper</div>
+        <ul class="concepts">${tema.map(b => `<li class="${found.includes(b) ? 'done' : ''}">${found.includes(b) ? '✅' : '⬜'} ${esc(b.navn)}</li>`).join('')}</ul>
+        ${spellHtml(text)}
+        <div class="row end"><button class="btn primary" id="next2">Videre ➜</button></div>`;
+      $('#next2').onclick = () => { $('#next2').disabled = true; buildMesterRest(d.t, missing);
+        finish({ok:true, rec:[], xp: 5 + found.length*2, silent:true, note: found.length ? `Godt hentet fram! Nå skal du lære ${Math.min(3, missing.length) || 'noen'} begreper til.` : 'Helt greit! Nå skal du lære noen begreper, og så skriver du dem selv etterpå.'}); };
+    };
+    $('#check').onclick = () => { if(ta.value.trim().split(/\s+/).length < 2){ ta.focus(); return; } done(); };
+  },
+  studer(el, s, finish){
+    el.innerHTML = `<div class="q-label">Steg 2: Lær det du manglet</div>
+      <div class="q-text">Les disse nøye. Litt senere i økta skal du skrive dem selv.</div>
+      ${s.list.map(b => `<div class="studycard"><b>${esc(cap(b.navn))}</b>${esc(b.fork)}</div>`).join('')}
+      <div class="row end"><button class="btn primary" id="read" disabled>Jeg har lest ✓ <span id="rc">(5)</span></button></div>`;
+    let c = 5; const t = setInterval(() => { c--; const rc = $('#rc'); if(!rc){ clearInterval(t); return; } rc.textContent = c > 0 ? `(${c})` : ''; if(c <= 0){ clearInterval(t); $('#read').disabled = false; } }, 1000);
+    $('#read').onclick = () => { $('#read').disabled = true; finish({ok:true, rec:[], xp:3, silent:true, note:'Bra! Nå kommer noen oppgaver fra andre temaer først.'}); };
   },
   kortsvar(el, k, finish, topic){
     shortWrite(el, k, finish, {head:`<div class="q-label">${TEMA[k.t].e} Svar kort med fagbegreper</div><div class="q-text">${esc(k.spm)}</div>`,
@@ -891,20 +938,21 @@ function chooseTask(){
 }
 function nextTask(){
   $('.fb')?.remove();
-  if(SES.i >= SES.total && SES.retry.length && SES.total < SES.mode.total + 3 && SES.topic !== 'prove'){ SES.total++; SES.retry[0].due = 0; }
+  if(!SES.plan && SES.i >= SES.total && SES.retry.length && SES.total < SES.mode.total + 3 && SES.topic !== 'prove'){ SES.total++; SES.retry[0].due = 0; }
   if(SES.i >= SES.total) return endSession();
-  const di = SES.retry.findIndex(r => r.due <= SES.i);
-  const task = di >= 0 ? SES.retry.splice(di,1)[0] : chooseTask();
+  const di = SES.plan ? -1 : SES.retry.findIndex(r => r.due <= SES.i);
+  const task = SES.plan ? SES.plan[SES.i] : di >= 0 ? SES.retry.splice(di,1)[0] : chooseTask();
   SES.current = task; SES.lastKind = task.kind; SES.kindCount[task.kind] = (SES.kindCount[task.kind]||0) + 1;
   if(task.item){ SES.recent.push(task.item.id); SES.recent = SES.recent.slice(-6); }
   app.innerHTML = `
     <div class="sbar"><button class="icon" id="quit" aria-label="Avslutt">✕</button>
       <div class="bar"><div style="width:${100*SES.i/SES.total}%"></div></div>
       <div class="combo ${SES.combo >= 3 ? 'on' : ''}">${SES.combo >= 2 ? '🔥 '+SES.combo : ''}</div></div>
-    ${SES.i >= SES.mode.total ? '<p class="muted" style="margin:-6px 0 10px">🔁 Ekstrarunde: noe du bommet på</p>' : ''}
+    ${SES.plan ? `<div class="steps5">${MESTER_STEPS.map((n,k) => `<span class="${k+1 === task.step ? 'now' : k+1 < task.step ? 'done' : ''}">${k+1}. ${n}</span>`).join('')}</div>`
+      : SES.i >= SES.mode.total ? '<p class="muted" style="margin:-6px 0 10px">🔁 Ekstrarunde: noe du bommet på</p>' : ''}
     <div class="card task" id="task"></div>`;
   $('#quit').onclick = () => { if(confirm('Avslutte økta? XP-en du har fått, beholder du.')){ save(); renderHome(); } };
-  RUN[task.kind]($('#task'), task.item, onResult, SES.topic);
+  RUN[task.kind]($('#task'), task.item, onResult, task.topic || SES.topic);
   window.scrollTo(0,0);
 }
 const PRAISE = ['Riktig!','Supert!','Bra jobba!','Kjempebra!','Helt rått!','Akkurat!'];
@@ -917,10 +965,10 @@ function onResult(res){
   else if(!res.ok){ SES.combo = 0; }
   if(!res.silent) beep(res.ok ? 'ok' : 'bad');
   if(res.ok && ([3,5,10,15].includes(SES.combo) || res.xp >= 20)) burst();
-  if((!res.ok || res.near) && SES.current.item && RETRY.includes(SES.current.kind) && SES.topic !== 'prove')
+  if((!res.ok || res.near) && SES.current.item && RETRY.includes(SES.current.kind) && SES.topic !== 'prove' && !SES.plan)
     SES.retry.push({kind:SES.current.kind, item:SES.current.item, due:SES.i+3});
   // Et begrepskort han ikke kunne, kommer igjen som skriveoppgave (ikke som nytt selvvurderingskort)
-  if((!res.ok || res.near) && SES.current.kind === 'kort'){ const b = SES.current.item;
+  if((!res.ok || res.near) && SES.current.kind === 'kort' && !SES.plan){ const b = SES.current.item;
     SES.retry.push({kind:'skrivBegrep', item:{id:'sb-'+b.id, t:b.t, b}, due:SES.i+3}); }
   SES.xp += gained; S.xp += gained; SES.i++; save();
   const fb = document.createElement('div');
@@ -957,6 +1005,72 @@ function endSession(){
       <div class="row"><button class="btn primary" id="again">En runde til</button><button class="btn" id="home">Hjem</button></div>
     </div>`;
   const t = SES.topic; $('#again').onclick = () => startSession(t); $('#home').onclick = renderHome; $('#again').focus();
+}
+
+/* =====================================================================
+   SMART ØKT – bygd på forskning om læring (se slik-er-appen-laget.md):
+   1 hent fram (skriv alt du husker) → 2 lær det du manglet → 3 blandet
+   repetisjon fra andre temaer → 4 skriv de nye begrepene selv (med litt
+   tid imellom) → 5 prøveoppgave uten hint. Alt skrives, som på prøven.
+   ===================================================================== */
+const MESTER_STEPS = ['Hent fram','Lær','Bland','Skriv','Prøve'];
+const GENERIC = ['det','den','nervesystemet','nervecelle','anfall','sykdom','spalte'];
+function begrepStems(b){
+  const n = b.navn.toLowerCase(), m = n.match(/^(.*?)\s*\((.*)\)$/), alts = m ? [m[1], m[2]] : [n];
+  return alts.map(a => { const ws = a.split(/\s+/).filter(Boolean); const key = ws.filter(w => !GENERIC.includes(w));
+    return (key.length ? key : ws.filter(w => w !== 'det' && w !== 'den')).map(w => w.length > 6 ? w.slice(0, -2) : w.length > 4 ? w.slice(0, -1) : w); });
+}
+function begrepFound(text, b){ const ws = words(text); return begrepStems(b).some(stems => stems.every(st => hasStem(text, ws, st))); }
+function mesterTema(){
+  return P.temaer.map(t => ({t, m: mastery(t.id)})).sort((a,b) => a.m - b.m)[0].t.id;
+}
+function renderMesterIntro(temaId = mesterTema()){
+  const t = TEMA[temaId];
+  app.innerHTML = `<div class="sbar"><button class="icon" id="back" aria-label="Tilbake">←</button><b style="font-size:20px">🧠 Smart økt</b></div>
+    <div class="card">
+      <div class="q-label">Dagens tema (det du har øvd minst på)</div>
+      <div class="q-big" style="margin-bottom:8px">${t.e} ${esc(t.navn)}</div>
+      <details><summary>Bytt tema</summary><div class="chips" style="margin-top:8px">${P.temaer.map(x => `<button class="chip" data-t="${x.id}" style="border:0">${x.e} ${esc(x.navn)}</button>`).join('')}</div></details>
+      <div class="q-label" style="margin-top:12px">Slik ser økta ut (ca. 10 minutter)</div>
+      <ol class="plan">
+        <li><b>Hent fram</b><small>Skriv alt du husker om temaet. 2 minutter.</small></li>
+        <li><b>Lær det du manglet</b><small>Les de begrepene du ikke fikk med.</small></li>
+        <li><b>Blandet repetisjon</b><small>3 korte skriveoppgaver fra andre temaer.</small></li>
+        <li><b>Skriv de nye begrepene</b><small>Nå skal du skrive dem selv.</small></li>
+        <li><b>Prøveoppgave</b><small>Én forklaringsoppgave uten hint, som på prøven.</small></li>
+      </ol>
+      <details><summary>Hvorfor er økta laget sånn?</summary><div class="model">
+        Forskning viser at det som virker best, er å <b>hente fram</b> det man har lært (teste seg selv), og å <b>spre øvingen</b> utover tid. Å lese om igjen virker dårlig.
+        Det gjelder også for elever med ADHD. Derfor starter økta med at du skriver alt du husker, før du får se det du manglet.
+        Korte steg og rask tilbakemelding gjør det lettere å holde fokus. Du skriver alt selv, fordi prøven er skriftlig.</div></details>
+      <div class="row end"><button class="btn primary" id="go">Start økta ➜</button></div>
+    </div>`;
+  $('#back').onclick = renderHome;
+  app.querySelectorAll('[data-t]').forEach(b => b.onclick = () => renderMesterIntro(b.dataset.t));
+  $('#go').onclick = () => startMester(temaId);
+  window.scrollTo(0,0);
+}
+function startMester(temaId){
+  SES = {topic:'mester', mode:{total:1, kinds:[]}, i:0, total:1, correct:0, combo:0, xp:0, lastKind:null, recent:[], retry:[], kindCount:{}, startLevel:level(), forklar:[],
+    tema:temaId, plan:[{kind:'dump', item:{id:'dump-'+temaId, t:temaId}, step:1}]};
+  nextTask();
+}
+function buildMesterRest(temaId, missing){
+  const tema = BEGREPER.filter(b => b.t === temaId);
+  // Inntil 3 begreper å lære: de han ikke fikk med, de svakeste først
+  let learn = missing.slice().sort((a,b) => st('sb-'+b.id).w - st('sb-'+a.id).w).slice(0, 3);
+  if(!learn.length) learn = tema.slice().sort((a,b) => st('sb-'+b.id).w - st('sb-'+a.id).w).slice(0, 2);
+  const plan = SES.plan;
+  plan.push({kind:'studer', item:{id:'studer-'+temaId, t:temaId, list:learn}, step:2});
+  // Blandet repetisjon: korte skriveoppgaver fra andre temaer, svake først
+  const others = [...P.kortsvar.map(x => ['kortsvar', x]), ...P.fyllinn.map(x => ['fyllinn', x]), ...P.fullfor.map(x => ['fullfor', x])].filter(([,x]) => x.t !== temaId);
+  const mixed = [], usedT = new Set();
+  for(const o of weightedPick(others.map(([k,x]) => ({id:x.id, k, x})), others.length)){ if(!usedT.has(o.x.t)){ usedT.add(o.x.t); mixed.push(o); } if(mixed.length === 3) break; }
+  mixed.forEach(o => plan.push({kind:o.k, item:o.x, step:3}));
+  learn.forEach(b => plan.push({kind:'skrivBegrep', item:{id:'sb-'+b.id, t:b.t, b}, step:4}));
+  const fk = P.forklar.filter(f => f.t === temaId);
+  if(fk.length) plan.push({kind:'forklar', item:weightedPick(fk, 1)[0], step:5, topic:'prove'});
+  SES.total = plan.length;
 }
 
 /* ---------- BEGREPSJAKT på tid (alle begrepene) ----------
@@ -1109,6 +1223,7 @@ function renderHome(){
 
     <h2 class="sec">Spesialøkter</h2>
     <div class="grid">
+      <button class="topic wide" id="mester"><span class="em">🧠</span><b>Smart økt</b><small>Laget etter forskning på hvordan vi lærer best. Du skriver alt selv. Ca. 10 minutter.</small></button>
       <button class="topic" data-topic="mix"><span class="em">🎲</span><b>Blandet</b><small>Litt av alt. Best rett før prøven!</small></button>
       <button class="topic" data-topic="skriv"><span class="em">✍️</span><b>Skrivetrening</b><small>Korte skriveoppgaver med fagbegreper</small></button>
       <button class="topic" data-topic="prove"><span class="em">📝</span><b>Prøvetrening</b><small>5 skriveoppgaver som på prøven, uten hint</small></button>
@@ -1130,6 +1245,7 @@ function renderHome(){
     <footer><button class="link" id="reset">Nullstill all fremgang i naturfag</button></footer>`;
   $('#snd').onclick = () => { S.sound = !S.sound; save(); renderHome(); };
   app.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => startSession(b.dataset.topic));
+  $('#mester').onclick = () => renderMesterIntro();
   app.querySelectorAll('[data-jakt]').forEach(b => b.onclick = () => startChallenge(b.dataset.jakt));
   $('#glist').onclick = renderGlossary;
   $('#reset').onclick = () => { if(confirm('Vil du slette all fremgang i naturfag?')){ S = JSON.parse(JSON.stringify(DEFAULT)); save(); renderHome(); } };
