@@ -5,7 +5,7 @@
    ===================================================================== */
 window.PROVE = {
   tittel: 'Naturfag: Nervesystemet',
-  provedato: '2026-10-16', // FORELØPIG: uke 42. Oppdateres når datoen er kjent.
+  provedato: '2026-10-16', // Bekreftet av forelderen: fredag 16. oktober 2026.
   lagringsnokkel: 'naturfag_v1',
 
   temaer: [
