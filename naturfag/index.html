@@ -325,7 +325,7 @@ const MEDALS = [
   {id:'figur',  e:'🔬', name:'Figurekspert',      desc:'5 figurer uten feil',             test:()=>S.figurOk>=5},
   {id:'prove',  e:'📝', name:'Prøveklar',         desc:'2 prøvetreninger',                test:()=>S.proveDone>=2},
   {id:'lyn',    e:'⚡', name:'Begrepsjeger',      desc:'Nå målet i Begrepsjakt: velg',    test:()=>(S.jakt.velg?.best||0)>=JAKT.velg.mal || S.best60>=15},
-  {id:'mester',  e:'🧠', name:'Smart elev',       desc:'3 smarte økter',                  test:()=>(S.topicDone.mester||0)>=3},
+  {id:'mester',  e:'🧠', name:'Smart elev',       desc:'3 smart-økter',                  test:()=>(S.topicDone.mester||0)>=3},
   {id:'jaktvelg',e:'🎯', name:'Begrepsmester',    desc:'Full pott i Begrepsjakt: velg',   test:()=>!!S.jakt.velg?.full},
   {id:'jaktskriv',e:'⌨️', name:'Staveekspert',    desc:'Full pott i Begrepsjakt: skriv',  test:()=>!!S.jakt.skriv?.full},
   {id:'alle',   e:'🧭', name:'Hele pensum',       desc:'En økt i hvert tema',             test:()=>P.temaer.every(t => S.topicDone[t.id])},
@@ -677,8 +677,9 @@ const RUN = {
     el.innerHTML = `<div class="q-label">Steg 2: Lær det du manglet</div>
       <div class="q-text">Les disse nøye. Litt senere i økta skal du skrive dem selv.</div>
       ${s.list.map(b => `<div class="studycard"><b>${esc(cap(b.navn))}</b>${esc(b.fork)}</div>`).join('')}
-      <div class="row end"><button class="btn primary" id="read" disabled>Jeg har lest ✓ <span id="rc">(5)</span></button></div>`;
-    let c = 5; const t = setInterval(() => { c--; const rc = $('#rc'); if(!rc){ clearInterval(t); return; } rc.textContent = c > 0 ? `(${c})` : ''; if(c <= 0){ clearInterval(t); $('#read').disabled = false; } }, 1000);
+      <div class="row end"><button class="btn primary" id="read" disabled>Jeg har lest ✓ <span id="rc"></span></button></div>`;
+    // Lesetid: 5 sek per begrep, minst 10 og høyst 15 sekunder
+    let c = Math.min(15, Math.max(10, 5 * s.list.length)); $('#rc').textContent = `(${c})`; const t = setInterval(() => { c--; const rc = $('#rc'); if(!rc){ clearInterval(t); return; } rc.textContent = c > 0 ? `(${c})` : ''; if(c <= 0){ clearInterval(t); $('#read').disabled = false; } }, 1000);
     $('#read').onclick = () => { $('#read').disabled = true; finish({ok:true, rec:[], xp:3, silent:true, note:'Bra! Nå kommer noen oppgaver fra andre temaer først.'}); };
   },
   kortsvar(el, k, finish, topic){
@@ -1008,7 +1009,7 @@ function endSession(){
 }
 
 /* =====================================================================
-   SMART ØKT – bygd på forskning om læring (se slik-er-appen-laget.md):
+   SMART-ØKT – bygd på forskning om læring (se slik-er-appen-laget.md):
    1 hent fram (skriv alt du husker) → 2 lær det du manglet → 3 blandet
    repetisjon fra andre temaer → 4 skriv de nye begrepene selv (med litt
    tid imellom) → 5 prøveoppgave uten hint. Alt skrives, som på prøven.
@@ -1026,7 +1027,7 @@ function mesterTema(){
 }
 function renderMesterIntro(temaId = mesterTema()){
   const t = TEMA[temaId];
-  app.innerHTML = `<div class="sbar"><button class="icon" id="back" aria-label="Tilbake">←</button><b style="font-size:20px">🧠 Smart økt</b></div>
+  app.innerHTML = `<div class="sbar"><button class="icon" id="back" aria-label="Tilbake">←</button><b style="font-size:20px">🧠 Smart-økt</b></div>
     <div class="card">
       <div class="q-label">Dagens tema (det du har øvd minst på)</div>
       <div class="q-big" style="margin-bottom:8px">${t.e} ${esc(t.navn)}</div>
@@ -1223,7 +1224,7 @@ function renderHome(){
 
     <h2 class="sec">Spesialøkter</h2>
     <div class="grid">
-      <button class="topic wide" id="mester"><span class="em">🧠</span><b>Smart økt</b><small>Laget etter forskning på hvordan vi lærer best. Du skriver alt selv. Ca. 10 minutter.</small></button>
+      <button class="topic wide" id="mester"><span class="em">🧠</span><b>Smart-økt</b><small>Laget etter forskning på hvordan vi lærer best. Du skriver alt selv. Ca. 10 minutter.</small></button>
       <button class="topic" data-topic="mix"><span class="em">🎲</span><b>Blandet</b><small>Litt av alt. Best rett før prøven!</small></button>
       <button class="topic" data-topic="skriv"><span class="em">✍️</span><b>Skrivetrening</b><small>Korte skriveoppgaver med fagbegreper</small></button>
       <button class="topic" data-topic="prove"><span class="em">📝</span><b>Prøvetrening</b><small>5 skriveoppgaver som på prøven, uten hint</small></button>
