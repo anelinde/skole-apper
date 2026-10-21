@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tysk: Zuhause</title>
+<style>
+:root{
+  --bg:#f5f3ff; --card:#ffffff; --ink:#1f1b3a; --muted:#6b6790; --line:#e4e0f5; --chip:#efeafe;
+  --brand:#6c4cf1; --brand-ink:#ffffff; --accent:#ff8a3d;
+  --ok:#14874a; --okbg:#e3f6ea; --bad:#c93a3a; --badbg:#fde9e9; --near:#b45309; --nearbg:#fff4e5;
+  --shadow:0 2px 0 rgba(31,27,58,.08), 0 8px 24px rgba(31,27,58,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#14122a; --card:#1f1c3b; --ink:#f1efff; --muted:#a8a3cc; --line:#34305a; --chip:#2c2852;
+    --brand:#8f74ff; --brand-ink:#ffffff; --accent:#ff9b57;
+    --ok:#46d68a; --okbg:#173a28; --bad:#ff7070; --badbg:#3d1d24; --near:#ffb35c; --nearbg:#3a2a14;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+#app{max-width:720px;margin:0 auto;padding:16px 16px 160px}
+h1,h2,h3{line-height:1.2;margin:0}
+h2.sec{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:28px 0 10px}
+button{font:inherit;color:inherit;cursor:pointer}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.row.end{justify-content:flex-end}
+.btn{border:0;border-radius:14px;padding:13px 20px;font-weight:700;background:var(--chip);color:var(--ink);min-height:48px}
+.btn.primary{background:var(--brand);color:var(--brand-ink);box-shadow:0 3px 0 rgba(0,0,0,.18)}
+.btn.primary:active{transform:translateY(2px);box-shadow:none}
+.btn.ghost{background:transparent;border:2px solid var(--line)}
+.btn:disabled{opacity:.5;cursor:default}
+.icon{border:0;background:var(--chip);border-radius:12px;width:44px;height:44px;font-size:20px;display:grid;place-items:center;flex:none;text-decoration:none;color:inherit}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{font-weight:800;font-size:21px;display:flex;align-items:center;gap:10px}
+.hero{display:grid;gap:10px}
+.lvl{display:flex;align-items:baseline;gap:10px}
+.lvlnum{font-size:28px;font-weight:800}
+.rank{font-weight:700;color:var(--brand)}
+.bar{height:14px;background:var(--chip);border-radius:99px;overflow:hidden}
+.bar>div{height:100%;background:linear-gradient(90deg,var(--brand),var(--accent));border-radius:99px;transition:width .5s}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:var(--chip);border-radius:99px;padding:6px 12px;font-size:15px;font-weight:600}
+.pill.hot{background:var(--accent);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.topic{display:grid;gap:6px;text-align:left;padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow)}
+.topic:hover{border-color:var(--brand)}
+.topic .em{font-size:30px}
+.topic b{font-size:18px}
+.topic small{color:var(--muted);font-size:14px}
+.topic .bar{height:8px;margin-top:4px}
+.topic.wide{grid-column:1/-1}
+footer{margin-top:32px;text-align:center}
+.link{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:14px}
+.sbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.sbar .bar{flex:1}
+.combo{font-weight:800;min-width:56px;text-align:right}
+.combo.on{color:var(--accent)}
+.task{min-height:260px}
+.q-label{color:var(--muted);font-weight:600;font-size:15px;margin-bottom:8px}
+.q-big{font-size:25px;font-weight:800;margin:6px 0 16px}
+.q-text{font-size:20px;font-weight:700;margin:6px 0 14px}
+.q-sent{font-size:21px;font-weight:700;margin:8px 0 6px;line-height:1.9}
+input.answer{width:100%;font:inherit;font-size:21px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+input.answer.inline{width:8.5ch;display:inline-block;padding:4px 8px;font-weight:700;text-align:center}
+input.answer:focus,textarea:focus{outline:none;border-color:var(--brand)}
+input.answer.right{border-color:var(--ok);background:var(--okbg)}
+input.answer.wrong{border-color:var(--bad);background:var(--badbg)}
+input.answer.near{border-color:var(--accent);background:var(--nearbg)}
+textarea{width:100%;min-height:110px;font:inherit;font-size:19px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink);resize:vertical}
+.guard{font-size:14px;color:var(--near);font-weight:700;margin-top:6px}
+.guard:empty{display:none}
+.hintbox{margin-top:10px;color:var(--muted);font-size:18px}
+.hintbox:empty{display:none}
+.diff{margin-top:6px;font-size:18px;line-height:1.6}
+.d-add{background:var(--okbg);color:var(--ok);text-decoration:underline;font-weight:800}
+.d-del{background:var(--badbg);color:var(--bad);text-decoration:line-through}
+.keys{list-style:none;padding:0;margin:8px 0;display:grid;gap:4px}
+.keys li.ok{color:var(--ok);font-weight:700}
+.keys li.near{color:var(--near);font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chipb{border:1px solid var(--line);background:var(--chip);border-radius:99px;padding:6px 12px;font-size:15px;font-weight:600}
+.checks{list-style:none;padding:0;margin:12px 0;display:grid;gap:6px}
+.checks li.done{color:var(--ok);font-weight:700}
+.model{background:var(--bg);border-radius:14px;padding:12px 14px;margin-top:6px}
+details{margin:10px 0}
+summary{cursor:pointer;font-weight:700;color:var(--brand)}
+.spell .marked{background:var(--bg);border-radius:14px;padding:12px 14px;line-height:1.8;white-space:pre-wrap}
+.spell mark{background:var(--badbg);color:inherit;border-bottom:3px solid var(--bad);border-radius:3px;padding:0 2px}
+.spell ul{list-style:none;padding:0;margin:10px 0 0;display:grid;gap:8px}
+.spell li{background:var(--bg);border-radius:12px;padding:10px 12px}
+.sugg{border:2px solid var(--ok);background:var(--okbg);color:var(--ok);border-radius:10px;padding:4px 10px;font-weight:800;margin:4px 6px 0 0}
+.mini{border-collapse:collapse;margin-top:6px}
+.mini td{padding:2px 14px 2px 0}
+.fb{position:fixed;left:0;right:0;bottom:0;padding:16px;border-top:3px solid;display:flex;justify-content:center;animation:up .2s ease-out;z-index:5}
+.fb .in{max-width:720px;width:100%;display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.fb.ok{background:var(--okbg);border-color:var(--ok)}
+.fb.bad{background:var(--badbg);border-color:var(--bad)}
+.fb.near{background:var(--nearbg);border-color:var(--accent)}
+.fb .msg{flex:1;min-width:220px;max-height:42vh;overflow:auto}
+.fb .title{font-size:21px;font-weight:800}
+.fb.ok .title{color:var(--ok)} .fb.bad .title{color:var(--bad)} .fb.near .title{color:var(--near)}
+.fb .xp{font-weight:800;color:var(--accent);margin-left:6px}
+.end{text-align:center;display:grid;gap:10px;justify-items:center}
+.end .big{font-size:72px}
+.end .stat{font-size:20px;font-weight:800}
+.review{text-align:left;width:100%;display:grid;gap:8px}
+.review div{background:var(--bg);border-radius:12px;padding:10px 12px}
+.conf{position:fixed;top:55vh;font-size:28px;pointer-events:none;z-index:10;animation:pop 1.1s ease-out forwards}
+@keyframes pop{0%{transform:translate(0,0) scale(.6);opacity:1}100%{transform:translate(var(--dx),-50vh) scale(1.2) rotate(var(--r));opacity:0}}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="innhold.js"></script>
+<script>
+const T = window.TYSK;
+const ORD = T.ord.map(([id,t,no,svar,n]) => ({id,t,no,svar,n:n||''}));
+const TEMA = Object.fromEntries(T.temaer.map(t => [t.id, t]));
+
+/* ---------- Lagring ---------- */
+const KEY = T.lagringsnokkel;
+const DEFAULT = {xp:0, stats:{}, sessions:0, topicDone:{}, maxCombo:0, dayStreak:0, lastDay:null, sound:true, drafts:{}, submitted:{}};
+let S = load();
+function load(){ try{ const r = localStorage.getItem(KEY); if(r) return Object.assign(JSON.parse(JSON.stringify(DEFAULT)), JSON.parse(r)); }catch(e){} return JSON.parse(JSON.stringify(DEFAULT)); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function st(id){ return S.stats[id] || {w:3, s:0, n:0}; }
+function record(id, ok){ const x = st(id); x.n++; if(ok){ x.s++; x.w = Math.max(1, x.w-1); } else { x.s = 0; x.w = Math.min(9, x.w+3); } S.stats[id] = x; }
+function weightedPick(arr, n){
+  const a = arr.slice(), out = [];
+  while(out.length < n && a.length){
+    const tot = a.reduce((s,x) => s+st(x.id).w, 0); let r = Math.random()*tot, i = 0;
+    for(; i < a.length-1; i++){ r -= st(a[i].id).w; if(r <= 0) break; }
+    out.push(a.splice(i,1)[0]);
+  }
+  return out;
+}
+
+/* ---------- Hjelpere ---------- */
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+const rnd = a => a[Math.floor(Math.random()*a.length)];
+const RANKS = ['Anfänger','Lehrling','Entdecker','Kenner','Profi','Meister','Champion','Legende'];
+function level(xp = S.xp){ return Math.floor(Math.sqrt(xp/30)) + 1; }
+function levelInfo(){ const l = level(), base = 30*(l-1)*(l-1), next = 30*l*l; return {l, rank:RANKS[Math.min(l-1, RANKS.length-1)], cur:S.xp-base, need:next-base}; }
+function dayKey(d = new Date()){ return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function markDay(){ const today = dayKey(); if(S.lastDay === today) return; const y = new Date(); y.setDate(y.getDate()-1); S.dayStreak = (S.lastDay === dayKey(y)) ? S.dayStreak+1 : 1; S.lastDay = today; }
+function streakNow(){ const y = new Date(); y.setDate(y.getDate()-1); return (S.lastDay === dayKey() || S.lastDay === dayKey(y)) ? S.dayStreak : 0; }
+let actx;
+function beep(kind){
+  if(!S.sound) return;
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    ({ok:[660,880], bad:[260,200], win:[523,659,784,1046]})[kind].forEach((f,i) => {
+      const t0 = actx.currentTime + i*0.09, o = actx.createOscillator(), g = actx.createGain();
+      o.type = kind === 'bad' ? 'triangle' : 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(0.14, t0+0.02); g.gain.exponentialRampToValueAtTime(0.0001, t0+0.2);
+      o.connect(g); g.connect(actx.destination); o.start(t0); o.stop(t0+0.22);
+    });
+  }catch(e){}
+}
+function burst(n = 14){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  for(let i=0;i<n;i++){
+    const s = document.createElement('span'); s.className = 'conf'; s.textContent = rnd(['⭐','✨','🎉','🏠','🔑','🏆']);
+    s.style.left = (35 + Math.random()*30) + 'vw'; s.style.setProperty('--dx', (Math.random()*60-30) + 'vw'); s.style.setProperty('--r', (Math.random()*360-180) + 'deg');
+    document.body.append(s); setTimeout(() => s.remove(), 1400);
+  }
+}
+
+/* ---------- Skrivefelt: han skriver selv ---------- */
+const WRITE_ATTR = 'autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" lang="de"';
+function guardInput(inp, msgEl){
+  inp.addEventListener('beforeinput', e => {
+    const t = e.inputType || '';
+    if(/^insertFrom(Paste|Drop|Yank)/.test(t) || (e.data && e.data.length > 25)){ e.preventDefault(); if(msgEl) msgEl.textContent = '✍️ Skriv svaret selv. På prøven skriver du for hånd!'; }
+  });
+  inp.addEventListener('paste', e => { e.preventDefault(); if(msgEl) msgEl.textContent = '✍️ Innliming er skrudd av. Skriv selv!'; });
+}
+
+/* ---------- Retting ---------- */
+const strip = s => String(s).replace(/[.,!?;:«»"()…]/g,' ').replace(/\.\.\./g,' ').replace(/\s+/g,' ').trim();
+const lowFirst = s => s.charAt(0).toLowerCase() + s.slice(1);
+const loose = s => s.toLowerCase().replace(/ä/g,'a').replace(/ö/g,'o').replace(/ü/g,'u').replace(/ß/g,'ss').replace(/ae/g,'a').replace(/oe/g,'o').replace(/ue/g,'u');
+// 'ok' | 'case' (bare stor/liten bokstav) | 'close' (ä/ö/ü/ß) | false
+function gradeWord(input, answers){
+  const a = strip(input); if(!a) return null;
+  for(const x of answers){ const y = strip(x);
+    if(y === a) return 'ok';
+    if(/^[a-zäöü]/.test(y) && lowFirst(a) === y) return 'ok';   // stor forbokstav på et ord som ellers er lite, er ikke feil i seg selv
+  }
+  if(answers.some(x => strip(x).toLowerCase() === a.toLowerCase())) return 'case';
+  if(answers.some(x => loose(strip(x)) === loose(a))) return 'close';
+  return false;
+}
+// Nøkkelen skrives slik den står midt i en setning. Første ord i svaret kan ha stor forbokstav.
+function hasKey(input, key, exactCase){
+  const pad = s => ' ' + s + ' ', k = pad(strip(key));
+  const vars = [pad(strip(input)), pad(lowFirst(strip(input)))];
+  return exactCase ? vars.some(v => v.includes(k)) : vars.some(v => v.toLowerCase().includes(k.toLowerCase()));
+}
+function diffHtml(input, correct){
+  const a = input.trim(), b = correct.trim();
+  const L = Array.from({length:a.length+1}, () => Array(b.length+1).fill(0));
+  for(let i=a.length-1;i>=0;i--) for(let j=b.length-1;j>=0;j--) L[i][j] = a[i] === b[j] ? L[i+1][j+1]+1 : Math.max(L[i+1][j], L[i][j+1]);
+  let i = 0, j = 0, ha = '', hb = '';
+  while(i < a.length || j < b.length){
+    if(i < a.length && j < b.length && a[i] === b[j]){ ha += esc(a[i]); hb += esc(b[j]); i++; j++; }
+    else if(j < b.length && (i >= a.length || L[i][j+1] >= L[i+1][j])){ hb += `<span class="d-add">${esc(b[j])}</span>`; j++; }
+    else { ha += `<span class="d-del">${esc(a[i] === ' ' ? '␣' : a[i])}</span>`; i++; }
+  }
+  return `<div class="diff" lang="de"><div><span class="muted">Du skrev:</span> ${ha}</div><div><span class="muted">Riktig:</span> <b>${hb}</b></div></div>`;
+}
+const NEAR = {case:'Nesten! Se på store og små bokstaver. Substantiv har alltid stor forbokstav på tysk.', close:'Nesten! Husk ä, ö, ü og ß.'};
+function bestOf(input, answers){ const a = strip(input).toLowerCase(); return answers.slice().sort((x,y) => Math.abs(strip(x).length - a.length) - Math.abs(strip(y).length - a.length))[0]; }
+const POSS = '<table class="mini" lang="de">' + [['ich','mein / meine'],['du','dein / deine'],['er','sein / seine'],['sie (hun)','ihr / ihre'],['es','sein / seine'],['wir','unser / unsere'],['ihr','euer / eure'],['sie (de)','ihr / ihre'],['Sie','Ihr / Ihre']].map(r => `<tr><td>${r[0]}</td><td><b>${r[1]}</b></td></tr>`).join('') + '</table>';
+
+/* =====================================================================
+   OPPGAVETYPER (alle er skriving)
+   ===================================================================== */
+function onEnter(inp, fn){ inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); fn(); } }); }
+const RUN = {
+  ord(el, o, finish){
+    const hint = o.svar[0].replace(/^(der|die|das) /,'');
+    el.innerHTML = `<div class="q-label">${TEMA[o.t].e} Skriv på tysk</div><div class="q-big">${esc(o.no)}</div>
+      <input class="answer" ${WRITE_ATTR} placeholder="Skriv her …"><div class="guard"></div><div class="hintbox"></div>
+      <div class="row end"><button class="btn ghost" id="hint">💡 Hint</button><button class="btn primary" id="check">Sjekk</button></div>`;
+    const inp = el.querySelector('input'); guardInput(inp, el.querySelector('.guard')); let hinted = false;
+    $('#hint').onclick = e => { hinted = true; e.target.disabled = true; el.querySelector('.hintbox').textContent = hint.split(' ').map(w => w[0] + w.slice(1).replace(/[^ .,…]/g,'_')).join(' '); inp.focus(); };
+    const check = () => {
+      const g = gradeWord(inp.value, o.svar); if(g === null || inp.disabled) return;
+      inp.disabled = true; el.querySelectorAll('button').forEach(b => b.disabled = true);
+      inp.classList.add(g === 'ok' ? 'right' : g ? 'near' : 'wrong');
+      finish({ok:!!g, near: g && g !== 'ok', rec:[[o.id, g === 'ok']], xp: g === 'ok' ? (hinted ? 5 : 10) : 3,
+        note: g === 'ok' ? o.n : (g ? NEAR[g] : '') + diffHtml(inp.value, bestOf(inp.value, o.svar)) + (o.n ? `<div>${esc(o.n)}</div>` : '')});
+    };
+    $('#check').onclick = check; onEnter(inp, check); inp.focus();
+  },
+  fyll(el, f, finish){
+    const [a, b] = f.s.split('___');
+    el.innerHTML = `<div class="q-label">${TEMA.eiendom.e} Skriv riktig eiendomsord</div>
+      <div class="q-sent" lang="de">${esc(a)}<input class="answer inline" ${WRITE_ATTR}>${esc(b)}</div>
+      ${f.no ? `<div class="muted">🇳🇴 ${esc(f.no)}</div>` : ''}<div class="guard"></div><div class="hintbox"></div>
+      <div class="row end"><button class="btn ghost" id="hint">💡 Vis tabellen</button><button class="btn primary" id="check">Sjekk</button></div>`;
+    const inp = el.querySelector('input'); guardInput(inp, el.querySelector('.guard')); let hinted = false;
+    $('#hint').onclick = e => { hinted = true; e.target.disabled = true; el.querySelector('.hintbox').innerHTML = POSS; inp.focus(); };
+    const check = () => {
+      const g = gradeWord(inp.value, f.svar.concat(f.svar.map(x => x.charAt(0).toUpperCase() + x.slice(1)))); if(g === null || inp.disabled) return;
+      inp.disabled = true; el.querySelectorAll('button').forEach(b => b.disabled = true);
+      const ok = g === 'ok' || g === 'case';
+      inp.classList.add(ok ? 'right' : g ? 'near' : 'wrong');
+      finish({ok:!!g, near: g === 'close', rec:[[f.id, ok]], xp: ok ? (hinted ? 5 : 10) : 3,
+        note: (ok ? '' : diffHtml(inp.value, f.svar[0])) + `<div>💡 ${esc(f.fork)}</div>`});
+    };
+    $('#check').onclick = check; onEnter(inp, check); inp.focus();
+  },
+  setning(el, s, finish){
+    el.innerHTML = `<div class="q-label">${TEMA.setning.e} Skriv setningen på tysk</div><div class="q-text">${esc(s.no)}</div>
+      <textarea id="txt" ${WRITE_ATTR} rows="2" style="min-height:90px" placeholder="Skriv setningen her …"></textarea><div class="guard"></div><div class="hintbox"></div>
+      <div class="row end"><button class="btn ghost" id="hint">💡 Hint</button><button class="btn primary" id="check">Sjekk</button></div><div id="res"></div>`;
+    const ta = $('#txt'); guardInput(ta, el.querySelector('.guard')); let hinted = false;
+    $('#hint').onclick = e => { hinted = true; e.target.disabled = true; el.querySelector('.hintbox').innerHTML = `Ord du trenger: ${shuffle(s.fasit.replace(/[.,]/g,'').split(' ')).map(w => `<span class="chipb" lang="de">${esc(w)}</span>`).join(' ')}`; ta.focus(); };
+    const check = () => {
+      const v = ta.value.trim(); if(v.split(/\s+/).length < 2 || ta.disabled) return ta.focus();
+      const res = s.keys.map(k => hasKey(v, k, true) ? 'ok' : hasKey(v, k, false) ? 'case' : (loose(' '+strip(v)+' ').includes(loose(' '+strip(k)+' ')) ? 'close' : 'bad'));
+      const allOk = res.every(r => r === 'ok'), almost = res.every(r => r !== 'bad');
+      ta.disabled = true; el.querySelectorAll('button').forEach(b => b.disabled = true);
+      $('#res').innerHTML = `<ul class="keys">${s.keys.map((k,i) => `<li class="${res[i] === 'ok' ? 'ok' : res[i] === 'bad' ? '' : 'near'}" lang="de">${res[i] === 'ok' ? '✅' : res[i] === 'bad' ? '⬜' : '🔶'} ${esc(k)}</li>`).join('')}</ul>`;
+      finish({ok: almost, near: almost && !allOk, rec:[[s.id, allOk]], xp: allOk ? (hinted ? 8 : 15) : almost ? 5 : 0,
+        note: (allOk ? '' : almost ? (res.includes('case') ? NEAR.case : NEAR.close) : 'Se på delene som mangler (⬜).') + diffHtml(v, s.fasit)});
+    };
+    $('#check').onclick = check; onEnter(ta, check); ta.focus();
+  },
+  hus(el, h, finish){
+    el.innerHTML = `<div class="q-label">${TEMA.hus.e} Hvilken hustype? Skriv ordet på tysk</div><div class="q-text">${esc(h.clue)}</div>
+      <input class="answer" ${WRITE_ATTR} placeholder="Hustypen …"><div class="guard"></div>
+      <div class="row end"><button class="btn primary" id="check">Sjekk</button></div>`;
+    const inp = el.querySelector('input'); guardInput(inp, el.querySelector('.guard'));
+    const check = () => {
+      const g = gradeWord(inp.value, h.svar); if(g === null || inp.disabled) return;
+      inp.disabled = true; $('#check').disabled = true; inp.classList.add(g === 'ok' ? 'right' : g ? 'near' : 'wrong');
+      finish({ok:!!g, near: g && g !== 'ok', rec:[[h.id, g === 'ok']], xp: g === 'ok' ? 10 : 3,
+        note: (g && g !== 'ok' ? NEAR[g] : '') + (g === 'ok' ? '' : diffHtml(inp.value, h.svar[0]))});
+    };
+    $('#check').onclick = check; onEnter(inp, check); inp.focus();
+  },
+};
+
+/* =====================================================================
+   ØKTER
+   ===================================================================== */
+const HUS = T.hus.map(h => ({...h, t:'hus'}));
+const FYLL = T.fyll.map(f => ({...f, t:'eiendom'}));
+function pool(topic){
+  const all = [...ORD.map(x => ['ord',x]), ...FYLL.map(x => ['fyll',x]), ...T.setninger.map(x => ['setning',x]), ...HUS.map(x => ['hus',x])];
+  if(topic === 'mix') return all;
+  return all.filter(([,x]) => x.t === topic);
+}
+const RANK_KIND = {ord:1, fyll:1, setning:1, hus:1};
+let SES = null;
+function startSession(topic){
+  const p = pool(topic).map(([k,x]) => ({id:x.id, k, x}));
+  const n = Math.min(topic === 'mix' ? 15 : 12, p.length);
+  // Variasjon: i blandet økt fordeles oppgavene på typene
+  let picks;
+  if(topic === 'mix'){
+    const by = k => p.filter(o => o.k === k);
+    picks = shuffle([...weightedPick(by('ord'), 5), ...weightedPick(by('fyll'), 4), ...weightedPick(by('setning'), 4), ...weightedPick(by('hus'), 2)]);
+  } else picks = weightedPick(p, n);
+  SES = {topic, plan:picks.map(o => ({kind:o.k, item:o.x})), i:0, base:picks.length, correct:0, combo:0, xp:0, wrong:[], startLevel:level()};
+  nextTask();
+}
+function nextTask(){
+  $('.fb')?.remove();
+  if(SES.i >= SES.plan.length) return endSession();
+  const task = SES.plan[SES.i]; SES.current = task;
+  app.innerHTML = `<div class="sbar"><button class="icon" id="quit" aria-label="Avslutt">✕</button>
+      <div class="bar"><div style="width:${100*SES.i/SES.plan.length}%"></div></div>
+      <div class="combo ${SES.combo >= 3 ? 'on' : ''}">${SES.combo >= 2 ? '🔥 ' + SES.combo : ''}</div></div>
+    ${SES.i >= SES.base ? '<p class="muted" style="margin:-6px 0 10px">🔁 Ekstrarunde: noe du bommet på</p>' : ''}
+    <div class="card task" id="task"></div>`;
+  $('#quit').onclick = () => { if(confirm('Avslutte økta? XP-en du har fått, beholder du.')){ save(); renderHome(); } };
+  RUN[task.kind]($('#task'), task.item, onResult);
+  window.scrollTo(0,0);
+}
+const PRAISE = ['Richtig!','Super!','Sehr gut!','Toll!','Genau!','Perfekt!'];
+function onResult(res){
+  (res.rec||[]).forEach(([id,ok]) => record(id, ok));
+  let gained = Math.max(0, res.xp || 0);
+  if(res.ok && !res.near){ SES.correct++; SES.combo++; S.maxCombo = Math.max(S.maxCombo, SES.combo); if(SES.combo >= 3) gained += 5; }
+  else { SES.combo = 0;
+    const cur = SES.current; if(!SES.wrong.includes(cur)) SES.wrong.push(cur);
+    // Kommer tilbake om 3 oppgaver (høyst 4 ekstra per økt)
+    if(SES.plan.length < SES.base + 4){ const at = Math.min(SES.i + 4, SES.plan.length); SES.plan.splice(at, 0, {kind:cur.kind, item:cur.item}); }
+  }
+  beep(res.ok && !res.near ? 'ok' : 'bad');
+  if(res.ok && !res.near && [3,5,10,15].includes(SES.combo)) burst();
+  SES.xp += gained; S.xp += gained; SES.i++; save();
+  const fb = document.createElement('div');
+  fb.className = 'fb ' + (res.near ? 'near' : res.ok ? 'ok' : 'bad');
+  fb.innerHTML = `<div class="in"><div class="msg">
+      <div class="title">${res.near ? 'Nesten!' : res.ok ? rnd(PRAISE) : 'Ikke helt'}${gained ? `<span class="xp">+${gained} XP</span>` : ''}${res.ok && !res.near && SES.combo >= 3 ? ` <span class="xp">🔥 ${SES.combo} på rad!</span>` : ''}</div>
+      ${res.note ? `<div>${res.note}</div>` : ''}</div><button class="btn primary" id="next">Fortsett ➜</button></div>`;
+  document.body.append(fb); const nb = $('#next'); nb.onclick = nextTask; nb.focus();
+}
+document.addEventListener('keydown', e => { if(e.key === 'Enter' && !e.defaultPrevented && $('#next') && document.activeElement?.id !== 'next' && document.activeElement?.tagName !== 'TEXTAREA'){ e.preventDefault(); nextTask(); } });
+function taskLabel(t){ const x = t.item; return t.kind === 'ord' ? `${x.no} → <b lang="de">${esc(x.svar[0])}</b>` : t.kind === 'fyll' ? `<span lang="de">${esc(x.s.replace('___', x.svar[0]))}</span>` : t.kind === 'setning' ? `<span lang="de">${esc(x.fasit)}</span>` : `<b lang="de">${esc(x.svar[0])}</b>`; }
+function endSession(){
+  $('.fb')?.remove();
+  S.sessions++; S.topicDone[SES.topic] = (S.topicDone[SES.topic]||0) + 1; markDay(); save();
+  const pct = SES.correct / SES.plan.length, up = level() > SES.startLevel, L = levelInfo();
+  beep('win'); burst(up ? 30 : 16);
+  app.innerHTML = `<div class="card end">
+      <div class="big">${pct >= .85 ? '🏆' : pct >= .6 ? '🌟' : '💪'}</div>
+      <h2>${pct >= .85 ? 'Wunderbar!' : pct >= .6 ? 'Kjempebra jobba!' : 'Bra! Det du bommet på, kommer igjen.'}</h2>
+      <div class="stat">${SES.correct} av ${SES.plan.length} helt riktige</div>
+      <div class="stat" style="color:var(--accent)">+${SES.xp} XP</div>
+      ${up ? `<div class="pill hot">⬆️ Nytt nivå: ${L.l} – ${L.rank}!</div>` : ''}
+      ${SES.wrong.length ? `<div class="review"><div class="q-label">Øv mer på disse:</div>${SES.wrong.map(t => `<div>${taskLabel(t)}</div>`).join('')}</div>` : ''}
+      <div class="row"><button class="btn primary" id="again">En runde til</button><button class="btn" id="home">Hjem</button></div></div>`;
+  const t = SES.topic; $('#again').onclick = () => startSession(t); $('#home').onclick = renderHome; $('#again').focus();
+}
+
+/* =====================================================================
+   SKRIVEOPPDRAG med sjekkliste og stavekontroll (LanguageTool, tysk)
+   ===================================================================== */
+const Wd = t => ' ' + t.toLowerCase().replace(/[.,!?;:"«»()]/g,' ').replace(/\s+/g,' ').trim() + ' ';
+function sjekkOk(t, [, type, arg]){
+  const w = Wd(t);
+  if(type === 'setn') return t.split(/[.!?]+/).filter(s => s.trim().split(/\s+/).length >= 3).length >= arg;
+  if(type === 'noen') return arg.some(x => w.includes(' ' + x + ' '));
+  if(type === 'antall') return arg[0].filter(x => w.includes(' ' + x)).length >= arg[1];
+  return false;
+}
+async function spellCheck(t){
+  try{
+    const r = await fetch('https://api.languagetool.org/v2/check', {method:'POST', body:new URLSearchParams({text:t, language:'de-DE'})});
+    if(!r.ok) throw 0;
+    const d = await r.json();
+    return {failed:false, matches:d.matches.filter(m => !/TYPOGRAPHY|STYLE|REDUNDANCY|COLLOQUIALISMS/.test(m.rule.category.id)).map(m => {
+      const msg = m.message || '';
+      const label = /großgeschrieben|Großschreibung/i.test(msg) ? 'Stor forbokstav: substantiv skrives med stor bokstav på tysk.'
+        : /kleingeschrieben|Kleinschreibung/i.test(msg) ? 'Liten forbokstav.'
+        : /Übereinstimmung|Subjekt|Prädikat/i.test(msg) ? 'Verbet passer ikke med personen (ich, du, er …).'
+        : m.rule.category.id === 'TYPOS' ? 'Stavefeil.' : m.rule.category.id === 'GRAMMAR' ? 'Grammatikkfeil.' : 'Mulig feil.';
+      return {offset:m.offset, length:m.length, label, repl:m.replacements.slice(0,3).map(x => x.value)};
+    })};
+  }catch(e){ return {failed:true, matches:[]}; }
+}
+function renderSkriv(k){
+  const w = T.skriv[k];
+  app.innerHTML = `<div class="sbar"><button class="icon" id="back" aria-label="Tilbake">✕</button><b style="font-size:20px">${w.e} ${esc(w.tittel)}</b></div>
+    <div class="card">
+      <p style="margin-top:0">${esc(w.oppgave)}</p>
+      <div class="q-label">Ord fra boka du kan bruke (skriv dem selv):</div>
+      <div class="chips" lang="de">${w.ordbank.map(b => `<span class="chipb">${esc(b)}</span>`).join('')}</div>
+      <textarea id="txt" ${WRITE_ATTR} style="min-height:200px" placeholder="Skriv teksten din her …">${esc(S.drafts[k] || '')}</textarea><div class="guard"></div>
+      <div class="q-label" style="margin-top:12px">Sjekkliste</div><ul class="checks" id="checks"></ul>
+      <details><summary>Se et eksempel (prøv selv først!)</summary><div class="model" lang="de">${esc(w.eksempel)}</div></details>
+      <div class="row end"><button class="btn" id="spellbtn">🔍 Sjekk stavingen</button><button class="btn primary" id="done">Jeg er ferdig ✓</button></div>
+      <div class="spell" id="spell"></div>
+      <p class="muted" style="font-size:14px">Stavekontrollen (LanguageTool) finner de fleste feil, men ikke alle.</p>
+    </div>`;
+  const ta = $('#txt'); guardInput(ta, $('.guard'));
+  const upd = () => { $('#checks').innerHTML = w.sjekk.map(c => { const ok = sjekkOk(ta.value, c); return `<li class="${ok ? 'done' : ''}">${ok ? '✅' : '⬜'} ${esc(c[0])}</li>`; }).join(''); S.drafts[k] = ta.value; save(); };
+  ta.addEventListener('input', upd); upd();
+  let last = null;
+  const runSpell = async () => {
+    const t = ta.value; if(!t.trim()) return null;
+    $('#spell').innerHTML = '<p class="muted">🔍 Sjekker …</p>';
+    const {matches, failed} = await spellCheck(t);
+    if(!ta.isConnected || ta.value !== t) return null;
+    last = {t, n:matches.length};
+    let html = '', pos = 0; matches.forEach(m => { html += esc(t.slice(pos, m.offset)) + `<mark>${esc(t.substr(m.offset, m.length))}</mark>`; pos = m.offset + m.length; }); html += esc(t.slice(pos));
+    $('#spell').innerHTML = (failed ? '<p style="color:var(--bad)">Fikk ikke kontakt med stavekontrollen (er du på nett?).</p>' : '') +
+      (matches.length ? `<div class="q-label">${matches.length} mulige feil. Rett dem selv i teksten:</div><div class="marked" lang="de">${html}</div>
+        <ul>${matches.map(m => `<li><b style="color:var(--bad)" lang="de">${esc(t.substr(m.offset, m.length))}</b> · ${esc(m.label)}${m.repl.length ? '<br>Forslag: ' + m.repl.map(r => `<span class="sugg" lang="de">${esc(r)}</span>`).join('') : ''}</li>`).join('')}</ul>`
+        : (failed ? '' : '<p style="color:var(--ok);font-weight:700">✅ Fant ingen feil. Sehr gut!</p>'));
+    return last;
+  };
+  $('#spellbtn').onclick = runSpell;
+  $('#back').onclick = renderHome;
+  $('#done').onclick = async () => {
+    if(!ta.value.trim()) return ta.focus();
+    if(!last || last.t !== ta.value){ const c = await runSpell(); if(!ta.isConnected) return; if(c && c.n){ $('#spell').insertAdjacentHTML('afterbegin', '<p style="font-weight:700">Rett feilene først, eller trykk «Jeg er ferdig» igjen for å levere likevel.</p>'); return; } }
+    const passed = w.sjekk.filter(c => sjekkOk(ta.value, c)).length, all = passed === w.sjekk.length;
+    const isNew = S.submitted[k] !== ta.value.trim(), noErr = last && last.t === ta.value && last.n === 0;
+    const xp = isNew ? passed*5 + (all ? 20 : 0) + (noErr ? 15 : 0) : 0;
+    if(isNew){ S.xp += xp; S.submitted[k] = ta.value.trim(); markDay(); } save();
+    if(all){ beep('win'); burst(24); } else beep('ok');
+    app.innerHTML = `<div class="card end"><div class="big">${all ? '🏆' : '✍️'}</div>
+      <h2>${all ? 'Hele sjekklista er fullført!' : `${passed} av ${w.sjekk.length} punkter på sjekklista`}</h2>
+      ${xp ? `<div class="stat" style="color:var(--accent)">+${xp} XP</div>` : '<div class="muted">Endre teksten for å få XP igjen.</div>'}
+      ${noErr ? '<div class="pill hot">✨ Ingen stavefeil: +15 XP</div>' : ''}
+      <div class="row"><button class="btn primary" id="more">${all ? 'Skriv mer' : 'Fortsett å skrive'}</button><button class="btn" id="home">Hjem</button></div></div>`;
+    $('#more').onclick = () => renderSkriv(k); $('#home').onclick = renderHome;
+  };
+}
+
+/* =====================================================================
+   FORSIDE
+   ===================================================================== */
+function mastery(topic){ const ids = pool(topic).map(([,x]) => x.id); return ids.length ? Math.round(100 * ids.filter(id => st(id).s >= 1).length / ids.length) : 0; }
+function renderHome(){
+  const L = levelInfo(), streak = streakNow();
+  app.innerHTML = `<header class="top"><div class="brand"><a class="icon" href="../../" aria-label="Alle fag">←</a> 🇩🇪 Mein Zuhause</div>
+      <button class="icon" id="snd" aria-label="Lyd av/på">${S.sound ? '🔊' : '🔇'}</button></header>
+    <section class="card hero">
+      <div class="muted" style="font-weight:700">${esc(T.tittel)}</div>
+      <div class="lvl"><span class="lvlnum">Nivå ${L.l}</span><span class="rank">${L.rank}</span></div>
+      <div class="bar"><div style="width:${Math.min(100, 100*L.cur/L.need)}%"></div></div>
+      <small class="muted">${S.xp} XP · ${L.need - L.cur} XP til neste nivå</small>
+      <div class="pills">${streak ? `<span class="pill hot">🔥 ${streak} ${streak === 1 ? 'dag' : 'dager'} på rad</span>` : '<span class="pill">🔥 Start en streak i dag!</span>'}</div>
+    </section>
+    <h2 class="sec">Øv</h2>
+    <div class="grid">
+      <button class="topic wide" data-topic="mix"><span class="em">🎲</span><b>Blandet</b><small>15 skriveoppgaver fra hele kapitlet</small><div class="bar"><div style="width:${mastery('mix')}%"></div></div><small>${mastery('mix')} % riktig minst én gang</small></button>
+      ${T.temaer.map(t => `<button class="topic" data-topic="${t.id}"><span class="em">${t.e}</span><b>${esc(t.navn)}</b><small>${esc(t.desc)}</small>
+        <div class="bar"><div style="width:${mastery(t.id)}%"></div></div><small>${mastery(t.id)} % riktig minst én gang</small></button>`).join('')}
+    </div>
+    <h2 class="sec">Skriveoppdrag</h2>
+    <div class="grid">${Object.entries(T.skriv).map(([k,w]) => `<button class="topic" data-skriv="${k}"><span class="em">${w.e}</span><b>${esc(w.tittel)}</b><small>Med sjekkliste og stavekontroll${S.submitted[k] ? ' · levert ✅' : ''}</small></button>`).join('')}</div>
+    <footer><button class="link" id="reset">Nullstill fremgangen i denne øvingen</button></footer>`;
+  $('#snd').onclick = () => { S.sound = !S.sound; save(); renderHome(); };
+  app.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => startSession(b.dataset.topic));
+  app.querySelectorAll('[data-skriv]').forEach(b => b.onclick = () => renderSkriv(b.dataset.skriv));
+  $('#reset').onclick = () => { if(confirm('Slette all fremgang i denne øvingen?')){ S = JSON.parse(JSON.stringify(DEFAULT)); save(); renderHome(); } };
+  window.scrollTo(0,0);
+}
+renderHome();
+</script>
+</body>
+</html>
