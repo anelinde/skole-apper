@@ -38,6 +38,11 @@ a.app:hover{border-color:var(--brand)}
   <h1>📚 Skole-apper</h1>
   <p class="lead">Velg hva du vil øve på.</p>
   <div class="grid">
+    <a class="app" href="krle/">
+      <span class="em">🕉️</span><b>KRLE: Hinduisme</b>
+      <small>Prøve uke 43</small>
+      <span class="tag new" id="krle-xp">Ny!</span>
+    </a>
     <a class="app" href="naturfag/">
       <span class="em">🔬</span><b>Naturfag</b>
       <small>Nervesystemet, prøve uke 42</small>
@@ -60,6 +65,10 @@ a.app:hover{border-color:var(--brand)}
 try{
   const t = JSON.parse(localStorage.getItem('tyskTrening_v1') || 'null');
   if(t && t.xp) document.getElementById('tysk-xp').textContent = '⭐ ' + t.xp + ' XP';
+}catch(e){}
+try{
+  const k = JSON.parse(localStorage.getItem('krle_hinduisme_v1') || 'null');
+  if(k && k.xp) document.getElementById('krle-xp').textContent = '⭐ ' + k.xp + ' XP';
 }catch(e){}
 try{
   const z = JSON.parse(localStorage.getItem('tysk46_v1') || 'null');
