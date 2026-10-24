@@ -8,7 +8,7 @@
    ===================================================================== */
 const FAG = [
   {id:'norsk', e:'✍️', navn:'Norsk', apper:[
-    {e:'💬', navn:'Argumenterende tekst', desc:'Skriveprøve: påstand, argumenter, motargumenter og oppbygging (kurs 5.4)', type:'prove', url:'norsk/argumenterende-tekst-uke44/', dato:'2026-10-30', key:'norsk_argumenterende_v1'},
+    {e:'💬', navn:'Argumenterende tekst', desc:'Skriv en argumenterende tekst steg for steg, med hjelp fra boka underveis (kurs 5.4)', type:'prove', url:'norsk/argumenterende-tekst-uke44/', dato:'2026-10-30', key:'norsk_argumenterende_v1'},
   ]},
   {id:'naturfag', e:'🔬', navn:'Naturfag', apper:[
     {e:'🧠', navn:'Nervesystemet', desc:'Celler, fotosyntese og nervesystemet', type:'prove', url:'naturfag/eldre-tester/nervesystemet/', dato:'2026-10-16', eldre:true, key:'naturfag_v1'},

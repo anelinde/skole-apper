@@ -11,7 +11,7 @@ window.FAG = {
   lagringsnokkel: 'norsk_argumenterende_v1',
   ikkeFag: ['argumentet','argumentene','argumenter'],
 
-  temaer: [
+  temaer: [  // brukes til å gruppere de korte skriveøvelsene
     {id:'begr',     e:'📚', navn:'Fagbegrepene',          desc:'Påstand, begrunnelse, argument, motargument, drøfte …'},
     {id:'typer',    e:'🧰', navn:'Argumenttyper',         desc:'Fakta, flertall, fornuft, ekspert, parallell, følelse (s. 218)'},
     {id:'saklig',   e:'🤝', navn:'God debattskikk',       desc:'Saklighetspyramiden (s. 219)'},
@@ -20,112 +20,9 @@ window.FAG = {
     {id:'les',      e:'🐝', navn:'Framtiden sulter',      desc:'Undersøk eksempelteksten (s. 220, oppgave 6)'},
   ],
 
-  /* ---------- BEGREPER: les forklaringen, skriv begrepet ---------- */
-  begreper: [
-    ['b1','begr','Noe som påstås, uten at det er begrunnet.',['påstand','en påstand']],
-    ['b2','begr','Det som støtter en påstand: vi beskriver, forklarer, utdyper og kommer med eksempler.',['begrunnelse','begrunnelser','en begrunnelse']],
-    ['b3','begr','Påstand + begrunnelse(r).',['argument','et argument']],
-    ['b4','begr','Et argument som går imot et annet argument.',['motargument','et motargument']],
-    ['b5','begr','Å undersøke en sak nærmere, se den fra flere sider og veie argumenter og motargumenter opp mot hverandre.',['drøfte','å drøfte']],
-    ['b6','begr','Å tenke seg fram til veloverveide standpunkter og gode løsninger.',['reflektere','å reflektere']],
-    ['b7','begr','Tekster som har til hensikt å påvirke, overbevise, undersøke og drøfte.',['argumenterende tekster','argumenterende tekst','argumenterende']],
-    ['b8','begr','Et spørsmål som er utgangspunktet i en drøftende tekst.',['problemstilling','en problemstilling']],
-    ['b9','struktur','Den første setningen i et avsnitt, som er påstanden.',['temasetning','temasetningen']],
-    ['b10','struktur','Setningene i et avsnitt som kommer med begrunnelsene.',['kommentarsetninger','kommentarsetning','kommentarsetningene']],
-    ['b11','saklig','Modellen som viser hva som gjør en diskusjon dårlig, og hva som skal til for et godt debattklima.',['saklighetspyramiden','saklighetspyramide']],
-    ['b12','typer','Argument som viser til fakta, undersøkelser eller forskning.',['faktaargument']],
-    ['b13','typer','Argument som viser til «alle» eller «mange».',['flertallsargument']],
-    ['b14','typer','Argument som viser til hva sunn fornuft sier.',['fornuftsargument']],
-    ['b15','typer','Argument som viser til noen med høy troverdighet, for eksempel en ekspert.',['ekspertargument']],
-    ['b16','typer','Argument som viser til liknende tilfeller.',['parallellargument']],
-    ['b17','typer','Argument som viser til følelser.',['følelsesargument']],
-    ['b18','saklig','Øverste trinn i pyramiden: vise feil i argumentasjonen og argumentere mot.',['tilbakevise']],
-    ['b19','saklig','Nederste trinn i pyramiden: bruke nedsettende uttrykk om motparten.',['latterliggjøre']],
-    ['b20','saklig','Trinnet i pyramiden der man er uenig uten å begrunne.',['motsi']],
-    ['b21','saklig','Trinnet der man angriper motparten uten å bruke argumenter.',['kritisere']],
-    ['b22','saklig','Trinnet der man begrunner og forklarer med eksempler.',['argumentere']],
-  ],
 
-  /* ---------- FYLL INN ---------- */
-  fyll: [
-    {id:'y1', t:'begr', s:'Et argument = påstand + ___.', svar:['begrunnelse','begrunnelser','begrunnelse(r)']},
-    {id:'y2', t:'begr', s:'Argumenter kan være saklige eller ___, sanne eller usanne.', svar:['usaklige']},
-    {id:'y3', t:'drofte', s:'I tekster som skal overbevise, sier vi: «Slik er det!» I tekster som drøfter, spør vi: «Er det ___?»', svar:['slik']},
-    {id:'y4', t:'struktur', s:'I eksempelteksten er temasetningene påstandene, og de blir begrunnet i ___.', svar:['kommentarsetningene','kommentarsetninger']},
-    {id:'y5', t:'struktur', s:'Eksempelteksten «Framtiden sulter» har ___ avsnitt.', svar:['fem','5']},
-    {id:'y6', t:'typer', s:'Følelsene virker sterkere på oss enn fornuften. Derfor virker følelsesargumenter ofte sterkere enn ___.', svar:['fornuftsargumenter','fornuftsargument']},
-    {id:'y7', t:'typer', s:'Et faktaargument kan ___, og vi kan se om det er riktig eller galt.', svar:['kontrolleres']},
-    {id:'y8', t:'typer', s:'Hvis vi har tillit til eksperten, har ekspertargumentet høy ___.', svar:['troverdighet']},
-    {id:'y9', t:'begr', s:'Legger vi selv fram motargumentene, viser vi at vi har tenkt godt gjennom saken, noe som kan skape ___.', svar:['tillit']},
-    {id:'y10', t:'saklig', s:'I saklige debatter argumenterer vi for og mot selve ___.', svar:['saken']},
-    {id:'y11', t:'begr', s:'Eksemplene i en begrunnelse kan bygge på erfaringer, eller vi kan vise til fakta, forskning og ___.', svar:['statistikk']},
-  ],
 
-  /* ---------- KORTSVAR (skriv med egne ord) ---------- */
-  kortsvar: [
-    {id:'k1', t:'begr', spm:'Hva er et argument? Forklar med begrepene påstand og begrunnelse.', begreper:[['påstand','påstand'],['begrunnelse','begrunn'],['påstand + begrunnelse','+','og en','med en']], min:2,
-     modell:'Et argument er bygd opp av en påstand og en begrunnelse for påstanden. Argument = påstand + begrunnelse(r).'},
-    {id:'k2', t:'begr', spm:'Hvordan kan du begrunne en påstand?', begreper:[['beskrive / forklare / utdype','beskriv','forklar','utdyp'],['eksempler','eksempel'],['erfaringer','erfaring'],['fakta, forskning, statistikk','fakta','forskning','statistikk']], min:3,
-     modell:'Vi beskriver, forklarer, utdyper og kommer med eksempler. Eksemplene kan bygge på erfaringer, eller vi kan vise til fakta, forskning og statistikk.'},
-    {id:'k3', t:'begr', spm:'Hvorfor kan det være lurt å legge fram motargumentene selv?', begreper:[['viser at du har tenkt gjennom saken','tenkt','gjennom'],['skaper tillit','tillit']], min:2,
-     modell:'Det viser at vi har tenkt godt gjennom saken, og det kan skape tillit.'},
-    {id:'k4', t:'drofte', spm:'Hva er forskjellen på en argumenterende (overbevisende) og en drøftende tekst?', begreper:[['overbevisende: «Slik er det!»','slik er det','overbevis'],['drøftende: «Er det slik?»','er det slik','spør'],['drøftende: argumenter og motargumenter','motargument','for og mot','flere sider'],['problemstilling','problemstilling']], min:3,
-     modell:'En argumenterende tekst skal overbevise og sier «Slik er det!». En drøftende tekst har ofte en problemstilling som utgangspunkt og bruker både argumenter og motargumenter for å spørre «Er det slik?».'},
-    {id:'k5', t:'drofte', spm:'Hva gjør du når du skal debattere en sak? (Tips-boksen s. 221)', begreper:[['vær overbevisende / tydelig standpunkt','overbevis','standpunkt'],['bruk argumenter med fakta, eksempler, statistikk','fakta','eksempel','statistikk'],['tenk ut motargumenter og avvis dem','motargument','avvis'],['ulike typer argumenter','typer','ulike']], min:3,
-     modell:'Vær overbevisende og få tydelig fram standpunktet ditt. Bruk argumenter og underbygg det du mener med fakta, eksempler og statistikk. Tenk ut motargumenter, slik at du kan drøfte og avvise dem. Bruk ulike typer argumenter.'},
-    {id:'k6', t:'drofte', spm:'Hva gjør du når du skal drøfte en sak? (Tips-boksen s. 221)', begreper:[['spørrende og åpen','spørrende','åpen'],['problemstilling','problemstilling'],['argumenter for og mot, vei dem opp','for og mot','vei'],['konklusjon (eller la spørsmålet stå ubesvart)','konklusjon','ubesvart']], min:3,
-     modell:'Vær spørrende og åpen, og formuler gjerne en problemstilling du tar utgangspunkt i. Finn argumenter for og mot, og vei dem opp mot hverandre. Lag en konklusjon på bakgrunn av drøftingen, eller la hovedspørsmålet stå ubesvart, slik at mottakeren må trekke konklusjonen.'},
-    {id:'k7', t:'saklig', spm:'Forklar saklighetspyramiden fra bunnen til toppen.', begreper:[['latterliggjøre','latterliggjør'],['kritisere','kritiser'],['motsi','motsi'],['argumentere','argumenter'],['tilbakevise','tilbakevis']], min:4,
-     modell:'Nederst er latterliggjøre (bruke nedsettende uttrykk om motparten), så kritisere (angripe motparten uten argumenter), motsi (være uenig uten å begrunne), argumentere (begrunne og forklare med eksempler) og øverst tilbakevise (vise feil i argumentasjonen og argumentere mot).'},
-    {id:'k8', t:'saklig', spm:'Hvorfor er det viktig å være saklig i en debatt?', begreper:[['argumentere for og mot selve saken','saken'],['bedre forståelse','forståelse'],['usaklighet kan spore av diskusjonen','spore av','av sporet','usaklig']], min:2,
-     modell:'I saklige debatter argumenterer vi for og mot selve saken, og slik får vi bedre forståelse av hva den handler om. Å være usaklig kan spore av en diskusjon.'},
-    {id:'k9', t:'typer', spm:'Hvorfor virker følelsesargumenter ofte sterkere enn fornuftsargumenter?', begreper:[['følelsene virker sterkere på oss','følelse'],['vi liker å tro at fornuften styrer','fornuft']], min:2,
-     modell:'Vi liker å tro at fornuften styrer valgene våre, men følelsene virker sterkere på oss. Derfor virker følelsesargumenter ofte sterkere.'},
-    {id:'k10', t:'typer', spm:'Hva er svakheten med et parallellargument og med et flertallsargument?', begreper:[['parallell: det er ikke sikkert det går likt hos deg','ikke sikkert','behøver','problemfritt','likt'],['flertall: vi kan ikke vite hvor mange som mener det','hvor mange','vite']], min:2,
-     modell:'Parallellargument: selv om eksemplet er riktig, behøver det ikke bety at det vil gå problemfritt hos deg. Flertallsargument: vi kan ikke vite hvor mange som faktisk mener det.'},
-    {id:'k11', t:'les', spm:'Les «Framtiden sulter» i boka (s. 220). Hva drøfter teksten?', begreper:[['insektene / at vi er på vei til å utrydde dem','insekt','utrydd'],['pollen / plantene','pollen','plante'],['økosystemene','økosystem'],['mennesket har skylden','skyld','oss selv']], min:2,
-     modell:'Teksten drøfter at vi er på vei til å utrydde insektene. Plantene er avhengige av insekter for å formere seg, og nesten alle økosystemer er avhengige av pollen. Forfatteren mener at det er mennesket selv som har skylden.'},
-    {id:'k12', t:'les', spm:'«Framtiden sulter»: Finn et faktaargument i teksten. Hva viser det til?', begreper:[['rapport / 73 studier','rapport','73','studier'],['Worldwide Decline of the Entomofauna','worldwide','entomofauna'],['vi er på vei til å utrydde insektene','utrydd','insekt']], min:2,
-     modell:'Forfatteren viser til rapporten «Worldwide Decline of the Entomofauna», som er satt sammen av 73 studier fra hele verden. Konklusjonen er at vi er på vei til å utrydde insektene.'},
-    {id:'k13', t:'les', spm:'«Framtiden sulter»: Hva er konklusjonen, og hvem er teksten skrevet for?', begreper:[['framtiden vil dømme / ingen mennesker igjen','dømme','ingen mennesker'],['debattinnlegg','debattinnlegg'],['for å få folk / politikere til å bry seg om insektene','regjering','verdenssamfunn','behandle','bry']], min:2,
-     modell:'Konklusjonen er at framtiden vil dømme oss, men at det kanskje ikke vil være noen mennesker igjen til å gjøre det. Det er et debattinnlegg, skrevet av en skoleelev, til regjeringen, verdenssamfunnet og alle som leser det, for å få oss til å behandle insektene bedre.'},
-    {id:'k14', t:'struktur', spm:'Hvordan er avsnittene i «Framtiden sulter» bygd opp?', begreper:[['hvert avsnitt er et argument','argument'],['temasetning = påstand','temasetning','påstand'],['kommentarsetninger = begrunnelser','kommentarsetning','begrunnelse']], min:3,
-     modell:'Hvert avsnitt er et argument. Temasetningen er påstanden, og kommentarsetningene kommer med begrunnelsene.'},
-  ],
 
-  /* ---------- SORTER ---------- */
-  sorter: [
-    {id:'s1', t:'typer', tittel:'Hvilken argumenttype?', kurver:['Fakta','Flertall','Fornuft','Ekspert','Parallell','Følelse'], ting:[
-      ['«Statistikken viser at 90 000 barn i Norge er rammet av fattigdom.»',0],
-      ['«De fleste vil være enige i at ungdom bør være inne før klokka ti om kvelden.»',1],
-      ['«Det må være lett å forstå at det ikke er sunt for unge mennesker å slanke seg.»',2],
-      ['«Bruk av mobil om kvelden påvirker søvnen negativt, sier søvnforsker Hilde.»',3],
-      ['«Naboskolen arrangerte skoleball uten problemer. Det skal vi også få til.»',4],
-      ['«Å holde dyr i bur er rett og slett grusomt.»',5]]},
-    {id:'s2', t:'saklig', tittel:'Hvilket trinn i saklighetspyramiden?', kurver:['Tilbakevise','Argumentere','Motsi','Kritisere','Latterliggjøre'], ting:[
-      ['«Det stemmer nok ikke at man alltid blir mer konsentrert av musikk. Jeg har lest forskning som viser …»',0],
-      ['«Jeg har sjekket pulsmåleren min, den går ned når jeg hører på rolig musikk.»',1],
-      ['«Jeg er ikke enig, jeg synes vi bør få lov, for jeg elsker å ha musikk på.»',2],
-      ['«Selvfølgelig sier han det, han skjønner jo ingenting av hvordan vi har det.»',3],
-      ['«Er han helt dust, eller?»',4]]},
-    {id:'s3', t:'begr', tittel:'Påstand eller begrunnelse?', kurver:['Påstand','Begrunnelse'], ting:[
-      ['Vi må bruke mye mindre fossilt brennstoff.',0],
-      ['Bruk av bensin og kull frigjør CO₂, en klimagass som fører til temperaturstigning.',1],
-      ['Det er ikke smart å spise glovarm pizza.',0],
-      ['Jeg har selv erfart å brenne meg kraftig på osten.',1],
-      ['Vi bør spise mindre rødt kjøtt.',0],
-      ['Det kreves ti kilo korn for å produsere én kilo kjøtt.',1],
-      ['Alle skoler bør være mobilfrie.',0]]},
-    {id:'s4', t:'struktur', tittel:'Innledning, hoveddel eller avslutning? (setningsstartere s. 221)', kurver:['Innledning','Hoveddel','Avslutning'], ting:[
-      ['Har du tenkt på …',0],['Mange mener at …, men jeg er ikke så sikker …',0],
-      ['Det er kjent for mange at …',1],['En av fordelene/ulempene er at …',1],['For det første/andre/tredje …',1],['På den annen side …',1],
-      ['Derfor tror jeg at …',2],['Tenk derfor over …',2],['Kanskje kan det være …',2]]},
-    {id:'s5', t:'drofte', tittel:'Overbevisende («Slik er det!») eller drøftende («Er det slik?»)', kurver:['Overbevisende','Drøftende'], ting:[
-      ['Privatbilene må ut av byene.',0],
-      ['I hele landet må bilbruken ned.',0],
-      ['Men kan vi egentlig klare oss uten bilen, som er så praktisk i hverdagen?',1],
-      ['Det er ingen tvil om at bilen forurenser mye, men kan vi gi slipp på den? Kanskje, hvis vi må.',1]]},
-  ],
 
   /* ---------- SKRIVEOPPGAVER med sjekkliste ----------
      sjekk: [etikett, type, arg]   type: ord | setn | noen | ikke | start | spm */
@@ -181,5 +78,29 @@ window.FAG = {
     'Ekspertargument':['ekspert','professor','lege','sier forsker','sier eksperter','fagfolk','psykolog'],
     'Parallellargument':['naboskolen','andre skoler','i andre land','i sverige','i danmark','akkurat som','på samme måte som'],
     'Følelsesargument':['grusomt','trist','forferdelig','fantastisk','urettferdig','tenk deg','skremmende','vondt'],
+  },
+  /* ---------- ARGUMENTTYPER (s. 218) – vises når han planlegger og skriver ---------- */
+  argtyper: [
+    {id:'fakta', navn:'Faktaargument', e:'📊', hva:'Viser til fakta, undersøkelser eller forskning.', eks:'«Statistikken viser at 90 000 barn i Norge er rammet av fattigdom.»', styrke:'Argumentet kan kontrolleres, og vi kan se om det er riktig eller galt.', start:['Forskning viser at …','Ifølge …','Undersøkelser viser at …']},
+    {id:'flertall', navn:'Flertallsargument', e:'👥', hva:'Viser til «alle» eller «mange».', eks:'«De fleste vil være enige i at ungdom bør være inne før klokka ti om kvelden.»', styrke:'Vi kan ikke vite hvor mange som mener dette. Det virker sant og fornuftig avhengig av hva vi selv mener.', start:['De fleste vil være enige i at …','Mange mener at …']},
+    {id:'fornuft', navn:'Fornuftsargument', e:'🧠', hva:'Viser til hva sunn fornuft sier.', eks:'«Det må være lett å forstå at det ikke er sunt for unge mennesker å slanke seg.»', styrke:'Trenger ikke mye begrunnelse hvis det virker sannsynlig.', start:['Det må være lett å forstå at …','Det sier seg selv at …']},
+    {id:'ekspert', navn:'Ekspertargument', e:'🎓', hva:'Viser til noen med høy troverdighet, for eksempel en ekspert.', eks:'«Vi er ganske sikre på at bruk av mobil og nettbrett om kvelden påvirker søvnen negativt, sier søvnforsker Hilde.»', styrke:'Hvis vi har tillit til eksperten, har argumentet høy troverdighet.', start:['… sier eksperten …','Ifølge forskeren …']},
+    {id:'parallell', navn:'Parallellargument', e:'🔁', hva:'Viser til liknende tilfeller.', eks:'«Naboskolen arrangerte skoleball uten problemer. Det skal vi også få til.»', styrke:'Selv om eksemplet er riktig, behøver det ikke bety at det vil gå problemfritt hos deg.', start:['På naboskolen …','Akkurat som …']},
+    {id:'folelse', navn:'Følelsesargument', e:'❤️', hva:'Viser til følelser.', eks:'«Å holde dyr i bur er rett og slett grusomt.»', styrke:'Vekker følelser og kan få noen over på din side. Følelsesargumenter virker ofte sterkere enn fornuftsargumenter.', start:['Tenk deg …','Det er rett og slett …']},
+  ],
+
+  /* ---------- HUSKELAPP (kurs 5.4, med egne ord) ---------- */
+  huskelapp: [
+    {tittel:'Argument = påstand + begrunnelse', side:'s. 216', tekst:'En påstand er noe som påstås, uten at det er begrunnet. For å overbevise må påstanden begrunnes: du beskriver, forklarer, utdyper og kommer med eksempler. Eksemplene kan bygge på erfaringer, eller du kan vise til fakta, forskning og statistikk.', eks:'Påstand: «Det er ikke smart å spise glovarm pizza.» Begrunnelse: «Jeg har selv erfart å brenne meg kraftig på osten.»'},
+    {tittel:'Motargumenter', side:'s. 217', tekst:'Alle argumenter kan møtes med motargumenter. Legger du selv fram motargumentene, viser du at du har tenkt godt gjennom saken, og det kan skape tillit.', eks:'Argument: «Vi bør spise mindre rødt kjøtt.» Motargument: «Kjøtt har alltid vært en viktig del av kostholdet til mennesker.»'},
+    {tittel:'Oppbygging: avsnitt', side:'s. 220', tekst:'Hvert avsnitt er ett argument. Temasetningen (den første setningen) er påstanden. Kommentarsetningene etter den kommer med begrunnelsene. «Framtiden sulter» har fem avsnitt bygd opp slik.', eks:''},
+    {tittel:'Når du skal debattere en sak', side:'s. 221', tekst:'Vær overbevisende, og få tydelig fram standpunktet ditt. Bruk argumenter: underbygg det du mener med fakta, eksempler og statistikk. Tenk ut motargumenter, slik at du kan drøfte og avvise dem. Bruk ulike typer argumenter.', eks:''},
+    {tittel:'Vær saklig', side:'s. 219', tekst:'Saklighetspyramiden, fra dårligst til best: latterliggjøre (nedsettende ord om motparten) → kritisere (angripe personen uten argumenter) → motsi (være uenig uten å begrunne) → argumentere (begrunne og forklare med eksempler) → tilbakevise (vise feil i argumentasjonen og argumentere mot). Argumenter for og mot saken, ikke personen.', eks:''},
+  ],
+  setningsstartere: {
+    inn:['Har du tenkt på …','Mange mener at …, men jeg er ikke så sikker …'],
+    hoved:['Det er kjent for mange at …','De fleste vil være enige i …','En av fordelene/ulempene er at …','Det viser seg (imidlertid) at …','I tillegg så …','For det første/andre/tredje …'],
+    mot:['På den annen side …','Selv om det kanskje …'],
+    avs:['Derfor tror jeg at …','Derfor vil det beste være …','Tenk derfor over …, neste gang …','Kanskje kan det være …'],
   },
 };
