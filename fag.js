@@ -21,7 +21,7 @@ const FAG = [
     {e:'🕉️', navn:'Hinduisme', desc:'Tro, guder, ritualer, kaste, skrifter og Gandhi', type:'prove', url:'krle/eldre-tester/hinduisme/', dato:'2026-10-23', eldre:true, key:'krle_hinduisme_v1'},
   ]},
   {id:'mat-og-helse', e:'🍎', navn:'Mat og helse', apper:[
-    {e:'🥦', navn:'Teoriprøve: kosthold og næringsstoffer', desc:'Kostsirkelen, kostrådene, vitaminer, baking og mattrygghet', type:'prove', url:'mat-og-helse/teoriprove-uke47/', dato:'2026-11-19', key:'mat_og_helse_v1'},
+    {e:'🥦', navn:'Teoriprøve: kosthold og næringsstoffer', desc:'Les og svar skriftlig på spørsmålene i heftet', type:'prove', url:'mat-og-helse/teoriprove-uke47/', dato:'2026-11-19', key:'mat_og_helse_v2'},
   ]},
 ];
 
