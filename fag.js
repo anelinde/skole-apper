@@ -71,14 +71,14 @@ function weekList(lekser){
 }
 function trainingTable(apps){
   const rows = apps.map(a => ({a, pr: progress(a)})).filter(r => r.pr && (r.pr.xp || r.pr.sessions || r.pr.forsok));
-  if(!rows.length) return '<p class="empty">Ingen øving registrert på denne enheten ennå.</p>';
+  if(!rows.length) return '<p class="empty">Du har ikke øvd på denne enheten ennå.</p>';
   rows.sort((x,y) => (y.pr.last || '').localeCompare(x.pr.last || ''));
   const tot = rows.reduce((t,r) => ({xp:t.xp + r.pr.xp, s:t.s + r.pr.sessions, r:t.r + r.pr.riktig}), {xp:0, s:0, r:0});
   return `<div class="sum"><span>⭐ <b>${tot.xp}</b> XP</span><span>🔁 <b>${tot.s}</b> økter</span><span>✅ <b>${tot.r}</b> oppgaver klart</span></div>
     <div class="tlist">${rows.map(({a, pr}) => `<a class="trow" href="${ROOT}${a.url}"><span class="em">${a.e}</span><span class="tn"><b>${esc(a.navn)}</b>
       <small>${isLekse(a) ? 'Ukelekse uke ' + a.uke : isOld(a) ? 'Prøve (har vært)' : 'Prøve'}${pr.last ? ' · sist øvd ' + lastText(pr.last) : ''}</small></span>
       <span class="tv">${pr.xp} XP<small>${pr.sessions} økt${pr.sessions === 1 ? '' : 'er'} · ${pr.riktig} klart</small></span></a>`).join('')}</div>
-    <p class="empty" style="font-size:13px;margin-top:6px">Viser øving på denne enheten og nettleseren.</p>`;
+    <p class="empty" style="font-size:13px;margin-top:6px">Viser det du har øvd på denne enheten og nettleseren.</p>`;
 }
 function renderHome(){
   const ukaLekser = FAG.flatMap(f => f.apper.filter(a => isLekse(a) && weekVal(a) === nowVal).map(a => ({...a, fag:f})));
@@ -102,7 +102,7 @@ function renderFag(id){
     ${active.length ? `<div class="grid">${active.map(appCard).join('')}</div>` : '<p class="empty">Ingen kommende prøver her ennå.</p>'}
     <h2>📅 Ukelekser</h2>
     ${lekser.length ? weekList(lekser) : '<p class="empty">Ingen ukelekser her ennå.</p>'}
-    <h2>📊 Dette har han trent på</h2>
+    <h2>📊 Dette har du trent på</h2>
     ${trainingTable(f.apper)}
     ${old.length ? `<details ${active.length ? '' : 'open'}><summary>🗂️ Eldre tester – prøven har vært (${old.length})</summary>
       <p class="empty" style="margin:8px 0 0">Kan fortsatt brukes til repetisjon. Fremgangen er lagret.</p>
