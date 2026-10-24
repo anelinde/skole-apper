@@ -184,7 +184,7 @@ function conceptCheck(begreper, text){ const ws = words(text); return begreper.m
 // Stavesjekk av fagordene (navn og begreper fra arket)
 const FAG = [...new Set(BEG.flatMap(b => b.svar).filter(x => x.length >= 5 && !x.includes(' ')))];
 function fagSjekk(text){ const out = []; const re = /\p{L}+/gu; let m;
-  while((m = re.exec(text))){ const w = m[0].toLowerCase(); if(w.length < 5 || FAG.some(f => w.startsWith(f.slice(0, Math.max(5, f.length-2))) && osa(w.slice(0,f.length), f) === 0)) continue;
+  while((m = re.exec(text))){ const w = m[0].toLowerCase(); if(w.length < 5 || (K.ikkeFag || []).some(x => w.startsWith(x)) || FAG.some(f => w.startsWith(f.slice(0, Math.max(5, f.length-2))) && osa(w.slice(0,f.length), f) === 0)) continue;
     const hit = FAG.find(f => w.slice(0,2) === f.slice(0,2) && [f.length-1, f.length, f.length+1].some(L => L <= w.length && L >= 5 && osa(w.slice(0,L), f) === 1 && !(L === f.length-1 && f.startsWith(w.slice(0,L)))));
     if(hit) out.push({ord:m[0], riktig:hit}); }
   return out; }
