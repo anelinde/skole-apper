@@ -38,6 +38,11 @@ a.app:hover{border-color:var(--brand)}
   <h1>📚 Skole-apper</h1>
   <p class="lead">Velg hva du vil øve på.</p>
   <div class="grid">
+    <a class="app" href="mat-og-helse/">
+      <span class="em">🍎</span><b>Mat og helse</b>
+      <small>Teoriprøve uke 47: kosthold og næringsstoffer</small>
+      <span class="tag new" id="mh-xp">Ny!</span>
+    </a>
     <a class="app" href="krle/">
       <span class="em">🕉️</span><b>KRLE: Hinduisme</b>
       <small>Prøve uke 43</small>
@@ -65,6 +70,10 @@ a.app:hover{border-color:var(--brand)}
 try{
   const t = JSON.parse(localStorage.getItem('tyskTrening_v1') || 'null');
   if(t && t.xp) document.getElementById('tysk-xp').textContent = '⭐ ' + t.xp + ' XP';
+}catch(e){}
+try{
+  const m = JSON.parse(localStorage.getItem('mat_og_helse_v1') || 'null');
+  if(m && m.xp) document.getElementById('mh-xp').textContent = '⭐ ' + m.xp + ' XP';
 }catch(e){}
 try{
   const k = JSON.parse(localStorage.getItem('krle_hinduisme_v1') || 'null');
