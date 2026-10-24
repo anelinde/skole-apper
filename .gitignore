@@ -6,3 +6,5 @@
 !*.html
 !*.js
 kilder/
+!felles/*.txt
+!felles/nb/*.txt

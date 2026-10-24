@@ -139,6 +139,7 @@ summary{cursor:pointer;font-weight:700;color:var(--brand)}
 <body>
 <div id="app"></div>
 <script src="innhold.js"></script>
+<script src="../../felles/stavekontroll.js"></script>
 <script>
 const K = window.FAG;
 const BEG = K.begreper.map(([id,t,fork,svar]) => ({id,t,fork,svar}));
@@ -207,6 +208,23 @@ function fagSjekk(text){ const out = []; const re = /\p{L}+/gu; let m;
     const hit = FAG.find(f => w.slice(0,2) === f.slice(0,2) && [f.length-1, f.length, f.length+1].some(L => L <= w.length && L >= 5 && osa(w.slice(0,L), f) === 1 && !(L === f.length-1 && f.startsWith(w.slice(0,L)))));
     if(hit) out.push({ord:m[0], riktig:hit}); }
   return out; }
+
+/* ---------- Norsk stavekontroll (Hunspell, kjører lokalt i nettleseren) ---------- */
+const STAVE_EKSTRA = [...new Set([...BEG.flatMap(b => b.svar), ...(K.fagord || [])].flatMap(x => x.toLowerCase().split(/\s+/)))];
+async function staveBoks(text, box){
+  if(!box) return;
+  box.innerHTML = '<p class="muted">🔍 Sjekker stavingen … (første gang lastes ordlista, ca. 1,4 MB)</p>';
+  let sk; try{ sk = await Stavekontroll.last('../../felles/'); }catch(e){ box.innerHTML = '<p class="muted">Fikk ikke lastet stavekontrollen (er du på nett?).</p>'; return; }
+  if(!box.isConnected) return;
+  const feil = sk.sjekk(text, STAVE_EKSTRA);
+  if(!feil.length){ box.innerHTML = '<p style="color:var(--ok);font-weight:700">✅ Fant ingen stavefeil.</p>'; return; }
+  let html = '', pos = 0;
+  feil.forEach(f => { html += esc(text.slice(pos, f.offset)) + `<mark>${esc(text.substr(f.offset, f.length))}</mark>`; pos = f.offset + f.length; });
+  html += esc(text.slice(pos));
+  box.innerHTML = `<div class="spell"><div class="q-label">🔍 Stavingen: ${feil.length} mulig${feil.length > 1 ? 'e' : ''} feil</div><div class="marked">${html}</div>
+    <ul>${feil.map(f => `<li><b style="color:var(--bad)">${esc(f.ord)}</b> · ${esc(f.grunn)}${f.forslag.length ? '<br>Forslag: ' + f.forslag.map(r => `<span class="sugg">${esc(r)}</span>`).join('') : ''}</li>`).join('')}</ul>
+    <p class="muted" style="font-size:13px">Stavekontrollen finner de fleste stavefeil, men ikke alle (for eksempel riktig stavede ord brukt feil, som «og/å» og «de/dem»).</p></div>`;
+}
 
 /* =====================================================================
    OPPGAVER (alle er skriving)
@@ -347,6 +365,7 @@ const RUN = {
       const text = ta.value.trim(); if(text.split(/\s+/).length < 4) return ta.focus();
       const n = w.sjekk.filter(c => sjekkOk(text, c)).length, all = n === w.sjekk.length;
       ta.disabled = true; el.querySelectorAll('button').forEach(b => b.disabled = true);
+      $('#res').innerHTML = '<div id="stave"></div>'; staveBoks(text, $('#stave'));
       finish({ok: n >= w.sjekk.length - 1, near: !all && n >= w.sjekk.length - 1, rec:[[w.id, all]], xp: n*4 + (all ? 8 : 0) - (hinted ? 3 : 0), quiet:true,
         note: `${n} av ${w.sjekk.length} punkter på sjekklista${all ? '. Bra skrevet! ✍️' : '. Se hva som mangler, og prøv igjen senere.'}<div class="model" style="margin-top:6px">${esc(w.modell)}</div>`});
     };
@@ -366,9 +385,10 @@ const RUN = {
       const sp = fagSjekk(text);
       $('#res').innerHTML = `<div class="stat" style="font-weight:800;margin-top:10px">${ok ? '✅' : '🔶'} ${found} av ${res.length} viktige punkter${ok ? '' : ` (trenger ${k.min})`}</div>
         <ul class="keys">${res.map(r => `<li class="${r.ok ? 'ok' : ''}">${r.ok ? '✅' : '⬜'} ${esc(r.navn)}</li>`).join('')}</ul>
-        ${sp.length ? `<div class="spell"><b>Sjekk stavingen:</b> ${sp.map(s => `<s>${esc(s.ord)}</s> → <span class="sugg">${esc(s.riktig.charAt(0).toUpperCase() + s.riktig.slice(1))}</span>`).join(' ')}</div>` : ''}
+        <div id="stave"></div>
         <div class="q-label" style="margin-top:10px">Eksempel på et godt svar:</div><div class="model">${esc(k.modell)}</div>
         <div class="row end"><button class="btn primary" id="done">Ferdig ✓</button></div>`;
+      staveBoks(text, $('#stave'));
       $('#done').onclick = () => { $('#done').disabled = true;
         finish({ok, near: !ok && found > 0, rec:[[k.id, ok]], xp: found*3 + (ok ? 8 : 0) - (hinted ? 3 : 0), quiet:true,
           note: ok ? 'Godt svar!' : 'Les eksempelsvaret og se hva du manglet. Oppgaven kommer igjen.'}); };
@@ -554,13 +574,15 @@ function drawProve(){
     <details><summary>Se det du har skrevet så langt</summary><div class="model" style="white-space:pre-wrap">${esc(PSTEG.slice(1, PV.steg).map(x => PV.tekst[x.id] || '').filter(Boolean).join('\n\n')) || '(ingenting ennå)'}</div></details>
     <textarea id="txt" ${WRITE_ATTR} style="min-height:170px" placeholder="Skriv ${esc(st.navn.toLowerCase())} her …">${esc(PV.tekst[st.id] || '')}</textarea><div class="guard"></div>
     <ul class="keys" id="live"></ul><div id="atype" class="muted" style="font-size:14px"></div>
-    <div class="row"><button class="btn ghost" id="prev">← Tilbake</button><span style="flex:1"></span><button class="btn primary" id="nx">${PV.steg < PSTEG.length-1 ? 'Neste ➜' : 'Ferdig ✓'}</button></div>`;
+    <div id="stave"></div>
+    <div class="row"><button class="btn ghost" id="prev">← Tilbake</button><button class="btn ghost" id="spell">🔍 Sjekk stavingen</button><span style="flex:1"></span><button class="btn primary" id="nx">${PV.steg < PSTEG.length-1 ? 'Neste ➜' : 'Ferdig ✓'}</button></div>`;
   const ta = $('#txt'); guardInput(ta, el.querySelector('.guard')); ta.focus();
   const draw = () => { PV.tekst[st.id] = ta.value; save();
     $('#live').innerHTML = st.sjekk.map(c => { const ok = sjekkOk(ta.value, c); return `<li class="${ok ? 'ok' : ''}">${ok ? '✅' : '⬜'} ${esc(c[0])}</li>`; }).join('');
     const ty = argTyper(ta.value); $('#atype').textContent = ty.length ? 'Argumenttype jeg ser spor av: ' + ty.join(', ') : ''; };
   ta.addEventListener('input', draw); draw();
   $('#prev').onclick = () => { PV.steg--; save(); drawProve(); };
+  $('#spell').onclick = () => staveBoks(ta.value, $('#stave'));
   $('#nx').onclick = () => { if(ta.value.trim().split(/\s+/).length < 5) return ta.focus(); if(PV.steg < PSTEG.length-1){ PV.steg++; save(); drawProve(); } else finishProve(); };
 }
 function argTyper(t){ const w = Wd(t); return Object.entries(K.typeOrd).filter(([,ord]) => ord.some(o => w.includes(' ' + o))).map(([n]) => n); }
@@ -587,9 +609,11 @@ function finishProve(){
       <ul class="keys" style="text-align:left">${total.map(([l,ok]) => `<li class="${ok ? 'ok' : ''}">${ok ? '✅' : '⬜'} ${esc(l)}</li>`).join('')}</ul>
       <div class="muted" style="text-align:left;font-size:14px">${stegOk.filter(x => !x.ok).length ? 'Deler som kan bli bedre: ' + stegOk.filter(x => !x.ok).map(x => x.navn).join(', ') + '. ' : ''}${typer.length ? 'Argumenttyper jeg ser spor av: ' + typer.join(', ') + '. ' : ''}${binde.length ? 'Bindeord: ' + binde.join(', ') + '.' : ''}</div>
       <p class="muted" style="text-align:left;font-size:14px">Appen sjekker oppbyggingen og ordene, ikke om argumentene er gode eller om teksten er riktig skrevet. Les teksten høyt for deg selv eller for en voksen.</p>
+      <div id="stave" style="width:100%;text-align:left"></div>
       <details style="width:100%;text-align:left"><summary>Les hele teksten din</summary><div class="model" style="white-space:pre-wrap"><b>${esc(PV.tekst.tema)}</b>\n\n${esc(full)}</div></details>
       <div class="row"><button class="btn primary" id="again">Skriv en ny tekst</button><button class="btn" id="home">Hjem</button></div></div>`;
   $('#again').onclick = renderProve; $('#home').onclick = renderHome; window.scrollTo(0,0);
+  staveBoks(full, $('#stave'));
 }
 
 /* ---------- Forside ---------- */
