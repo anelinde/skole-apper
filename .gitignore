@@ -1,19 +1,8 @@
-# Hviteliste: bare det som står her, blir publisert.
-# Bokbilder, PDF-er (kilder/) og instruksjonsfiler (CLAUDE.md) blir liggende lokalt.
+# Hviteliste: bare app-filer (.html og .js) blir publisert.
+# Bokbilder, PDF-er (kilder/) og instruksjons-/dokumentasjonsfiler (.md) blir liggende lokalt.
 *
 !*/
 !.gitignore
-!index.html
-!tysk-trening.html
-!tysk/index.html
-!tysk/uke46/*.html
-!tysk/uke46/*.js
-!krle/*.html
-!krle/*.js
-!mat-og-helse/*.html
-!mat-og-helse/*.js
-!naturfag/*.html
-!naturfag/*.js
-!naturfag/*.css
-!naturfag/*.json
+!*.html
+!*.js
 kilder/

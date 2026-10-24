@@ -452,7 +452,7 @@ function renderSkriv(k){
 function mastery(topic){ const ids = pool(topic).map(([,x]) => x.id); return ids.length ? Math.round(100 * ids.filter(id => st(id).s >= 1).length / ids.length) : 0; }
 function renderHome(){
   const L = levelInfo(), streak = streakNow();
-  app.innerHTML = `<header class="top"><div class="brand"><a class="icon" href="../../" aria-label="Alle fag">←</a> 🇩🇪 Mein Zuhause</div>
+  app.innerHTML = `<header class="top"><div class="brand"><a class="icon" href="../" aria-label="Tilbake til faget">←</a> 🇩🇪 Mein Zuhause</div>
       <button class="icon" id="snd" aria-label="Lyd av/på">${S.sound ? '🔊' : '🔇'}</button></header>
     <section class="card hero">
       <div class="muted" style="font-weight:700">${esc(T.tittel)}</div>
