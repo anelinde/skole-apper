@@ -4,8 +4,8 @@
    (næringsstoffene, næringsinnhold i kostsirkelen, nye nordiske råd,
    nye kostråd fra Helsedirektoratet med utdypinger).
    + Matopedia s. 13–22, 51 og 173–181 (IMG_7807–7826).
-   + s. 49–54 (IMG_7837–7841). Hygiene (de 11 reglene, krysskontaminering)
-   er IKKE med: de sidene mangler.
+   + s. 49–54 (IMG_7837–7841) + s. 151–154 mattrygghet (IMG_7842–7845).
+   De 11 hygienereglene (leksjon 1 og 4) er IKKE med: de sidene mangler.
    ===================================================================== */
 window.FAG = {
   tittel: 'Mat og helse: Kosthold og næringsstoffer',
@@ -13,7 +13,7 @@ window.FAG = {
   lagringsnokkel: 'mat_og_helse_v1',
 
   // Vanlige ord som ligner fagord, men er riktige (stavesjekken skal ikke merke dem)
-  ikkeFag: ['hvit','mettede','umettede','mettes','hvile','melke','vannet','kalde'],
+  ikkeFag: ['hvit','bakterie','mettede','umettede','mettes','hvile','melke','vannet','kalde'],
 
   temaer: [
     {id:'naering', e:'🧪', navn:'Næringsstoffene',          desc:'De seks hovedgruppene, energigivende og ikke-energigivende'},
@@ -26,6 +26,7 @@ window.FAG = {
     {id:'korn',    e:'🌾', navn:'Korn og mel',              desc:'Kornslag, fint og grovt mel, kornets deler, Brødskala\'n (s. 49–51)'},
     {id:'bake',    e:'🍞', navn:'Gjærbakst og gluten',      desc:'Gjær, heving, hevemidler, gluten og cøliaki (s. 52–54)'},
     {id:'bakt',    e:'🌡️', navn:'Bakterievekst',            desc:'Temperaturer og kjøleskap (s. 181)'},
+    {id:'trygg',   e:'🧼', navn:'Mattrygghet og hygiene',   desc:'Mattrygghet, matsikkerhet, zoonoser, kjøkkenhygiene (s. 151–154)'},
   ],
 
   /* ---------- SKRIV BEGREPET: les forklaringen, skriv ordet ---------- */
@@ -119,6 +120,13 @@ window.FAG = {
     ['d19','bake','Heving etter utbaking (den andre hevingen) kalles …',['etterheving']],
     ['d20','bake','Kronisk sykdom der tarmtottene i tynntarmen blir ødelagt på grunn av gluten.',['cøliaki']],
     ['d21','bake','Den som har cøliaki, kalles en …',['cøliaker']],
+    ['e1','trygg','At det vi spiser og drikker, er trygt, slik at vi ikke blir syke av det.',['mattrygghet']],
+    ['e2','trygg','Når mennesker har tilgang til nok, trygg og næringsrik mat, slik at de kan leve et aktivt og sunt liv.',['matsikkerhet']],
+    ['e3','trygg','Infeksjonssykdommer som kan smitte fra dyr til mennesker og omvendt.',['zoonoser','zoonose']],
+    ['e4','trygg','Myndigheten som har det overordnede ansvaret for at maten er trygg, og som kontrollerer importert mat.',['mattilsynet']],
+    ['e5','trygg','Smittestoffer som kan forårsake zoonoser (skriv ett av dem).',['virus','bakterier','sopp','parasitter','prioner']],
+    ['e6','trygg','En effektiv måte å drepe bakterier på, f.eks. koking eller steking.',['varmebehandling']],
+    ['e7','trygg','Den du må kontakte hvis du mistenker zoonose hos et dyr.',['veterinær','veterinæren']],
     ['c40','bakt','Tilstanden bakteriene er i under 0 °C: de dør ikke, men er i …',['dvale']],
   ],
 
@@ -192,6 +200,13 @@ window.FAG = {
     {id:'x9', t:'bake', s:'Brød oppbevares best i ___, ikke i kjøleskap.', svar:['romtemperatur']},
     {id:'x10', t:'bake', s:'Omtrent 1 av ___ har cøliaki.', svar:['100']},
     {id:'x11', t:'bake', s:'Grovt mel, hele korn og kli bør bløtlegges i cirka en ___ i lunkent vann.', svar:['time']},
+    {id:'w1', t:'trygg', s:'Zoo betyr «dyr», og nosos betyr «___».', svar:['sykdom']},
+    {id:'w2', t:'trygg', s:'Rundt ___ sykdomstilfeller som skyldes zoonoser, rapporteres i Norge hvert år.', svar:['5000','5 000']},
+    {id:'w3', t:'trygg', s:'Bakterier trives godt i temperaturer mellom 4 °C og ___ °C.', svar:['60']},
+    {id:'w4', t:'trygg', s:'For at maten skal forbli trygg, må den holdes under 4 °C eller over ___ °C.', svar:['60']},
+    {id:'w5', t:'trygg', s:'Det er umulig å sikre seg ___ prosent mot smitte.', svar:['100']},
+    {id:'w6', t:'trygg', s:'Vask hendene godt med ___ før du begynner med matlagingen.', svar:['såpe']},
+    {id:'w7', t:'trygg', s:'Ikke bruk samme kniv og skjærefjøl til rått ___ som til salat.', svar:['kjøtt']},
     {id:'z30', t:'bakt', s:'Bakterieveksten øker hurtig mellom 20 og ___ °C.', svar:['40']},
     {id:'z31', t:'bakt', s:'Ved ___ °C (kokepunktet) dør alle bakterier, men sporer overlever.', svar:['100']},
     {id:'z32', t:'bakt', s:'Over ___ °C dør de aller fleste bakterier, men noen kan overleve.', svar:['70']},
@@ -327,6 +342,18 @@ window.FAG = {
      modell:'Man må unngå gluten, og havre må være merket glutenfri. Selv bitte små mengder gluten kan gi reaksjon, så man må være nøye med kjøkkenhygienen: bruke rent utstyr, ikke skjære glutenfritt brød på en fjøl som har vært brukt til vanlig brød uten å vaske den, ha eget toastjern, og ikke bake glutenholdig og glutenfritt samtidig på grunn av melstøv.'},
     {id:'p11', t:'bake', spm:'Hvilke typer mel inneholder ikke gluten?', begreper:[['mais','mais'],['ris','ris'],['hirse','hirse'],['bokhvete','bokhvete'],['havre (naturlig fri)','havre']], min:3,
      modell:'Mel av mais, ris, hirse og bokhvete inneholder ikke gluten. Havre er også naturlig fri for gluten, men kan få med seg litt gluten fra andre kornslag.'},
+    {id:'r1', t:'trygg', spm:'Hva er forskjellen på mattrygghet og matsikkerhet?', begreper:[['mattrygghet: maten er trygg, vi blir ikke syke','trygg','syk'],['matsikkerhet: tilgang til nok mat','tilgang','nok'],['næringsrik mat / aktivt og sunt liv','næringsrik','sunt']], min:2,
+     modell:'Mattrygghet betyr at det vi spiser og drikker, er trygt, slik at vi ikke blir syke av det. Matsikkerhet er når mennesker har tilgang til nok, trygg og næringsrik mat, slik at de kan leve et aktivt og sunt liv. I Norge har vi begge deler.'},
+    {id:'r2', t:'trygg', spm:'Hva er zoonoser, og hvordan kan de smitte?', begreper:[['smitter fra dyr til mennesker og omvendt','dyr','menneske'],['virus, bakterier, sopp, parasitter, prioner','virus','bakterie','sopp','parasitt'],['kontakt med smittet dyr','kontakt'],['kjøtt, egg, meieriprodukter','kjøtt','egg','meieri'],['frukt og grønnsaker forurenset av gjødsel','gjødsel','frukt','grønnsak']], min:3,
+     modell:'Zoonoser er infeksjonssykdommer som kan smitte fra dyr til mennesker og omvendt. De forårsakes av smittestoffer som virus, bakterier, sopp, parasitter og prioner. De kan smitte ved kontakt med et smittet dyr (dyret trenger ikke være sykt selv), og gjennom kjøtt, egg og meieriprodukter, og frukt og grønnsaker som er forurenset av for eksempel gjødsel. Derfor er det viktig å vaske hendene etter kontakt med dyr.'},
+    {id:'r3', t:'trygg', spm:'Nevn punkter du bør følge for god mattrygghet på ditt eget kjøkken.', begreper:[['vask hendene med såpe','hend','såpe'],['vask grønnsakene','grønnsak'],['rene benker, redskaper og skjærefjøl','ren','benk','fjøl'],['ikke samme kniv/fjøl til rått kjøtt og salat','kniv','rått kjøtt','salat'],['oppbevar maten som på pakken','pakken','oppbevar'],['avkjøl rester raskt / sett i kjøleskap','rester','avkjøl','kjøleskap']], min:4,
+     modell:'Vask hendene godt med såpe før du begynner, og etter at du har håndtert rått kjøtt eller rå fisk. Vask grønnsakene godt. Ha rene kjøkkenbenker, kjøkkenredskaper og ren skjærefjøl. Ikke bruk samme kniv og skjærefjøl til rått kjøtt som til salat. Oppbevar maten slik det står på pakken. Avkjøl rester raskt, pakk dem inn og sett dem i kjøleskapet, og ikke la mat stå framme for lenge.'},
+    {id:'r4', t:'trygg', spm:'Hvorfor er det viktig å kjøle ned matrester raskt?', begreper:[['noen bakterier overlever koking','overlev','koking'],['kan vekkes til live og formere seg','formere','vekkes','live'],['bakterier trives mellom 4 og 60 °C','4','60']], min:2,
+     modell:'De aller fleste bakterier dør ved koking eller steking, men noen typer kan overleve varmebehandlingen. Kjøler vi ned restene raskt, hindrer vi at disse bakteriene vekkes til live og formerer seg. Bakterier trives mellom 4 °C og 60 °C, så maten må holdes under 4 °C eller over 60 °C.'},
+    {id:'r5', t:'trygg', spm:'Hva skjer med bakteriene i kjøleskapet og i fryseren?', begreper:[['kjøleskap 0–4 °C','0','4'],['slutter å formere seg','formere'],['dør ikke','dør ikke','ikke'],['våkner igjen i romtemperatur','våkn','romtemperatur'],['dvale i fryseren','dvale']], min:3,
+     modell:'Et kjøleskap skal holde 0–4 °C. Da slutter de fleste bakteriene å formere seg, men de dør ikke, og de våkner igjen hvis maten står i romtemperatur for lenge. I fryseren dør heller ikke bakteriene, men de slutter å formere seg og går i dvale.'},
+    {id:'r6', t:'trygg', spm:'Hvorfor er det regler for å ta med planter, frø og mat hjem fra ferie?', begreper:[['ikke ta med smitte','smitte'],['nye sykdommer, insekter og dyr','sykdom','insekt','dyr'],['som ikke finnes i vår natur','natur']], min:2,
+     modell:'For å unngå at vi tar med oss smitte og introduserer nye sykdommer, insekter og dyr som ikke allerede finnes i naturen vår. Fra noen land kan det være straffbart å innføre planter, frø eller mat som ikke er kontrollert.'},
     {id:'q25', t:'bakt', spm:'Når går bakterieveksten raskest, og når går den langsommere?', begreper:[['raskest mellom 20 og 40 °C','20','40'],['langsomt 10–20 og 40–50 °C','10','50','langsom'],['under 0: dvale','dvale','0'],['over 70: de fleste dør','70','dør']], min:3,
      modell:'Bakterieveksten øker hurtig mellom 20 og 40 °C. Den øker langsomt mellom 10 og 20 °C og mellom 40 og 50 °C. Mellom 50 og 70 °C dør noen bakterier, over 70 °C dør de aller fleste, og ved 100 °C dør alle, men sporer overlever. Ved 0–4 °C (kjøleskap) slutter de fleste å formere seg, og under 0 °C er de i dvale.'},
     {id:'q26', t:'bakt', spm:'Hvilken temperatur bør det være i kjøleskapet, og hvorfor?', begreper:[['0–4 °C','0','4'],['de fleste bakteriene slutter å formere seg','formere','vekst','bakterie']], min:2,
