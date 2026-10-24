@@ -139,6 +139,7 @@ summary{cursor:pointer;font-weight:700;color:var(--brand)}
 <body>
 <div id="app"></div>
 <script src="innhold.js"></script>
+<script src="../../felles/stavekontroll.js"></script>
 <script>
 const K = window.FAG;
 const BEG = K.begreper.map(([id,t,fork,svar]) => ({id,t,fork,svar}));
@@ -207,6 +208,22 @@ function fagSjekk(text){ const out = []; const re = /\p{L}+/gu; let m;
     const hit = FAG.find(f => w.slice(0,2) === f.slice(0,2) && [f.length-1, f.length, f.length+1].some(L => L <= w.length && L >= 5 && osa(w.slice(0,L), f) === 1 && !(L === f.length-1 && f.startsWith(w.slice(0,L)))));
     if(hit) out.push({ord:m[0], riktig:hit}); }
   return out; }
+
+/* ---------- Norsk stavekontroll (Hunspell, kjører lokalt i nettleseren) ---------- */
+const STAVE_EKSTRA = [...new Set([...BEG.flatMap(b => b.svar), ...K.kortsvar.flatMap(k => k.modell.split(/[^\p{L}-]+/u)), ...(K.lesetekster || []).flatMap(l => l.tekst.split(/[^\p{L}-]+/u))].flatMap(x => x.toLowerCase().split(/\s+/)).filter(w => w.length > 1))];
+async function staveBoks(text, box){
+  if(!box) return;
+  box.innerHTML = '<p class="muted">🔍 Sjekker stavingen …</p>';
+  let sk; try{ sk = await Stavekontroll.last('../../felles/'); }catch(e){ box.innerHTML = '<p class="muted">Fikk ikke lastet stavekontrollen (er du på nett?).</p>'; return; }
+  if(!box.isConnected) return;
+  const feil = sk.sjekk(text, STAVE_EKSTRA);
+  if(!feil.length){ box.innerHTML = '<p style="color:var(--ok);font-weight:700">✅ Fant ingen stavefeil.</p>'; return; }
+  let html = '', pos = 0;
+  feil.forEach(f => { html += esc(text.slice(pos, f.offset)) + `<mark>${esc(text.substr(f.offset, f.length))}</mark>`; pos = f.offset + f.length; });
+  html += esc(text.slice(pos));
+  box.innerHTML = `<div class="spell"><div class="q-label">🔍 Stavingen: ${feil.length} mulig${feil.length > 1 ? 'e' : ''} feil</div><div class="marked">${html}</div>
+    <ul>${feil.map(f => `<li><b style="color:var(--bad)">${esc(f.ord)}</b> · ${esc(f.grunn)}${f.forslag.length ? '<br>Forslag: ' + f.forslag.map(r => `<span class="sugg">${esc(r)}</span>`).join('') : ''}</li>`).join('')}</ul></div>`;
+}
 
 /* =====================================================================
    OPPGAVER (alle er skriving)
@@ -322,8 +339,9 @@ const RUN = {
         if(ok) okCount++; xp += found*3 + (ok ? 5 : 0); results.push(ok); beep(ok ? 'ok' : 'bad');
         $('#res').innerHTML = `<div style="font-weight:800;margin-top:8px">${ok ? '✅' : '🔶'} ${found} av ${res.length} viktige punkter</div>
           <ul class="keys">${res.map(r => `<li class="${r.ok ? 'ok' : ''}">${r.ok ? '✅' : '⬜'} ${esc(r.navn)}</li>`).join('')}</ul>
-          <div class="model">${esc(q.modell)}</div>
+          <div class="model">${esc(q.modell)}</div><div id="stave"></div>
           <div class="row end"><button class="btn primary" id="nq">${qi < L.sporsmal.length-1 ? 'Neste spørsmål ➜' : 'Ferdig ✓'}</button></div>`;
+        staveBoks(text, $('#stave'));
         $('#nq').onclick = () => { qi++; if(qi < L.sporsmal.length) return ask();
           const all = okCount === L.sporsmal.length;
           finish({ok: okCount >= L.sporsmal.length - 1, near: !all && okCount >= L.sporsmal.length - 1, rec:[[L.id, all]], xp: Math.max(0, xp - peeks*3) + (all && !peeks ? 10 : 0), quiet:true,
@@ -346,9 +364,10 @@ const RUN = {
       const sp = fagSjekk(text);
       $('#res').innerHTML = `<div class="stat" style="font-weight:800;margin-top:10px">${ok ? '✅' : '🔶'} ${found} av ${res.length} viktige punkter${ok ? '' : ` (trenger ${k.min})`}</div>
         <ul class="keys">${res.map(r => `<li class="${r.ok ? 'ok' : ''}">${r.ok ? '✅' : '⬜'} ${esc(r.navn)}</li>`).join('')}</ul>
-        ${sp.length ? `<div class="spell"><b>Sjekk stavingen:</b> ${sp.map(s => `<s>${esc(s.ord)}</s> → <span class="sugg">${esc(s.riktig.charAt(0).toUpperCase() + s.riktig.slice(1))}</span>`).join(' ')}</div>` : ''}
+        <div id="stave"></div>
         <div class="q-label" style="margin-top:10px">Eksempel på et godt svar:</div><div class="model">${esc(k.modell)}</div>
         <div class="row end"><button class="btn primary" id="done">Ferdig ✓</button></div>`;
+      staveBoks(text, $('#stave'));
       $('#done').onclick = () => { $('#done').disabled = true;
         finish({ok, near: !ok && found > 0, rec:[[k.id, ok]], xp: found*3 + (ok ? 8 : 0) - (hinted ? 3 : 0), quiet:true,
           note: ok ? 'Godt svar!' : 'Les eksempelsvaret og se hva du manglet. Oppgaven kommer igjen.'}); };

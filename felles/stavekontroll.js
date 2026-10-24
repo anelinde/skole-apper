@@ -60,7 +60,7 @@
         const forste = m.index === 0 || /[.!?:]\s*$/.test(tekst.slice(Math.max(0, m.index-3), m.index)) || /\n\s*$/.test(tekst.slice(Math.max(0,m.index-2), m.index));
         if(/^[A-ZÆØÅ]/.test(w) && !forste) continue;      // egennavn midt i setningen hoppes over
         if(w === w.toUpperCase() && w.length <= 5) continue; // forkortelser (EU, CO2)
-        if(w.split('-').every(finnes)) continue;
+        if(w.split('-').every(d => d.length <= 2 || finnes(d))) continue;
         out.push({offset:m.index, length:w.length, ord:w, forslag: sp.suggest(w).slice(0,3), grunn:'Mulig stavefeil.'});
       }
       return out.sort((a,b) => a.offset - b.offset);
