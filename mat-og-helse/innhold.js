@@ -359,4 +359,134 @@ window.FAG = {
     {id:'q26', t:'bakt', spm:'Hvilken temperatur bør det være i kjøleskapet, og hvorfor?', begreper:[['0–4 °C','0','4'],['de fleste bakteriene slutter å formere seg','formere','vekst','bakterie']], min:2,
      modell:'0–4 °C. Da slutter de fleste bakteriene å formere seg, så maten holder seg godt lenger.'},
   ],
+
+  /* ---------- SORTER: plasser i riktig gruppe (bare fra kildene) ---------- */
+  sorter: [
+    {id:'s1', t:'naering', tittel:'Gir det energi?', kurver:['Energigivende','Ikke energigivende'], ting:[
+      ['Karbohydrater',0],['Proteiner',0],['Fett',0],['Vitaminer',1],['Mineraler',1],['Vann',1],['Kostfiber',1]]},
+    {id:'s2', t:'vit', tittel:'Fettløselig eller vannløselig?', kurver:['Fettløselig','Vannløselig'], ting:[
+      ['Vitamin A',0],['Vitamin D',0],['Vitamin E',0],['Vitamin K',0],['Vitamin C',1],['B-vitaminene',1]]},
+    {id:'s3', t:'oppg', tittel:'Mest mettet eller mest umettet fett?', kurver:['Mettet (hardt)','Umettet (mykt/flytende)'], ting:[
+      ['Smør',0],['Rømme',0],['Fet ost',0],['Pølser',0],['Kokosolje',0],['Olivenolje',1],['Rapsolje',1],['Avokado',1],['Nøtter',1],['Fet fisk',1]]},
+    {id:'s4', t:'bake', tittel:'Inneholder det gluten?', kurver:['Gluten','Ikke gluten'], ting:[
+      ['Hvete',0],['Bygg',0],['Rug',0],['Spelt',0],['Mais',1],['Ris',1],['Hirse',1],['Bokhvete',1],['Havre (naturlig)',1]]},
+    {id:'s5', t:'bake', tittel:'Hvilket hevemiddel brukes?', kurver:['Gjær / surdeig','Bakepulver','Hornsalt'], ting:[
+      ['Brød',0],['Rundstykker',0],['Scones',1],['Smultringer',2],['Hvite kakemenn',2],['Snipper',2],['Sveler',2]]},
+    {id:'s6', t:'bakt', tittel:'Hva skjer med bakteriene?', kurver:['Vokser hurtig','Vokser langsomt','Slutter / dvale','De fleste dør'], ting:[
+      ['25 °C',0],['35 °C',0],['15 °C',1],['45 °C',1],['Kjøleskap 0–4 °C',2],['Fryser −18 °C',2],['Over 70 °C',3],['Koking 100 °C',3]]},
+    {id:'s7', t:'korn', tittel:'Hvilken del av kornet har mest av …?', kurver:['Skall','Kime','Melkjerne'], ting:[
+      ['Fiber',0],['Flerumettet fett',1],['Stivelse',2]]},
+    {id:'s8', t:'sirkel', tittel:'Hvilken gruppe i kostsirkelen?', kurver:['Kornvarer og poteter','Grønnsaker, frukt og bær','Meieriprodukter','Kjøtt, fisk, egg, belgfrukter','Smør, oljer og nøtter','Kaker, snacks, søtsaker'], ting:[
+      ['Grovt brød',0],['Poteter',0],['Havregrøt',0],['Gulrot',1],['Eple',1],['Bær',1],['Melk',2],['Yoghurt',2],['Ost',2],['Laks',3],['Egg',3],['Bønner og linser',3],['Rapsolje',4],['Nøtter',4],['Smør',4],['Godteri',5],['Kaker',5],['Snacks',5]]},
+    {id:'s9', t:'trygg', tittel:'Trygg eller utrygg på kjøkkenet?', kurver:['Trygt','Utrygt'], ting:[
+      ['Vaske hendene med såpe før matlaging',0],['Vaske grønnsakene godt',0],['Avkjøle rester raskt og sette dem i kjøleskapet',0],
+      ['Samme fjøl til rått kjøtt og salat',1],['La maten stå framme lenge',1],['Ikke vaske hendene etter rå fisk',1]]},
+  ],
+
+  /* ---------- LES OG SKRIV ----------
+     Lesetekstene er skrevet med egne ord, men bygger bare på heftet og
+     Matopedia (kilde står på hver tekst). Han leser, teksten skjules,
+     og han svarer skriftlig. */
+  lesetekster: [
+    {id:'l1', t:'naering', tittel:'Kroppens byggesteiner', kilde:'Teorivedlegget og Matopedia s. 13–14',
+     tekst:'Kroppen vår er bygd opp av celler, og hele livet byttes gamle celler ut med nye. Det kaller vi vedlikehold. Hos barn og unge lages det i tillegg stadig nye celler, og det kalles vekst. For å klare dette trenger kroppen næringsstoffer fra maten.\n\nVi har seks hovedgrupper av næringsstoffer: karbohydrater, proteiner, fett, vitaminer, mineraler og vann. Karbohydrater, proteiner og fett gir oss energi. Vitaminer, mineraler og vann gir ikke energi, men kroppen kan ikke fungere uten dem. Energien måler vi i kilokalorier (kcal). Ett gram karbohydrat eller protein gir 4 kcal, mens ett gram fett gir 9 kcal. Kroppen bruker energien til å holde liv i cellene, til at hjertet slår og lungene puster, til å bevege oss og til å holde temperaturen på cirka 37 °C.',
+     sporsmal:[
+       {spm:'Hva er forskjellen på vedlikehold og vekst?', begreper:[['vedlikehold: cellene byttes ut','byttes','vedlikehold'],['vekst: nye celler hos barn og unge','vekst','nye celler']], min:2,
+        modell:'Vedlikehold er når gamle celler byttes ut med nye hele livet. Vekst er når det lages nye celler hos barn og unge.'},
+       {spm:'Hvilke næringsstoffer gir energi, og hvor mye energi gir de per gram?', begreper:[['karbohydrater','karbohydrat'],['proteiner','protein'],['fett','fett'],['4 kcal','4'],['fett 9 kcal','9']], min:4,
+        modell:'Karbohydrater, proteiner og fett gir energi. Karbohydrat og protein gir 4 kcal per gram, og fett gir 9 kcal per gram.'},
+       {spm:'Hva bruker kroppen energien til?', begreper:[['holde liv i cellene','celle'],['hjertet og lungene','hjert','lunge'],['bevege oss','bevege'],['37 °C','37','temperatur']], min:3,
+        modell:'Til å holde liv i cellene, til at hjertet slår og lungene puster, til å bevege oss og til å holde temperaturen på cirka 37 °C.'},
+     ]},
+    {id:'l2', t:'oppg', tittel:'Fett – hardt eller mykt?', kilde:'Matopedia s. 16–17',
+     tekst:'Fett er en viktig energikilde, og i kroppen fungerer det som et energilager. Fettet isolerer, så vi ikke fryser så lett, og det beskytter organene våre hvis vi slår oss. Noen vitaminer, de fettløselige, finnes bare i mat som inneholder fett.\n\nVi deler fettet inn i mettet og umettet fett. Mat med mye mettet fett er hard eller fast i kjøleskapet, for eksempel smør, rømme, fet ost og pølser. Mat med mye umettet fett er myk eller flytende, for eksempel olivenolje, rapsolje, avokado, nøtter og fet fisk. Kroppen kan lage de fleste fettsyrene selv, men noen må vi få gjennom maten. De kalles essensielle fettsyrer. Helsedirektoratet anbefaler at vi ikke spiser mye mat med mettet fett, og at vi heller bruker olje og myk margarin.',
+     sporsmal:[
+       {spm:'Nevn tre oppgaver fett har i kroppen.', begreper:[['energikilde / energilager','energi'],['isolerer','isoler','fryser'],['beskytter organene','organ','beskytt'],['fettløselige vitaminer','vitamin']], min:3,
+        modell:'Fett er en energikilde og et energilager, det isolerer så vi ikke fryser, og det beskytter organene. Det bærer også de fettløselige vitaminene.'},
+       {spm:'Hvordan kan du se forskjell på mettet og umettet fett? Gi ett eksempel på hver.', begreper:[['mettet er hardt','hard','fast'],['umettet er mykt/flytende','myk','flytende'],['eksempel mettet','smør','rømme','ost','pølse'],['eksempel umettet','olje','avokado','nøtt','fisk']], min:4,
+        modell:'Mettet fett er hardt eller fast i kjøleskapet, for eksempel smør. Umettet fett er mykt eller flytende, for eksempel olivenolje.'},
+       {spm:'Hva er essensielle fettsyrer?', begreper:[['kroppen kan ikke lage dem selv','ikke lage','kan ikke','selv'],['må få gjennom maten','maten']], min:2,
+        modell:'Fettsyrer som kroppen ikke kan lage selv, og som vi derfor må få gjennom maten.'},
+     ]},
+    {id:'l3', t:'oppg', tittel:'Proteiner er som bokstaver', kilde:'Matopedia s. 17',
+     tekst:'Proteiner får vi både fra dyreriket og fra planteriket. De har en dobbel jobb i kroppen: de er byggemateriale, og de gir energi. Alle proteiner er bygd opp av aminosyrer. Aminosyrene settes sammen til proteiner omtrent slik bokstaver settes sammen til ord, og derfor finnes det utrolig mange forskjellige proteiner.\n\nDet finnes tjue aminosyrer. Åtte av dem er essensielle, det vil si at kroppen ikke kan lage dem selv. Mat som inneholder alle de essensielle aminosyrene, har fullverdig protein. Det finner vi i kjøtt, fisk, egg, melk og meieriprodukter og soya. Ved å spise forskjellige vegetabilske matvarer gjennom dagen kan man også få nok av alle. Et vanlig og variert kosthold gir nok protein for de fleste, så det er sjelden noen trenger proteintilskudd, selv om de trener.',
+     sporsmal:[
+       {spm:'Hvilken dobbel funksjon har proteiner?', begreper:[['byggemateriale','bygge'],['energikilde','energi']], min:2,
+        modell:'Proteiner er både byggemateriale og energikilde.'},
+       {spm:'Hva er fullverdig protein, og hvor finner vi det?', begreper:[['alle de essensielle aminosyrene','essensiell','alle'],['kjøtt / fisk / egg','kjøtt','fisk','egg'],['melk / soya','melk','soya','meieri']], min:2,
+        modell:'Protein som inneholder alle de essensielle aminosyrene. Det finnes i kjøtt, fisk, egg, melk og meieriprodukter og soya.'},
+       {spm:'Trenger man proteintilskudd når man trener? Begrunn.', begreper:[['nei','nei','ikke'],['variert kosthold gir nok','variert','nok']], min:2,
+        modell:'Nei. Et vanlig og variert kosthold gir nok protein for de fleste. Selv toppidrettsutøvere trenger det sjelden.'},
+     ]},
+    {id:'l4', t:'vit', tittel:'Sola, tran og sterke bein', kilde:'Matopedia s. 18, 173–176',
+     tekst:'Kalsium er mineralet vi har mest av i kroppen, og nesten alt sammen, 99 prosent, ligger i skjelettet. Kalsium er byggemateriale for skjelettet og tennene, og derfor er det ekstra viktig for barn og unge som vokser. Vi får mest kalsium fra melk, ost og andre meieriprodukter.\n\nFor at kroppen skal klare å bygge kalsiumet inn i skjelettet, trenger den vitamin D. Kroppen lager vitamin D selv når sollyset treffer huden. Om vinteren er sola svakere, det er få soltimer, og vi har mer klær på oss. Da må vi få ekstra vitamin D fra maten. Det er få matvarer som har mye vitamin D, men gode kilder er fet fisk som laks og ørret, tran og egg. En teskje tran dekker hele dagsbehovet. Vitamin D er det vitaminet det er vanskeligst å få nok av.',
+     sporsmal:[
+       {spm:'Hvorfor er kalsium spesielt viktig for barn og unge?', begreper:[['byggemateriale for skjelett og tenner','skjelett','tenner','bygge'],['de er i vekst','vekst','vokser']], min:2,
+        modell:'Kalsium er byggemateriale for skjelettet og tennene, og barn og unge er i vekst.'},
+       {spm:'Hvordan henger vitamin D og kalsium sammen?', begreper:[['vitamin D trengs','vitamin d'],['for å bygge kalsium inn i skjelettet','skjelett','ta opp','bygge']], min:2,
+        modell:'Kroppen trenger vitamin D for å ta opp kalsium og bygge det inn i skjelettet.'},
+       {spm:'Hvorfor må vi passe ekstra på vitamin D om vinteren, og hvor får vi det fra?', begreper:[['svakere sol / få soltimer / mer klær','sol','klær'],['fet fisk','fisk','laks','ørret'],['tran','tran'],['egg','egg']], min:3,
+        modell:'Om vinteren er sola svakere, det er få soltimer, og vi har mer klær på oss, så kroppen lager mindre vitamin D. Vi kan få det fra fet fisk, tran og egg.'},
+     ]},
+    {id:'l5', t:'vit', tittel:'Jern og oksygen', kilde:'Matopedia s. 18, 177–178',
+     tekst:'Det meste av jernet i kroppen finnes i blodet. Der har jernet en svært viktig oppgave: det frakter oksygen fra lungene ut til alle cellene. Får vi for lite jern over tid, tømmes jernlagrene, og vi kan føle oss slitne og slappe. En kropp som vokser, trenger ekstra jern. Unge jenter trenger mer jern enn gutter, fordi de mister jern gjennom menstruasjonen.\n\nDen største kilden til jern i norsk kosthold er brød og kornprodukter, særlig de grove. Rødt kjøtt og leverpostei er også gode kilder. Jernet i planteriket er ikke like lett for kroppen å ta opp som jernet fra dyreriket. Et triks er å ha kjøtt- eller fiskepålegg på grovbrødet, eller å spise noe med C-vitamin, som paprika eller frukt, til maten.',
+     sporsmal:[
+       {spm:'Hva er jernets viktigste oppgave i kroppen, og hva skjer hvis vi får for lite?', begreper:[['frakter oksygen','oksygen'],['fra lungene til cellene','lunge','celle'],['slitne og slappe','sliten','slapp','trøtt']], min:2,
+        modell:'Jern frakter oksygen fra lungene til alle cellene. Får vi for lite, kan vi bli slitne og slappe.'},
+       {spm:'Hvorfor trenger jenter mer jern enn gutter?', begreper:[['menstruasjon','menstruasjon']], min:1,
+        modell:'Fordi de mister jern gjennom menstruasjonen.'},
+       {spm:'Hvordan kan du gjøre det lettere for kroppen å ta opp jernet fra grovbrød?', begreper:[['kjøtt- eller fiskepålegg','kjøtt','fisk'],['C-vitamin (paprika/frukt)','vitamin c','c-vitamin','paprika','frukt']], min:2,
+        modell:'Ha kjøtt- eller fiskepålegg på brødet, og spis noe med C-vitamin, som paprika eller frukt.'},
+     ]},
+    {id:'l6', t:'korn', tittel:'Fra korn til mel', kilde:'Matopedia s. 49–51',
+     tekst:'Et korn har tre deler. Ytterst er skallet, som har mye fiber, protein, B-vitaminer og jern. Kimen har blant annet flerumettet fett. Den største delen er melkjernen, som har mest stivelse.\n\nNår man lager fint mel, som siktet hvetemel, skilles skallet bort, og man bruker bare kjernen. Skallet blir til kli. Fint mel gir lette og luftige bakverk. Når man maler hele kornet, både skall og kjerne, får man sammalt mel. Alt sammalt mel regnes som grovt mel, og det har mer kostfiber, mineraler og vitaminer enn siktet mel, fordi hele kornet er med. De fleste spiser for lite fiber: norske ungdommer spiser nesten 17 gram om dagen, mens anbefalingen er 25 til 35 gram. Merket Brødskala\'n viser hvor grovt et brød er. Jo flere kakestykker, jo mer fullkorn.',
+     sporsmal:[
+       {spm:'Hvilke tre deler har kornet, og hva er det mye av i hver?', begreper:[['skall: fiber','skall'],['kime: fett','kime'],['melkjerne: stivelse','melkjerne'],['fiber','fiber'],['stivelse','stivelse']], min:4,
+        modell:'Skallet har mye fiber, kimen har flerumettet fett, og melkjernen har mest stivelse.'},
+       {spm:'Hva er forskjellen på siktet og sammalt mel, og hvilket er sunnest?', begreper:[['siktet: skallet skilles bort','skall','kjerne'],['sammalt: hele kornet','hele'],['sammalt har mer fiber, vitaminer og mineraler','fiber','vitamin','mineral']], min:3,
+        modell:'I siktet mel er skallet skilt bort, og bare kjernen brukes. I sammalt mel er hele kornet malt. Sammalt mel er sunnest fordi det har mer fiber, mineraler og vitaminer.'},
+       {spm:'Hva viser Brødskala\'n?', begreper:[['hvor grovt brødet er','grovt','grovhet'],['kakestykker / fullkorn','kakestykke','fullkorn']], min:2,
+        modell:'Den viser hvor grovt brødet er. Jo flere kakestykker, jo mer fullkorn.'},
+     ]},
+    {id:'l7', t:'bake', tittel:'Hvorfor brødet hever', kilde:'Matopedia s. 49, 52–53',
+     tekst:'Gjær er en sopp. Når vi har gjær i en deig, henter gjæren næring fra karbohydratene og begynner å lage gassen karbondioksid (CO2). Hveten inneholder glutenproteiner. Når vi elter deigen, hekter glutenet seg sammen til et nettverk, glutennettverket. Nettverket fanger opp gassen, og da hever deigen. Derfor er det viktig å elte gjærdeigen godt.\n\nGjærdeig hever som regel to ganger: først hele deigen i bollen, og så de ferdig formede brødene eller rundstykkene. La deigen stå lunt og heve til dobbel størrelse. I ovnen fortsetter hevingen til deigen er cirka 50 °C. Brød stekes nederst i ovnen. For å sjekke om brødet er ferdig, kan du banke lett på undersiden. Hører du en hul lyd, er det ferdig. Til slutt legges brødet på rist for å kjøles ned.',
+     sporsmal:[
+       {spm:'Forklar hvorfor en gjærdeig hever.', begreper:[['gjær er en sopp','sopp','gjær'],['lager karbondioksid / CO2','karbondioksid','co2','gass'],['glutennettverket fanger gassen','gluten','nettverk','fanger']], min:3,
+        modell:'Gjæren, som er en sopp, lager karbondioksid. Glutennettverket som dannes når vi elter, fanger opp gassen, så deigen hever.'},
+       {spm:'Hvorfor må gjærdeig eltes godt?', begreper:[['for å utvikle glutennettverket','gluten','nettverk']], min:1,
+        modell:'For å utvikle glutennettverket, som fanger gassen og får deigen til å heve.'},
+       {spm:'Hvordan kan du sjekke om et brød er ferdig stekt?', begreper:[['banke på undersiden','bank'],['hul lyd','hul']], min:2,
+        modell:'Bank lett på undersiden av brødet. Hører du en hul lyd, er det ferdig. Det kalles banketesten.'},
+     ]},
+    {id:'l8', t:'bake', tittel:'Livet med cøliaki', kilde:'Matopedia s. 53–54',
+     tekst:'Mye av næringen i maten tas opp i tynntarmen. Cøliaki er en sykdom man har hele livet. Hos en som har cøliaki, blir tarmtottene i tynntarmen ødelagt av en betennelse, og da tar de ikke opp næring som de skal. Betennelsen kommer av gluten. Omtrent 1 av 100 har cøliaki. Spiser man glutenfritt, blir man helt fri for symptomer.\n\nGluten er et protein som finnes i hvete, bygg, rug, spelt, emmer og enkorn. Mel av mais, ris, hirse og bokhvete har ikke gluten. Havre er naturlig glutenfri, men kan få litt gluten fra andre kornslag, så havren må være merket glutenfri. Selv bitte små mengder gluten kan gi reaksjon. Derfor må kjøkkenet være rent: man skal ikke skjære glutenfritt brød på en fjøl som er brukt til vanlig brød, en som har cøliaki, bør ha eget toastjern, og man skal ikke bake glutenfritt samtidig som man baker med vanlig mel.',
+     sporsmal:[
+       {spm:'Hva er cøliaki?', begreper:[['tarmtottene i tynntarmen ødelegges','tarmtott','tynntarm','ødelagt'],['på grunn av gluten','gluten'],['tar ikke opp næring','næring']], min:2,
+        modell:'Cøliaki er en sykdom der tarmtottene i tynntarmen blir ødelagt av betennelse på grunn av gluten, så de ikke tar opp næring som de skal.'},
+       {spm:'Hvilke kornslag har gluten, og hvilke har ikke?', begreper:[['hvete','hvete'],['bygg','bygg'],['rug','rug'],['mais / ris','mais','ris'],['havre (merket)','havre']], min:3,
+        modell:'Hvete, bygg, rug, spelt, emmer og enkorn har gluten. Mais, ris, hirse og bokhvete har ikke gluten. Havre er naturlig glutenfri, men må være merket glutenfri.'},
+       {spm:'Hva må du passe på når du lager mat til en som har cøliaki?', begreper:[['rent utstyr / fjøl','fjøl','rent','utstyr'],['eget toastjern','toastjern'],['ikke bake samtidig / melstøv','samtidig','melstøv']], min:2,
+        modell:'Bruk rent utstyr og en ren fjøl, la personen ha eget toastjern, og ikke bak glutenfritt samtidig som du baker med vanlig mel.'},
+     ]},
+    {id:'l9', t:'trygg', tittel:'Trygg mat på kjøkkenet', kilde:'Matopedia s. 151–154',
+     tekst:'Mattrygghet betyr at det vi spiser og drikker, er trygt, så vi ikke blir syke. I Norge har Mattilsynet det overordnede ansvaret, men når maten kommer hjem på kjøkkenet, er det vårt eget ansvar å behandle den riktig.\n\nDe aller fleste bakterier dør når maten kokes eller stekes, men noen tåler varmen. Bakterier trives mellom 4 og 60 °C. Derfor må mat holdes kaldere enn 4 °C eller varmere enn 60 °C, og rester må kjøles ned raskt. I kjøleskapet, som skal holde 0–4 °C, slutter de fleste bakteriene å formere seg, men de dør ikke. I fryseren går de i dvale. Husk også å vaske hendene godt med såpe før du lager mat og etter at du har tatt i rått kjøtt eller rå fisk, og bruk aldri samme kniv og fjøl til rått kjøtt som til salat.',
+     sporsmal:[
+       {spm:'Hva betyr mattrygghet, og hvem har ansvaret?', begreper:[['maten er trygg / vi blir ikke syke','trygg','syk'],['Mattilsynet','mattilsyn'],['vi selv på kjøkkenet','vårt','selv','eget']], min:2,
+        modell:'At maten vi spiser og drikker, er trygg, så vi ikke blir syke. Mattilsynet har det overordnede ansvaret, men på kjøkkenet er det vårt eget ansvar.'},
+       {spm:'Hvorfor må matrester kjøles ned raskt?', begreper:[['noen bakterier tåler varme / overlever','overlev','tåler'],['bakterier trives mellom 4 og 60 °C','4','60']], min:2,
+        modell:'Fordi noen bakterier overlever kokingen, og bakterier trives mellom 4 og 60 °C. Kjøles restene raskt ned, får de ikke formere seg.'},
+       {spm:'Nevn to hygieneråd fra teksten.', begreper:[['vaske hendene med såpe','hend','såpe'],['ikke samme kniv/fjøl til rått kjøtt og salat','kniv','fjøl','rått kjøtt']], min:2,
+        modell:'Vask hendene godt med såpe før matlaging og etter rått kjøtt eller fisk, og bruk ikke samme kniv og fjøl til rått kjøtt som til salat.'},
+     ]},
+    {id:'l10', t:'rad', tittel:'Hvorfor har vi kostråd?', kilde:'Heftet (nye kostråd) og Matopedia s. 20',
+     tekst:'Hver eneste uke kan vi lese nye råd om mat i aviser, på TV og på nettet. Noen som gir råd, har kanskje et produkt de vil selge, og rådene sier ofte imot hverandre. Da kan det være vanskelig å vite hva som er sant.\n\nHelsedirektoratet har ansvaret for å gi oss kostråd. Rådene bygger på store mengder forskning om hvordan maten påvirker helsa, og de blir justert når det kommer ny kunnskap. Et usunt kosthold øker risikoen for blant annet hjerte- og karsykdommer, diabetes type 2, flere former for kreft og overvekt. Kostrådene gjelder for alle voksne og barn over to år. De nye kostrådene er sju, og det første sier at vi skal ha et variert kosthold, velge mest mat fra planteriket og spise med glede.',
+     sporsmal:[
+       {spm:'Hvorfor kan det være vanskelig å vite hvilke matråd man skal stole på?', begreper:[['mange råd i aviser og på nett','mange','avis','nett'],['noen vil selge et produkt','selge','produkt','reklame'],['rådene sier imot hverandre','motstridende','imot']], min:2,
+        modell:'Det finnes veldig mange råd i aviser, på TV og på nettet, noen vil selge et produkt, og rådene sier ofte imot hverandre.'},
+       {spm:'Hvorfor kan vi stole på kostrådene fra Helsedirektoratet?', begreper:[['bygger på forskning','forskning'],['justeres ved ny kunnskap','juster','ny']], min:1,
+        modell:'Fordi de bygger på store mengder forskning, og de justeres når det kommer ny kunnskap.'},
+       {spm:'Hva sier det første av de sju nye kostrådene?', begreper:[['variert kosthold','variert'],['mest mat fra planteriket','planteriket','plante'],['spis med glede','glede']], min:3,
+        modell:'Ha et variert kosthold, velg mest mat fra planteriket og spis med glede.'},
+     ]},
+  ],
 };

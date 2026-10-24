@@ -115,6 +115,25 @@ summary{cursor:pointer;font-weight:700;color:var(--brand)}
 @keyframes pop{0%{transform:translate(0,0) scale(.6);opacity:1}100%{transform:translate(var(--dx),-50vh) scale(1.2) rotate(var(--r));opacity:0}}
 @keyframes up{from{transform:translateY(100%)}to{transform:none}}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+.sortcard{font-size:22px;font-weight:800;text-align:center;background:var(--bg);border-radius:16px;padding:24px 14px;margin:8px 0 14px}
+.sortcard.right{background:var(--okbg);color:var(--ok)} .sortcard.wrong{background:var(--badbg);color:var(--bad)}
+.buckets{display:grid;gap:8px;grid-template-columns:1fr 1fr}
+.buckets .btn{min-height:58px;font-size:15px}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.dots span{width:12px;height:12px;border-radius:50%;background:var(--line)} .dots span.ok{background:var(--ok)} .dots span.bad{background:var(--bad)}
+.clue{font-size:19px;font-weight:700;background:var(--bg);border-radius:14px;padding:14px;margin:6px 0 12px;line-height:1.5}
+.clue .hid{filter:blur(6px);user-select:none}
+.potbar{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:baseline;font-weight:800;margin-bottom:8px}
+.wrongnum{background:var(--badbg);color:var(--bad);border-radius:6px;padding:0 6px;text-decoration:line-through}
+.badge{display:inline-block;border-radius:99px;padding:4px 12px;font-weight:800;font-size:14px;margin-bottom:8px}
+.badge.bonus{background:#fde68a;color:#92400e} .badge.boss{background:#ede9fe;color:#5b21b6}
+.chal-top{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:22px;margin-bottom:12px}
+.timer.low{color:var(--bad)}
+.flash{min-height:26px;font-weight:800;margin-top:10px}
+.readtext{background:var(--bg);border-radius:14px;padding:14px 16px;font-size:18px;line-height:1.65;white-space:pre-line;margin:8px 0}
+.readtext.hidden{filter:blur(7px);user-select:none;pointer-events:none}
+.src{font-size:13px;color:var(--muted)}
+.qnum{font-weight:800;color:var(--brand);margin:12px 0 4px}
 </style>
 </head>
 <body>
@@ -220,6 +239,99 @@ const RUN = {
         note: g === 'ok' ? '' : (g === 'near' ? 'Nesten! Se på skrivemåten. ' : '') + esc(y.s.replace('___', riktig))}); };
     $('#check').onclick = check; onEnter(inp, check); inp.focus();
   },
+  // 🕵️ Hvem er jeg? Forklaringen avsløres bit for bit. Jo færre biter, jo flere poeng.
+  gaate(el, b, finish){
+    const ws = b.fork.split(' '), parts = [Math.ceil(ws.length/3), Math.ceil(2*ws.length/3), ws.length];
+    let step = 0; const pts = [20, 12, 6];
+    const draw = () => { el.querySelector('.clue').innerHTML = ws.map((w,i) => i < parts[step] ? esc(w) : `<span class="hid">${esc(w)}</span>`).join(' ');
+      el.querySelector('.pot').textContent = pts[step]; if(step >= 2) $('#more').disabled = true; };
+    el.innerHTML = `<div class="q-label">${TEMA[b.t].e} 🕵️ Hvem er jeg?</div>
+      <div class="potbar">🏆 Potten: <span class="pot"></span> XP <span class="muted" style="font-weight:600">· gjett tidlig for flest poeng</span></div>
+      <div class="clue"></div>
+      <input class="answer" ${WRITE_ATTR} placeholder="Skriv begrepet …"><div class="guard"></div>
+      <div class="row end"><button class="btn ghost" id="more">🔎 Vis mer</button><button class="btn primary" id="check">Gjett</button></div>`;
+    const inp = el.querySelector('input'); guardInput(inp, el.querySelector('.guard')); draw();
+    $('#more').onclick = () => { step = Math.min(2, step+1); draw(); inp.focus(); };
+    const check = () => { const g = gradeWord(inp.value, b.svar); if(g === null || inp.disabled) return;
+      if(g === 'bad' && step < 2){ inp.classList.add('wrong'); setTimeout(() => inp.classList.remove('wrong'), 500); inp.value = ''; step++; draw(); beep('bad'); inp.focus(); return; }
+      step = 2; draw(); inp.disabled = true; el.querySelectorAll('button').forEach(x => x.disabled = true); inp.classList.add(g === 'ok' ? 'right' : g === 'near' ? 'near' : 'wrong');
+      const riktig = b.svar[0].charAt(0).toUpperCase() + b.svar[0].slice(1);
+      finish({ok: g !== 'bad', near: g === 'near', rec:[[b.id, g === 'ok']], xp: g === 'ok' ? pts[Math.min(step, b._step ?? step)] : g === 'near' ? 4 : 0,
+        note: g === 'ok' ? '' : (g === 'near' ? 'Nesten! Riktig skrivemåte: ' : 'Jeg er: ') + `<b>${esc(riktig)}</b>`}); };
+    // husk hvilket steg han gjettet på før alt ble vist
+    const origCheck = check;
+    $('#check').onclick = () => { b._step = step; origCheck(); };
+    onEnter(inp, () => { b._step = step; origCheck(); }); inp.focus();
+  },
+  // 🕵️ Rett feilen: et tall er byttet ut med feil tall. Skriv det riktige.
+  feil(el, f, finish){
+    const [a, c] = f.y.s.split('___');
+    el.innerHTML = `<div class="q-label">${TEMA[f.y.t].e} 🕵️ Rett feilen!</div>
+      <div class="muted" style="margin-bottom:6px">En slurvete kokk har skrevet feil tall. Finn feilen og skriv det riktige tallet.</div>
+      <div class="q-text">${esc(a)}<span class="wrongnum">${esc(f.feil)}</span>${esc(c)}</div>
+      <input class="answer" ${WRITE_ATTR} placeholder="Riktig tall eller ord …" style="max-width:240px"><div class="guard"></div>
+      <div class="row end"><button class="btn primary" id="check">Rett</button></div>`;
+    const inp = el.querySelector('input'); guardInput(inp, el.querySelector('.guard'));
+    const check = () => { const g = gradeWord(inp.value, f.y.svar); if(g === null || inp.disabled) return;
+      inp.disabled = true; $('#check').disabled = true; inp.classList.add(g === 'ok' ? 'right' : g === 'near' ? 'near' : 'wrong');
+      finish({ok: g !== 'bad', near: g === 'near', rec:[[f.y.id, g === 'ok']], xp: g === 'ok' ? 12 : g === 'near' ? 4 : 0,
+        note: g === 'ok' ? 'Feilen er rettet! 🕵️' : 'Riktig: ' + esc(f.y.s.replace('___', f.y.svar[0]))}); };
+    $('#check').onclick = check; onEnter(inp, check); inp.focus();
+  },
+  // 🧺 Sorter
+  sorter(el, s, finish){
+    const items = shuffle(s.ting).slice(0, Math.min(7, s.ting.length));
+    let i = 0, mistakes = 0; const res = [];
+    el.innerHTML = `<div class="q-label">${TEMA[s.t].e} 🧺 Sorter: ${esc(s.tittel)}</div>
+      <div class="sortcard"></div><div class="buckets">${s.kurver.map((k,j) => `<button class="btn" data-j="${j}">${esc(k)}</button>`).join('')}</div>
+      <div class="dots">${items.map(() => '<span></span>').join('')}</div>`;
+    const card = el.querySelector('.sortcard'), dots = [...el.querySelectorAll('.dots span')], bs = [...el.querySelectorAll('.buckets .btn')];
+    const show = () => { card.className = 'sortcard'; card.textContent = items[i][0]; bs.forEach(b => b.disabled = false); };
+    bs.forEach(b => b.onclick = () => {
+      const ok = +b.dataset.j === items[i][1]; bs.forEach(x => x.disabled = true);
+      card.classList.add(ok ? 'right' : 'wrong'); dots[i].className = ok ? 'ok' : 'bad';
+      if(!ok){ mistakes++; card.textContent = `${items[i][0]} → ${s.kurver[items[i][1]]}`; beep('bad'); } else beep('ok');
+      res.push(ok);
+      setTimeout(() => { i++; if(i < items.length) return show();
+        finish({ok: mistakes <= 1, near: mistakes === 1, rec:[[s.id, mistakes === 0]], xp: (items.length - mistakes)*2 + (mistakes ? 0 : 5), quiet:true,
+          note: mistakes ? 'Feil: ' + items.filter((x,k) => !res[k]).map(x => `<b>${esc(x[0])}</b> → ${esc(s.kurver[x[1]])}`).join(', ') : 'Alle riktige! 💪'}); }, ok ? 450 : 1400);
+    });
+    show();
+  },
+  // 📖 Les og skriv: les teksten, den skjules, svar skriftlig
+  les(el, L, finish){
+    const words = L.tekst.split(/\s+/).length, wait = Math.min(40, Math.max(15, Math.round(words/6)));
+    el.innerHTML = `<div class="q-label">${TEMA[L.t].e} 📖 Les og skriv</div><h3 style="margin:0 0 4px">${esc(L.tittel)}</h3>
+      <div class="src">Bygger på: ${esc(L.kilde)} (skrevet med egne ord)</div>
+      <div class="readtext" id="rt">${esc(L.tekst)}</div>
+      <div class="muted" id="rinfo">Les nøye. Når du går videre, skjules teksten, og du skal svare skriftlig.</div>
+      <div class="row end"><button class="btn primary" id="go" disabled>Jeg har lest ✓ <span id="rc">(${wait})</span></button></div><div id="qs"></div>`;
+    let c = wait; const t = setInterval(() => { const rc = $('#rc'); if(!rc){ clearInterval(t); return; } c--; rc.textContent = c > 0 ? `(${c})` : ''; if(c <= 0){ clearInterval(t); $('#go').disabled = false; } }, 1000);
+    let qi = 0, okCount = 0, xp = 0, peeks = 0; const results = [];
+    const ask = () => {
+      const q = L.sporsmal[qi];
+      $('#qs').innerHTML = `<div class="qnum">Spørsmål ${qi+1} av ${L.sporsmal.length}</div><div class="q-text">${esc(q.spm)}</div>
+        <textarea id="txt" ${WRITE_ATTR} style="min-height:90px" placeholder="Skriv svaret ditt …"></textarea><div class="guard"></div>
+        <div class="row end"><button class="btn ghost" id="peek">👀 Kikk i teksten (−3 XP)</button><button class="btn primary" id="check">Sjekk</button></div><div id="res"></div>`;
+      const ta = $('#txt'); guardInput(ta, $('#qs .guard')); ta.focus();
+      $('#peek').onclick = () => { peeks++; $('#rt').classList.remove('hidden'); $('#peek').disabled = true; setTimeout(() => { const r = $('#rt'); if(r) r.classList.add('hidden'); }, 6000); };
+      $('#check').onclick = () => {
+        const text = ta.value.trim(); if(text.split(/\s+/).length < 2) return ta.focus();
+        const res = conceptCheck(q.begreper, text), found = res.filter(r => r.ok).length, ok = found >= q.min;
+        ta.disabled = true; $('#qs').querySelectorAll('button').forEach(b => b.disabled = true);
+        if(ok) okCount++; xp += found*3 + (ok ? 5 : 0); results.push(ok); beep(ok ? 'ok' : 'bad');
+        $('#res').innerHTML = `<div style="font-weight:800;margin-top:8px">${ok ? '✅' : '🔶'} ${found} av ${res.length} viktige punkter</div>
+          <ul class="keys">${res.map(r => `<li class="${r.ok ? 'ok' : ''}">${r.ok ? '✅' : '⬜'} ${esc(r.navn)}</li>`).join('')}</ul>
+          <div class="model">${esc(q.modell)}</div>
+          <div class="row end"><button class="btn primary" id="nq">${qi < L.sporsmal.length-1 ? 'Neste spørsmål ➜' : 'Ferdig ✓'}</button></div>`;
+        $('#nq').onclick = () => { qi++; if(qi < L.sporsmal.length) return ask();
+          const all = okCount === L.sporsmal.length;
+          finish({ok: okCount >= L.sporsmal.length - 1, near: !all && okCount >= L.sporsmal.length - 1, rec:[[L.id, all]], xp: Math.max(0, xp - peeks*3) + (all && !peeks ? 10 : 0), quiet:true,
+            note: `${okCount} av ${L.sporsmal.length} svar godkjent${peeks ? ` · kikket ${peeks} gang${peeks > 1 ? 'er' : ''}` : ''}${all && !peeks ? ' · 🏅 +10 XP for alt riktig uten å kikke!' : ''}`}); };
+      };
+    };
+    $('#go').onclick = () => { $('#go').remove(); $('#rinfo').remove(); $('#rt').classList.add('hidden'); ask(); };
+  },
   kortsvar(el, k, finish, topic){
     const prove = topic === 'prove';
     el.innerHTML = `<div class="q-label">${TEMA[k.t].e} Svar med egne ord${prove ? ' · prøvetrening' : ''}</div><div class="q-text">${esc(k.spm)}</div>
@@ -248,15 +360,36 @@ const RUN = {
 /* =====================================================================
    ØKTER
    ===================================================================== */
-const ALL = () => [...BEG.map(x => ['begrep',x]), ...K.fyll.map(x => ['fyll',x]), ...K.kortsvar.map(x => ['kortsvar',x])];
+const ALL = () => [...BEG.map(x => ['begrep',x]), ...K.fyll.map(x => ['fyll',x]), ...K.kortsvar.map(x => ['kortsvar',x]), ...(K.sorter||[]).map(x => ['sorter',x]), ...(K.lesetekster||[]).map(x => ['les',x])];
+// Tall-oppgaver for «Rett feilen» og «Tallsprint»
+const isNum = y => /\d/.test(y.svar[0]);
+const NUMS = () => K.fyll.filter(isNum);
+function feilItem(y){
+  const pool = [...new Set(NUMS().map(x => x.svar[0]))].filter(v => !y.svar.some(a => a.replace(/\s/g,'') === v.replace(/\s/g,'')));
+  return {id:'feil-'+y.id, t:y.t, y, feil: rnd(pool)};
+}
 function startSession(topic){
   let plan;
   const pick = (kind, n, filt) => weightedPick(ALL().filter(([k,x]) => k === kind && (!filt || filt(x))).map(([k,x]) => ({id:x.id, k, x})), n);
-  if(topic === 'mix') plan = shuffle([...pick('begrep',5), ...pick('fyll',3), ...pick('kortsvar',4)]);
+  const pickFeil = (n, filt) => weightedPick(NUMS().filter(y => !filt || filt(y)), n).map(y => ({k:'feil', x:feilItem(y)}));
+  const asGaate = arr => arr.map(o => ({k:'gaate', x:o.x}));
+  if(topic === 'mix'){
+    const kort = pick('kortsvar',3);
+    plan = [...shuffle([...pick('begrep',3), ...asGaate(pick('begrep',2)), ...pick('fyll',2), ...pickFeil(1), ...pick('sorter',1), ...kort.slice(0,2)]), kort[2]].filter(Boolean);
+  }
   else if(topic === 'prove') plan = pick('kortsvar',5);
-  else if(topic === 'begreper') plan = pick('begrep',12);
-  else { const f = x => x.t === topic; plan = shuffle([...pick('begrep',4,f), ...pick('fyll',2,f), ...pick('kortsvar',3,f)]); }
-  SES = {topic, plan:plan.map(o => ({kind:o.k, item:o.x})), i:0, base:plan.length, correct:0, combo:0, xp:0, wrong:[], startLevel:level()};
+  else if(topic === 'les') plan = pick('les',3);
+  else if(topic === 'begreper') plan = shuffle([...pick('begrep',6), ...asGaate(pick('begrep',6))]);
+  else { const f = x => x.t === topic;
+    const kort = pick('kortsvar',3,f);
+    plan = [...shuffle([...pick('begrep',2,f), ...asGaate(pick('begrep',2,f)), ...pick('fyll',2,f), ...pickFeil(1,f), ...pick('sorter',1,f), ...pick('les',1,f), ...kort.slice(0,2)]), kort[2]].filter(Boolean); }
+  plan = plan.map(o => ({kind:o.k, item:o.x}));
+  // ⭐ Én bonusoppgave (dobbel XP) og 👾 sjefsoppgave til slutt (trippel XP)
+  if(topic !== 'prove' && plan.length > 3){
+    plan[Math.floor(Math.random()*(plan.length-1))].bonus = 2;
+    if(plan.at(-1).kind === 'kortsvar') plan.at(-1).boss = 3;
+  }
+  SES = {topic, plan, i:0, base:plan.length, correct:0, combo:0, xp:0, wrong:[], startLevel:level()};
   nextTask();
 }
 let SES = null;
@@ -267,13 +400,14 @@ function nextTask(){
   app.innerHTML = `<div class="sbar"><button class="icon" id="quit" aria-label="Avslutt">✕</button><div class="bar"><div style="width:${100*SES.i/SES.plan.length}%"></div></div>
     <div class="combo ${SES.combo >= 3 ? 'on' : ''}">${SES.combo >= 2 ? '🔥 ' + SES.combo : ''}</div></div>
     ${SES.i >= SES.base ? '<p class="muted" style="margin:-6px 0 10px">🔁 Ekstrarunde: noe du bommet på</p>' : ''}
+    ${task.boss ? '<div class="badge boss">👾 SJEFSOPPGAVE · trippel XP</div>' : task.bonus ? '<div class="badge bonus">⭐ BONUS · dobbel XP</div>' : ''}
     <div class="card task" id="task"></div>`;
   $('#quit').onclick = () => { if(confirm('Avslutte økta? XP-en du har fått, beholder du.')){ save(); renderHome(); } };
   RUN[task.kind]($('#task'), task.item, onResult, SES.topic); window.scrollTo(0,0);
 }
 function onResult(res){
   (res.rec||[]).forEach(([id,ok]) => record(id, ok));
-  let gained = Math.max(0, res.xp || 0);
+  let gained = Math.max(0, res.xp || 0) * (SES.current.boss || SES.current.bonus || 1);
   if(res.ok && !res.near){ SES.correct++; SES.combo++; S.maxCombo = Math.max(S.maxCombo, SES.combo); if(SES.combo >= 3) gained += 5; }
   else { SES.combo = 0; const cur = SES.current; if(!SES.wrong.includes(cur)) SES.wrong.push(cur);
     if(SES.topic !== 'prove' && SES.plan.length < SES.base + 4) SES.plan.splice(Math.min(SES.i + 4, SES.plan.length), 0, {kind:cur.kind, item:cur.item}); }
@@ -286,7 +420,7 @@ function onResult(res){
   document.body.append(fb); const nb = $('#next'); nb.onclick = nextTask; nb.focus();
 }
 document.addEventListener('keydown', e => { if(e.key === 'Enter' && !e.defaultPrevented && $('#next') && document.activeElement?.id !== 'next' && document.activeElement?.tagName !== 'TEXTAREA'){ e.preventDefault(); nextTask(); } });
-function label(t){ const x = t.item; return t.kind === 'begrep' ? `${esc(x.fork)} → <b>${esc(x.svar[0])}</b>` : t.kind === 'fyll' ? esc(x.s.replace('___', x.svar[0])) : `<b>${esc(x.spm)}</b><br><span class="muted">${esc(x.modell)}</span>`; }
+function label(t){ const x = t.item; return t.kind === 'les' ? `📖 ${esc(x.tittel)}` : t.kind === 'sorter' ? `🧺 ${esc(x.tittel)}` : t.kind === 'feil' ? esc(x.y.s.replace('___', x.y.svar[0])) : t.kind === 'begrep' || t.kind === 'gaate' ? `${esc(x.fork)} → <b>${esc(x.svar[0])}</b>` : t.kind === 'fyll' ? esc(x.s.replace('___', x.svar[0])) : `<b>${esc(x.spm)}</b><br><span class="muted">${esc(x.modell)}</span>`; }
 function endSession(){
   $('.fb')?.remove(); S.sessions++; markDay(); save();
   const pct = SES.correct / SES.plan.length, up = level() > SES.startLevel, L = levelInfo(); beep('win'); burst(up ? 30 : 16);
@@ -297,6 +431,40 @@ function endSession(){
     ${SES.wrong.length ? `<div class="review"><div class="q-label">Les gjennom disse en gang til:</div>${SES.wrong.map(t => `<div>${label(t)}</div>`).join('')}</div>` : ''}
     <div class="row"><button class="btn primary" id="again">En runde til</button><button class="btn" id="home">Hjem</button></div></div>`;
   const t = SES.topic; $('#again').onclick = () => startSession(t); $('#home').onclick = renderHome; $('#again').focus();
+}
+
+/* ---------- ⚡ Tallsprint: skriv tallene på 90 sekunder ---------- */
+let CH = null;
+function startSprint(){
+  CH = {score:0, left:90, wrong:[], timer:null};
+  app.innerHTML = `<div class="sbar"><button class="icon" id="quit" aria-label="Avslutt">✕</button><div class="bar"><div id="tbar" style="width:100%"></div></div></div>
+    <div class="chal-top"><span class="timer" id="time">⏱ 1:30</span><span>⭐ <span id="score">0</span> · rekord ${S.bestSprint || 0}</span></div>
+    <div class="card task"><div class="q-label">⚡ Tallsprint: skriv tallet eller ordet som mangler</div>
+      <div class="q-text" id="sq"></div><input class="answer" id="sinp" ${WRITE_ATTR} placeholder="Svar + Enter" style="max-width:240px"><div class="guard"></div>
+      <div class="flash" id="sfl"></div><div class="row end"><button class="btn ghost" id="skip">Hopp over</button><button class="btn primary" id="sok">Sjekk</button></div></div>`;
+  const inp = $('#sinp'); guardInput(inp, $('.guard'));
+  $('#quit').onclick = () => { clearInterval(CH.timer); CH = null; renderHome(); };
+  const next = () => { CH.cur = weightedPick(NUMS(), 1)[0]; $('#sq').textContent = CH.cur.s; inp.value = ''; inp.disabled = false; inp.focus(); };
+  const submit = skip => { if(!CH || inp.disabled) return; const g = skip ? 'bad' : gradeWord(inp.value, CH.cur.svar); if(g === null) return;
+    inp.disabled = true; record(CH.cur.id, g === 'ok');
+    if(g === 'ok'){ CH.score++; $('#score').textContent = CH.score; $('#sfl').innerHTML = '<span style="color:var(--ok)">✅ Riktig!</span>'; beep('ok'); }
+    else { CH.wrong.push(CH.cur); $('#sfl').innerHTML = `<span style="color:var(--bad)">Riktig: ${esc(CH.cur.svar[0])}</span>`; beep('bad'); }
+    setTimeout(() => { if(CH){ $('#sfl').innerHTML = ''; next(); } }, g === 'ok' ? 350 : 1400); };
+  $('#sok').onclick = () => submit(false); $('#skip').onclick = () => submit(true);
+  inp.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); submit(false); } });
+  CH.timer = setInterval(() => { CH.left--; $('#time').textContent = '⏱ ' + Math.floor(CH.left/60) + ':' + String(CH.left%60).padStart(2,'0');
+    $('#tbar').style.width = (100*CH.left/90) + '%'; if(CH.left <= 10) $('#time').classList.add('low'); if(CH.left <= 0) endSprint(); }, 1000);
+  next();
+}
+function endSprint(){
+  const c = CH; clearInterval(c.timer); CH = null;
+  const rec = c.score > (S.bestSprint || 0); if(rec) S.bestSprint = c.score;
+  const xp = c.score * 4; S.xp += xp; markDay(); save(); beep('win'); burst(rec ? 30 : 12);
+  app.innerHTML = `<div class="card end"><div class="big">${rec ? '🏆' : '⚡'}</div><h2>${rec ? 'Ny rekord!' : 'Tiden er ute!'}</h2>
+    <div class="stat">${c.score} riktige på 90 sekunder</div><div class="muted">Rekord: ${S.bestSprint}</div><div class="stat" style="color:var(--accent)">+${xp} XP</div>
+    ${c.wrong.length ? `<div class="review"><div class="q-label">Øv på disse:</div>${[...new Set(c.wrong)].map(y => `<div>${esc(y.s.replace('___', y.svar[0]))}</div>`).join('')}</div>` : ''}
+    <div class="row"><button class="btn primary" id="again">Prøv igjen</button><button class="btn" id="home">Hjem</button></div></div>`;
+  $('#again').onclick = startSprint; $('#home').onclick = renderHome;
 }
 
 /* ---------- Forside ---------- */
@@ -313,9 +481,11 @@ function renderHome(){
       <div class="pills">${cd ? `<span class="pill hot">${cd}</span>` : ''}</div></section>
     <h2 class="sec">Kort tid? Start her</h2>
     <div class="grid">
-      <button class="topic wide" data-topic="mix"><span class="em">🎲</span><b>Blandet: det viktigste</b><small>12 skriveoppgaver fra arkene (ca. 10 min)</small></button>
-      <button class="topic" data-topic="begreper"><span class="em">✍️</span><b>Begrepene</b><small>Les forklaringen og skriv begrepet eller tallet</small></button>
+      <button class="topic wide" data-topic="mix"><span class="em">🎲</span><b>Blandet: det viktigste</b><small>🕵️ Hvem er jeg, rett feilen, sortering, ⭐ bonus og 👾 sjefsoppgave (ca. 10 min)</small></button>
+      <button class="topic" data-topic="begreper"><span class="em">✍️</span><b>Begrepene</b><small>Skriv begrepet, og 🕵️ Hvem er jeg?</small></button>
       <button class="topic" data-topic="prove"><span class="em">📝</span><b>Prøvetrening</b><small>5 spørsmål du svarer på med egne ord, uten hint</small></button>
+      <button class="topic" data-topic="les"><span class="em">📖</span><b>Les og skriv</b><small>Les en kort fagtekst, så skjules den, og du svarer skriftlig</small></button>
+      <button class="topic" id="sprint"><span class="em">⚡</span><b>Tallsprint</b><small>Skriv så mange tall du klarer på 90 sekunder${S.bestSprint ? ' · rekord ' + S.bestSprint : ''}</small></button>
     </div>
     <h2 class="sec">Øv på ett tema</h2>
     <div class="grid">${K.temaer.map(t => `<button class="topic" data-topic="${t.id}"><span class="em">${t.e}</span><b>${esc(t.navn)}</b><small>${esc(t.desc)}</small>
@@ -323,6 +493,7 @@ function renderHome(){
     <footer><button class="link" id="reset">Nullstill fremgangen i Mat og helse</button></footer>`;
   $('#snd').onclick = () => { S.sound = !S.sound; save(); renderHome(); };
   app.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => startSession(b.dataset.topic));
+  $('#sprint').onclick = startSprint;
   $('#reset').onclick = () => { if(confirm('Slette all fremgang i Mat og helse?')){ S = JSON.parse(JSON.stringify(DEFAULT)); save(); renderHome(); } };
   window.scrollTo(0,0);
 }
