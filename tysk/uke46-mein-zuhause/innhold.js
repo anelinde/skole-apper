@@ -10,7 +10,7 @@ window.TYSK = {
   temaer: [
     {id:'rom',    e:'🏠', navn:'Rom og møbler',      desc:'Plantegningen (s. 48) og ordene fra rom-tekstene'},
     {id:'ord',    e:'📒', navn:'Vokabeln',           desc:'Ordene fra Vokabeln-boksene (s. 50–57)'},
-    {id:'hvor',   e:'📍', navn:'Hvor er det?',       desc:'links neben, über, vor … (s. 58)'},
+    {id:'hvor',   e:'📍', navn:'Hvor er det?',       desc:'links neben, über, vor … (s. 60)'},
     {id:'eiendom',e:'🔑', navn:'Eiendomsord',        desc:'mein, dein, sein, ihr … (s. 62 og 65)'},
     {id:'setning',e:'✍️', navn:'Skriv setninger',    desc:'Beskriv rommet og huset på tysk'},
     {id:'hus',    e:'🏢', navn:'Etasjer og hus',     desc:'Erdgeschoss, Stock, hustypene (s. 50–52)'},
@@ -61,7 +61,7 @@ window.TYSK = {
     ['v18','ord','av en eller annen grunn',['aus irgendwelchem Grund']],
     ['v19','ord','å ligne',['ähneln']],
     ['v20','ord','setningen',['der Satz','Satz']],
-    // Posisjonsord s. 58 (Vertiefen 2), svar fra tekstene s. 55–57
+    // Posisjonsord s. 60 (Vertiefen 2), svar fra tekstene s. 55–57
     ['h1','hvor','bak den',['dahinter']],
     ['h2','hvor','over (f.eks. over skrivebordet)',['über','über dem']],
     ['h3','hvor','oppå (det)',['darauf']],
@@ -152,6 +152,34 @@ window.TYSK = {
     {id:'u4', clue:'Bestemor, søsteren og foreldrene bor i samme hus. Bestemor flyttet inn etter at bestefar døde.', svar:['Mehrgenerationenhaus','das Mehrgenerationenhaus']},
     {id:'u5', clue:'Huset ser akkurat ut som husene til naboene. 12 hus ligger rett ved siden av hverandre i en blindvei.', svar:['Reihenhaus','das Reihenhaus']},
     {id:'u6', clue:'Et hus der bare én familie bor (står i spørsmål 3, s. 52).', svar:['Einfamilienhaus','das Einfamilienhaus']},
+  ],
+
+  /* ---------- SIDE 60, VERTIEFEN OPPGAVE 2: finn ordene i de tre tekstene ----------
+     Tekstene er skrevet av ordrett fra s. 55, 56 og 57. Ordene og hvilken tekst
+     de skal finnes i, står i oppgaven på s. 60. svar = godkjente markeringer/skrivemåter. */
+  tekster: {
+    z1: {navn:'Zimmer 1', side:55, tekst:"Wenn man in mein Zimmer kommt, steht links neben der Tür mein Bett. Dahinter ist mein kleiner Nachttisch mit einer Lampe darauf. Am Ende vom Zimmer ist ein großes Fenster. Meine Aussicht ist wirklich schön. Rechts steht mein Schreibtisch, und darauf steht mein Laptop. Über dem Schreibtisch ist ein kleines Bücherregal, und neben dem Schreibtisch ist mein Kleiderschrank. Ah, und in der Mitte hängt eine große Lampe, die wie die Weltkugel aussieht. Das war's! Das ist mein Zimmer."},
+    z2: {navn:'Zimmer 2', side:56, tekst:"Hier wohnt mein Bruder Leon. Wenn man in sein Zimmer kommt, stehen rechts neben der Tür sein Wäschekorb und sein Bett. Leon hat keinen Schreibtisch, nur ein Sofa und einen Sofatisch in der Mitte vom Zimmer. Oft steht sein Laptop darauf, heute ist es aber im Wohnzimmer. Links neben der Tür steht sein Kleiderschrank, aber die meisten seiner Klamotten liegen auf dem Boden. An den Wänden hat Leon Fußballposter."},
+    z3: {navn:'Zimmer 3', side:57, tekst:"Und zum Schluss haben wir meine Schwester Julika. Sie wohnt im Erdgeschoss, und ihre Aussicht ist nicht so schön wie meine, finde ich. Aber ihr Zimmer ist größer als meins, und sie hat aus irgendwelchem Grund ein Doppelbett! Sie hat auch mehr Kleider als Leon und ich, und deshalb hat sie zwei Kleiderschränke. Weil ihr Zimmer das größte ist, hat sie auch einen Fernseher. Da dürfen Leon und ich Videospiele spielen. Vor dem Fernseher stehen ein Sofa und ein Tisch, und auf dem Tisch liegen immer ihre Schulbücher."},
+  },
+  finn: [
+    // Første tekst
+    {id:'v60a', z:'z1', no:'bak den', svar:['dahinter']},
+    {id:'v60b', z:'z1', no:'over', svar:['über','über dem Schreibtisch']},
+    // I første og andre tekst
+    {id:'v60c', z:'z1', no:'oppå', svar:['darauf']},
+    {id:'v60d', z:'z1', no:'i midten', svar:['in der Mitte']},
+    {id:'v60e', z:'z1', no:'til venstre for', svar:['links neben','links neben der Tür']},
+    {id:'v60f', z:'z2', no:'oppå', svar:['darauf']},
+    {id:'v60g', z:'z2', no:'i midten', svar:['in der Mitte','in der Mitte vom Zimmer']},
+    {id:'v60h', z:'z2', no:'til venstre for', svar:['links neben','links neben der Tür']},
+    // Andre tekst
+    {id:'v60i', z:'z2', no:'til høyre for', svar:['rechts neben','rechts neben der Tür']},
+    {id:'v60j', z:'z2', no:'på gulvet', svar:['auf dem Boden']},
+    {id:'v60k', z:'z2', no:'på veggene', svar:['an den Wänden']},
+    // Tredje tekst
+    {id:'v60l', z:'z3', no:'på bordet', svar:['auf dem Tisch']},
+    {id:'v60m', z:'z3', no:'foran', svar:['vor','vor dem Fernseher']},
   ],
 
   /* ---------- SKRIVEOPPDRAG (læringsmålene s. 47) ---------- */
