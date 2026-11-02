@@ -11,6 +11,7 @@ const FAG = [
     {e:'💬', navn:'Argumenterende tekst', desc:'Skriv en argumenterende tekst steg for steg, med hjelp fra boka underveis (kurs 5.4)', type:'prove', url:'norsk/argumenterende-tekst-uke44/', dato:'2026-10-30', key:'norsk_argumenterende_v1'},
   ]},
   {id:'naturfag', e:'🔬', navn:'Naturfag', apper:[
+    {e:'🧪', navn:'Hormonsystemet', desc:'Kapittelquiz kap. 4: kjertler, adrenalin, insulin og diabetes', type:'lekse', aar:2026, uke:45, url:'naturfag/lekser/uke45-hormonsystemet/', key:'naturfag_hormon_v1'},
     {e:'🧠', navn:'Nervesystemet', desc:'Celler, fotosyntese og nervesystemet', type:'prove', url:'naturfag/eldre-tester/nervesystemet/', dato:'2026-10-16', eldre:true, key:'naturfag_v1'},
   ]},
   {id:'tysk', e:'🇩🇪', navn:'Tysk', apper:[

@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="no">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hormonsystemet</title>
+<style>
+:root{
+  --bg:#eef6ff; --card:#ffffff; --ink:#14213d; --muted:#5b6a86; --line:#d3e3f7; --chip:#e3effc;
+  --brand:#1f5fd1; --brand-ink:#ffffff; --accent:#ff7a2f; --gold:#f2b705;
+  --ok:#14874a; --okbg:#e3f6ea; --bad:#c93a3a; --badbg:#fde9e9; --near:#b45309; --nearbg:#fff4e5;
+  --body:#f3dcc6; --body-line:#d9b99b; --organ:#e7b3a5; --gland:#9aa7bd; --blood:#d94a4a;
+  --shadow:0 2px 0 rgba(20,33,61,.07), 0 8px 24px rgba(20,33,61,.07);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0e1626; --card:#172239; --ink:#e8eefb; --muted:#9fb0cf; --line:#2a3a5a; --chip:#22314f;
+    --brand:#6ea0ff; --brand-ink:#0b1220; --accent:#ff9b57; --gold:#ffd24a;
+    --ok:#46d68a; --okbg:#173a28; --bad:#ff7070; --badbg:#3d1d24; --near:#ffb35c; --nearbg:#3a2a14;
+    --body:#3a3448; --body-line:#5a5170; --organ:#6d4f5a; --gland:#56607a; --blood:#e46a6a;
+    --shadow:0 2px 0 rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.25);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+#app{max-width:720px;margin:0 auto;padding:16px 16px 70px}
+h1,h2,h3{line-height:1.2;margin:0}
+h2.sec{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:26px 0 10px}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:inherit}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;align-items:center}
+.btn{border:0;border-radius:14px;padding:12px 18px;font-weight:700;background:var(--chip);color:var(--ink);min-height:50px}
+.btn.primary{background:var(--brand);color:var(--brand-ink)}
+.btn.ghost{background:transparent;border:2px solid var(--line)}
+.btn:disabled{opacity:.45;cursor:default}
+.icon{border:0;background:var(--chip);border-radius:12px;width:44px;height:44px;font-size:20px;display:grid;place-items:center;flex:none;text-decoration:none;color:inherit}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.brand{font-weight:800;font-size:20px;display:flex;align-items:center;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:4px;background:var(--chip);border-radius:99px;padding:5px 12px;font-size:14px;font-weight:700}
+.pill.hot{background:var(--accent);color:#fff}
+.pill.gold{background:var(--gold);color:#3a2a00}
+.bar{height:12px;border-radius:99px;background:var(--chip);overflow:hidden}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),#38bdf8);border-radius:99px;transition:width .6s ease}
+.bar.small{height:8px}
+/* hjem */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:center}
+.lvl{width:64px;height:64px;border-radius:50%;background:var(--brand);color:var(--brand-ink);display:grid;place-items:center;font-weight:800;font-size:24px;line-height:1;text-align:center}
+.lvl small{display:block;font-size:10px;font-weight:700;opacity:.85}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stats3 div{background:var(--chip);border-radius:12px;padding:8px;text-align:center;font-size:13px;color:var(--muted)}
+.stats3 b{display:block;font-size:20px;color:var(--ink)}
+.mapwrap{display:grid;grid-template-columns:150px 1fr;gap:14px;align-items:center}
+.mapwrap>*,.glist,.glist div{min-width:0}
+.glist{display:grid;gap:7px;font-size:15px}
+.glist .gn{font-weight:600;overflow-wrap:anywhere}
+.glist>div{display:grid;grid-template-columns:1fr 42px;gap:8px;align-items:center}
+.glist span.p{font-weight:700;text-align:right;font-size:14px}
+.big{display:flex;gap:14px;align-items:center;text-align:left;padding:18px;border-radius:20px;border:0;background:var(--brand);color:var(--brand-ink);box-shadow:var(--shadow);width:100%}
+.big .em{font-size:38px}
+.big b{font-size:21px;display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.tile{display:grid;gap:6px;align-content:start;text-align:left;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow)}
+.tile:hover{border-color:var(--brand)}
+.tile .em{font-size:28px}
+.tile small{color:var(--muted);font-size:13px;line-height:1.35}
+.stars{letter-spacing:2px;font-size:15px}
+.chal{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;text-align:left;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow);width:100%}
+.chal .em{font-size:34px}
+.spark{display:flex;gap:3px;align-items:flex-end;height:30px;margin-top:6px}
+.spark i{width:10px;background:var(--brand);border-radius:3px 3px 0 0;opacity:.55}
+.spark i.best{background:var(--gold);opacity:1}
+.spark i.last{opacity:1}
+.medals{display:flex;flex-wrap:wrap;gap:8px}
+.medal{display:flex;gap:8px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:8px 10px;font-size:14px}
+.medal.off{opacity:.35;filter:grayscale(1)}
+.medal .em{font-size:22px}
+/* oppgave */
+.hud{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.hud .bar{flex:1}
+.combo{font-weight:800;min-width:64px;text-align:right}
+.kind{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.kind .tenk{background:var(--nearbg);color:var(--near);border-radius:99px;padding:2px 8px;text-transform:none;letter-spacing:0}
+.q{font-size:21px;font-weight:700;margin:2px 0 14px;line-height:1.3}
+.opts{display:grid;gap:10px}
+.opt{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:13px 16px;text-align:left;font-size:17px;min-height:54px}
+.opt:hover:not(:disabled){border-color:var(--brand)}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt.sel{border-color:var(--brand);background:var(--chip)}
+.opt:disabled{cursor:default}
+.tf{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tf .opt{text-align:center;font-size:20px;font-weight:800;min-height:70px}
+.fb{margin-top:14px;border-radius:14px;padding:12px 14px;font-size:16px}
+.fb.ok{background:var(--okbg);color:var(--ink);border-left:5px solid var(--ok)}
+.fb.bad{background:var(--badbg);color:var(--ink);border-left:5px solid var(--bad)}
+.fb.near{background:var(--nearbg);color:var(--ink);border-left:5px solid var(--near)}
+.fb b.h{display:block;margin-bottom:2px}
+textarea,input.answer{width:100%;font:inherit;font-size:18px;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+textarea{min-height:120px;resize:vertical}
+textarea:focus,input.answer:focus{outline:none;border-color:var(--brand)}
+.fill{font-size:20px;line-height:1.7}
+.fill input.answer{display:inline-block;width:auto;min-width:180px;max-width:100%;padding:6px 10px;margin:0 4px}
+.guard{font-size:14px;color:var(--near);min-height:0}
+.checks{display:grid;gap:4px;margin:8px 0;font-size:16px}
+.model{background:var(--chip);border-radius:12px;padding:10px 12px;margin-top:8px;white-space:pre-line}
+.spell{margin-top:10px;font-size:15px;background:var(--card);border:1px dashed var(--line);border-radius:12px;padding:10px 12px}
+.spell mark{background:var(--badbg);color:inherit;border-bottom:2px solid var(--bad);padding:0 1px}
+.spell .sugg{display:inline-block;background:var(--chip);border-radius:8px;padding:1px 8px;margin:2px 4px 0 0}
+.seq{display:grid;gap:8px}
+.seq .opt{display:flex;gap:10px;align-items:center}
+.seq .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font-weight:800;font-size:15px}
+.seq .opt.sel .n{background:var(--brand);color:var(--brand-ink)}
+.bins{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bin{border:2px dashed var(--line);border-radius:14px;padding:8px;min-height:80px}
+.bin h4{margin:0 0 6px;font-size:15px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chipb{border:2px solid var(--line);background:var(--card);border-radius:99px;padding:8px 14px;font-size:16px}
+.chipb.sel{border-color:var(--brand);background:var(--chip)}
+.chipb.ok{border-color:var(--ok);background:var(--okbg)}
+.chipb.bad{border-color:var(--bad);background:var(--badbg)}
+.chipb.miss{border-style:dashed;border-color:var(--ok)}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.match .opt{font-size:15px;padding:10px 12px;min-height:48px}
+.match .opt.done{opacity:.45;border-color:var(--ok);background:var(--okbg)}
+table.tab{width:100%;border-collapse:collapse;font-size:16px}
+table.tab th{background:var(--chip);text-align:left;padding:8px}
+table.tab td{border:1px solid var(--line);padding:6px;vertical-align:top}
+table.tab td.fast{font-weight:700;padding:10px 8px}
+table.tab input{width:100%;font:inherit;font-size:16px;padding:8px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+table.tab input.ok{border-color:var(--ok);background:var(--okbg)}
+table.tab input.bad{border-color:var(--bad);background:var(--badbg)}
+table.tab .fas{font-size:13px;color:var(--ok);margin-top:3px}
+.figwrap{display:flex;justify-content:center}
+.figs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.figs button{border:2px solid var(--line);background:var(--card);border-radius:14px;padding:4px}
+.figs button.ok{border-color:var(--ok);background:var(--okbg)}
+.figs button.bad{border-color:var(--bad);background:var(--badbg)}
+svg text{font-family:system-ui,sans-serif}
+.gl{transition:fill .3s}
+.tap{cursor:pointer}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.blink{animation:blink 1s infinite}
+/* resultat */
+.res{text-align:center}
+.res .score{font-size:56px;font-weight:900;line-height:1}
+.res .rec{display:inline-block;margin-top:8px;font-weight:800;padding:6px 14px;border-radius:99px}
+.hist{display:flex;gap:6px;align-items:flex-end;height:90px;justify-content:center;margin:12px 0 4px}
+.hist div{display:grid;justify-items:center;gap:3px;font-size:11px;color:var(--muted)}
+.hist i{width:22px;border-radius:5px 5px 0 0;background:var(--brand);opacity:.5}
+.hist i.now{opacity:1}
+.hist i.best{background:var(--gold);opacity:1}
+/* sprint */
+.sprint-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.timer{font-size:30px;font-weight:900;font-variant-numeric:tabular-nums}
+.ghost{font-size:14px;font-weight:700;margin-top:6px}
+/* feiring */
+.pop{position:fixed;left:50%;top:22%;transform:translate(-50%,-50%);background:var(--accent);color:#fff;font-weight:900;font-size:22px;padding:10px 20px;border-radius:99px;box-shadow:var(--shadow);z-index:20;animation:pop 1.3s ease forwards;pointer-events:none;white-space:nowrap}
+@keyframes pop{0%{opacity:0;transform:translate(-50%,-30%) scale(.7)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-90%)}}
+.conf{position:fixed;font-size:24px;z-index:19;pointer-events:none;animation:fall 1.4s ease-out forwards}
+@keyframes fall{to{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+.gloss{display:grid;gap:8px}
+.gloss div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+details summary{cursor:pointer;font-weight:700}
+@media (max-width:480px){
+  .q{font-size:19px}
+  .mapwrap{grid-template-columns:120px 1fr}
+  .match .opt{font-size:14px}
+  .bins{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="../../../felles/stavekontroll.js"></script>
+<script src="innhold.js"></script>
+<script>
+'use strict';
+const K = window.INNHOLD;
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle = a => { a = [...a]; for(let i = a.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; };
+const pick = a => a[Math.floor(Math.random()*a.length)];
+const TEMA = Object.fromEntries(K.temaer.map(t => [t.id, t]));
+
+/* =====================================================================
+   LAGRING  (samme felt som de andre appene: xp, sessions, lastDay, stats)
+   ===================================================================== */
+const KEY = K.lagringsnokkel;
+const DEFAULT = {xp:0, stats:{}, sessions:0, lastDay:null, dayStreak:0, medals:[], sound:true,
+  best:{}, hist:{}, sprint:[], sprintBest:0, prove:[], proveBest:0, skrevet:0, maxCombo:0, dag:{d:null, runder:0}};
+let S = load();
+function load(){ try{ return Object.assign(JSON.parse(JSON.stringify(DEFAULT)), JSON.parse(localStorage.getItem(KEY) || '{}')); }catch(e){ return JSON.parse(JSON.stringify(DEFAULT)); } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function st(id){ return S.stats[id] || {s:0, n:0, w:3, last:null}; }
+function record(id, ok){ const x = Object.assign({s:0, n:0, w:3, last:null}, S.stats[id]); x.n++; if(ok){ x.s++; x.w = Math.max(1, x.w - 1); } else x.w = Math.min(9, x.w + 3); x.last = ok; S.stats[id] = x; }
+const mastered = id => { const x = st(id); return x.s >= 1 && x.last !== false; };
+function dayKey(d = new Date()){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function markDay(){ const t = dayKey(); if(S.lastDay === t) return; const y = new Date(); y.setDate(y.getDate()-1); S.dayStreak = S.lastDay === dayKey(y) ? S.dayStreak + 1 : 1; S.lastDay = t; }
+function streakNow(){ const y = new Date(); y.setDate(y.getDate()-1); return (S.lastDay === dayKey() || S.lastDay === dayKey(y)) ? S.dayStreak : 0; }
+function runderIDag(){ return S.dag.d === dayKey() ? S.dag.runder : 0; }
+
+/* Nivåer */
+const RANKS = ['Hormon-nybegynner','Kjertel-kjenner','Blodbud','Hormon-detektiv','Adrenalin-ekspert','Insulin-mester','Hypofyse-sjef','Hormonprofessor'];
+function level(xp = S.xp){ return Math.floor(Math.sqrt(xp/40)) + 1; }
+function levelInfo(){ const l = level(), base = 40*(l-1)*(l-1), next = 40*l*l; return {l, rank:RANKS[Math.min(l-1, RANKS.length-1)], cur:S.xp-base, need:next-base}; }
+
+/* =====================================================================
+   LYD OG FEIRING
+   ===================================================================== */
+let AC;
+function beep(kind){
+  if(!S.sound) return;
+  try{
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const notes = {ok:[660,880], bad:[300,220], up:[523,659,784,1047], combo:[784,988,1175]}[kind] || [440];
+    notes.forEach((f, i) => { const o = AC.createOscillator(), g = AC.createGain(); o.type = 'sine'; o.frequency.value = f;
+      const t = AC.currentTime + i*0.09; g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.18, t+0.02); g.gain.exponentialRampToValueAtTime(0.0001, t+0.16);
+      o.connect(g).connect(AC.destination); o.start(t); o.stop(t+0.18); });
+  }catch(e){}
+}
+let popFree = 0;
+function popup(text){ const wait = Math.max(0, popFree - Date.now()); popFree = Math.max(popFree, Date.now()) + 1100; setTimeout(() => showPop(text), wait); }
+function showPop(text){ const d = document.createElement('div'); d.className = 'pop'; d.textContent = text; document.body.appendChild(d); setTimeout(() => d.remove(), 1400); }
+function burst(n = 16, set = ['⭐','✨','🎉','💧','⚡']){
+  for(let i = 0; i < n; i++){ const s = document.createElement('span'); s.className = 'conf'; s.textContent = pick(set);
+    s.style.left = (40 + Math.random()*20) + 'vw'; s.style.top = '30vh';
+    s.style.setProperty('--dx', (Math.random()*80 - 40) + 'vw'); s.style.setProperty('--dy', (Math.random()*50 + 10) + 'vh'); s.style.setProperty('--r', (Math.random()*720 - 360) + 'deg');
+    document.body.appendChild(s); setTimeout(() => s.remove(), 1500); }
+}
+
+/* =====================================================================
+   TEKSTSJEKK
+   ===================================================================== */
+const norm = s => String(s).toLowerCase().replace(/[«»"'.,!?;:()\/–—]/g, ' ').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+function lev(a, b){ const m = a.length, n = b.length, d = Array.from({length:m+1}, (_, i) => [i, ...Array(n).fill(0)]); for(let j = 1; j <= n; j++) d[0][j] = j;
+  for(let i = 1; i <= m; i++) for(let j = 1; j <= n; j++) d[i][j] = Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1)); return d[m][n]; }
+function gradeWord(input, answers){
+  let n = norm(input).replace(/^(en|et|ei|den|det|de|i|fra|av) /, '');
+  if(!n) return {ok:false};
+  let best = null, bd = 99;
+  for(const a of answers){ const na = norm(a);
+    if(n === na || (' ' + n + ' ').includes(' ' + na + ' ')) return {ok:true, exact:true, best:a};
+    const d = lev(n, na); if(d < bd){ bd = d; best = a; } }
+  const tol = norm(best).length >= 9 ? 2 : norm(best).length >= 5 ? 1 : 0;
+  return bd <= tol ? {ok:true, exact:false, best} : {ok:false, best:answers[0]};
+}
+function hasStem(text, stem){
+  const t = ' ' + norm(text) + ' ', s = norm(stem);
+  if(s.includes(' ')) return t.includes(' ' + s);
+  return t.trim().split(' ').some(w => w.startsWith(s) || (s.length >= 5 && w.includes(s)) || (s.length >= 6 && w.length >= s.length && lev(w.slice(0, s.length), s) <= 1));
+}
+const wordCount = t => norm(t).split(' ').filter(Boolean).length;
+function conceptCheck(task, text){ const found = task.begreper.map(([navn, ...stems]) => ({navn, ok: stems.some(s => hasStem(text, s))})); const n = found.filter(f => f.ok).length; return {found, n, ok: n >= task.min}; }
+
+const WRITE_ATTR = 'autocomplete="off" autocorrect="off" autocapitalize="sentences" spellcheck="false"';
+function guardInput(inp, msgEl){
+  let prev = inp.value;
+  inp.addEventListener('paste', e => { e.preventDefault(); if(msgEl) msgEl.textContent = '✋ Skriv selv. Innliming er slått av.'; });
+  inp.addEventListener('drop', e => e.preventDefault());
+  inp.addEventListener('input', () => { if(inp.value.length - prev.length > 25){ inp.value = prev; if(msgEl) msgEl.textContent = '✋ Skriv selv, litt om gangen.'; } else prev = inp.value; });
+}
+
+/* Stavekontroll (lokal, Hunspell nb_NO) */
+const STAVE_EKSTRA = [...new Set([...K.fagord, ...K.begreper.flatMap(b => [b[2], ...b[4]]), ...K.skriv.flatMap(w => (w.modell + ' ' + w.spm).split(/[^\p{L}-]+/u))]
+  .flatMap(w => String(w).split(/\s+/)).map(w => w.toLowerCase()).filter(w => w.length > 1))];
+async function staveBoks(text, box){
+  if(!box || !text.trim()) return;
+  box.innerHTML = '<p class="muted" style="margin:6px 0">🔍 Sjekker stavingen …</p>';
+  let sk; try{ sk = await Stavekontroll.last('../../../felles/'); }catch(e){ box.innerHTML = '<p class="muted">Fikk ikke lastet stavekontrollen (er du på nett?).</p>'; return; }
+  if(!box.isConnected) return;
+  const feil = sk.sjekk(text, STAVE_EKSTRA);
+  if(!feil.length){ box.innerHTML = '<p style="color:var(--ok);font-weight:700;margin:6px 0">✅ Ingen stavefeil.</p>'; return; }
+  let html = '', pos = 0;
+  feil.forEach(f => { html += esc(text.slice(pos, f.offset)) + `<mark>${esc(text.substr(f.offset, f.length))}</mark>`; pos = f.offset + f.length; });
+  html += esc(text.slice(pos));
+  box.innerHTML = `<div class="spell"><b>🔍 ${feil.length} mulig${feil.length > 1 ? 'e' : ''} stavefeil</b><div style="margin:6px 0;white-space:pre-line">${html}</div>
+    ${feil.map(f => `<div><b style="color:var(--bad)">${esc(f.ord)}</b>${f.forslag.length ? ' → ' + f.forslag.map(r => `<span class="sugg">${esc(r)}</span>`).join('') : ''}</div>`).join('')}</div>`;
+}
+
+/* =====================================================================
+   FIGURER (egne tegninger i SVG)
+   ===================================================================== */
+const GLANDS = {
+  hyp:{navn:'hypofysen', svar:['hypofysen','hypofyse'], hint:['hypofysen','«dirigenten» i hormonsystemet','kjertelen som regulerer vannmengden i kroppen']},
+  skj:{navn:'skjoldbruskkjertelen', svar:['skjoldbruskkjertelen','skjoldbruskkjertel'], hint:['skjoldbruskkjertelen','kjertelen som påvirker lengdeveksten og stoffskiftet']},
+  bin:{navn:'binyrene', svar:['binyrene','binyre','binyrer','binyremargen'], hint:['binyrene','kjertlene som lager adrenalin']},
+  buk:{navn:'bukspyttkjertelen', svar:['bukspyttkjertelen','bukspyttkjertel'], hint:['bukspyttkjertelen','kjertelen som lager insulin']},
+  kjo:{navn:'eggstokkene / testiklene', svar:['eggstokkene','eggstokker','eggstokk','testiklene','testikler','testikkel','kjønnskjertler','kjønnskjertlene'], hint:['eggstokkene / testiklene','kjertlene som lager kjønnshormoner']},
+};
+const GPOS = {hyp:[100,44], skj:[100,79], bin:[100,176], buk:[104,210], kjo:[100,256]};
+// glow: {hyp:0..1, ...}  mode: 'map' | 'tap' | 'blink:<id>'
+function bodySvg(glow = {}, opts = {}){
+  const g = id => { const v = glow[id]; if(v === undefined) return 'var(--gland)'; return v >= 1 ? 'var(--gold)' : v > 0 ? `color-mix(in srgb, var(--accent) ${Math.round(25 + v*75)}%, var(--gland))` : 'var(--gland)'; };
+  const cls = id => 'gl' + (opts.blink === id ? ' blink' : '');
+  const col = id => opts.color && opts.color[id] ? opts.color[id] : g(id);
+  const blood = glow.blod === undefined ? 0.35 : 0.25 + glow.blod*0.75;
+  return `<svg viewBox="0 0 ${opts.labels ? 270 : 200} 360" width="${opts.w || 150}" role="img" aria-label="Kropp med kjertler">
+    <g fill="var(--body)" stroke="var(--body-line)" stroke-width="2">
+      <path d="M62 86 Q48 90 44 110 L30 200 Q28 210 36 212 Q42 212 44 202 L60 128 Z"/>
+      <path d="M138 86 Q152 90 156 110 L170 200 Q172 210 164 212 Q158 212 156 202 L140 128 Z"/>
+      <path d="M66 262 L64 344 Q64 352 74 352 L92 352 Q96 352 96 344 L100 280 L104 344 Q104 352 108 352 L126 352 Q136 352 136 344 L134 262 Z"/>
+      <path d="M62 84 Q100 72 138 84 Q146 88 146 104 L144 200 Q146 236 136 270 L64 270 Q54 236 56 200 L54 104 Q54 88 62 84 Z"/>
+      <rect x="89" y="62" width="22" height="22" rx="6"/>
+      <circle cx="100" cy="40" r="27"/>
+    </g>
+    <g stroke="var(--blood)" stroke-width="2.5" fill="none" opacity="${blood.toFixed(2)}" stroke-linecap="round">
+      <path d="M100 96 L100 250 M100 250 L82 340 M100 250 L118 340 M100 110 L70 120 L40 200 M100 110 L130 120 L160 200 M100 96 L100 62"/>
+    </g>
+    <g fill="var(--organ)" opacity=".75"><ellipse cx="80" cy="190" rx="9" ry="13"/><ellipse cx="120" cy="190" rx="9" ry="13"/></g>
+    <g>
+      <circle class="${cls('hyp')}" cx="100" cy="46" r="6" fill="${col('hyp')}"/>
+      <g class="${cls('skj')}" fill="${col('skj')}"><ellipse cx="94" cy="79" rx="6" ry="5"/><ellipse cx="106" cy="79" rx="6" ry="5"/></g>
+      <g class="${cls('bin')}" fill="${col('bin')}"><path d="M72 179 Q80 168 88 179 Z"/><path d="M112 179 Q120 168 128 179 Z"/></g>
+      <ellipse class="${cls('buk')}" cx="104" cy="210" rx="22" ry="6" transform="rotate(-8 104 210)" fill="${col('buk')}"/>
+      <g class="${cls('kjo')}" fill="${col('kjo')}"><ellipse cx="86" cy="256" rx="6" ry="4.5"/><ellipse cx="114" cy="256" rx="6" ry="4.5"/></g>
+    </g>
+    ${opts.labels ? Object.entries(GPOS).map(([id,[x,y]]) => `<text x="${id === 'buk' ? 130 : x + 30}" y="${y + 4}" font-size="11" fill="var(--ink)" font-weight="700">${opts.labels[id] || ''}</text>`).join('') : ''}
+    ${opts.tap ? Object.entries(GPOS).map(([id,[x,y]]) => `<${id === 'buk' ? `ellipse rx="30" ry="15"` : id === 'bin' ? `ellipse rx="40" ry="13"` : id === 'kjo' ? `ellipse rx="28" ry="14"` : `circle r="16"`} class="tap" data-g="${id}" cx="${x}" cy="${y}" fill="transparent"/>`).join('') : ''}
+  </svg>`;
+}
+// Celle med «sukkerdør». type: 'a' (frisk) | 'b' (type 1) | 'c' (type 2)
+function cellSvg(type){
+  const ins = type !== 'b';
+  const arrow = type === 'a' ? '<path d="M70 18 L70 78" stroke="var(--bad)" stroke-width="3" fill="none" marker-end="url(#ah)"/>'
+                             : '<path d="M66 18 Q66 46 74 46 Q86 46 100 20" stroke="var(--bad)" stroke-width="3" fill="none" marker-end="url(#ah)"/>';
+  return `<svg viewBox="0 0 140 150" width="100%" role="img" aria-label="Celle">
+    <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0 0 L7 3.5 L0 7 Z" fill="var(--bad)"/></marker></defs>
+    <circle cx="70" cy="100" r="44" fill="#f2b8c6" stroke="#c97a92" stroke-width="2"/>
+    <ellipse cx="58" cy="104" rx="11" ry="7" fill="#9c6aa8"/>
+    <rect x="62" y="50" width="6" height="12" rx="3" fill="#fff" stroke="#c97a92"/><rect x="72" y="50" width="6" height="12" rx="3" fill="#fff" stroke="#c97a92"/>
+    <polygon points="64,4 72,4 76,11 72,18 64,18 60,11" fill="#e0b25a" stroke="#a57a2a"/>
+    ${ins ? '<g fill="#1f7a6e">' + [[22,30],[30,24],[26,38],[36,34],[18,40],[34,44]].map(([x,y]) => `<circle cx="${x}" cy="${y}" r="2.6"/>`).join('') + '</g><path d="M38 40 L56 52" stroke="#1f7a6e" stroke-width="2" marker-end="url(#ah)"/>'
+          : '<text x="8" y="34" font-size="12" fill="var(--ink)" font-weight="700">ikke</text><text x="8" y="47" font-size="12" fill="var(--ink)" font-weight="700">insulin</text>'}
+    ${arrow}
+  </svg>`;
+}
+// Nøkkel og lås: form-tegninger
+const SHAPES = {
+  trekant:(x,y,r,f) => `<polygon points="${x},${y-r} ${x+r},${y+r*0.8} ${x-r},${y+r*0.8}" ${f}/>`,
+  firkant:(x,y,r,f) => `<rect x="${x-r*0.85}" y="${y-r*0.85}" width="${r*1.7}" height="${r*1.7}" rx="2" ${f}/>`,
+  sirkel:(x,y,r,f) => `<circle cx="${x}" cy="${y}" r="${r}" ${f}/>`,
+  stjerne:(x,y,r,f) => { let p = ''; for(let i = 0; i < 10; i++){ const a = Math.PI/5*i - Math.PI/2, rr = i % 2 ? r*0.45 : r; p += `${(x + rr*Math.cos(a)).toFixed(1)},${(y + rr*Math.sin(a)).toFixed(1)} `; } return `<polygon points="${p}" ${f}/>`; },
+};
+
+/* =====================================================================
+   OPPGAVEBANK
+   ===================================================================== */
+const BEG = K.begreper.map(([id,t,navn,fork,v]) => ({id, t, navn, fork, v}));
+const SANT = K.sant.map(([id,t,p,sann,fork]) => ({id, t, p, sann, fork}));
+const FYLL = K.fyll.map(([id,t,for_,etter,svar]) => ({id, t, for_, etter, svar}));
+const ITEMS = [];
+BEG.forEach(b => ITEMS.push({id:b.id, t:b.t, kinds:['begrep','skrivBegrep'], b}));
+SANT.forEach(x => ITEMS.push({id:x.id, t:x.t, kinds:['sant'], x}));
+K.mc.forEach(x => ITEMS.push({id:x.id, t:x.t, kinds:['mc'], x}));
+FYLL.forEach(x => ITEMS.push({id:x.id, t:x.t, kinds:['fyll'], x}));
+K.rekke.forEach(x => ITEMS.push({id:x.id, t:x.t, kinds:['rekke'], x}));
+K.sorter.forEach(x => ITEMS.push({id:x.id, t:x.t, kinds:['sorter'], x}));
+K.par.forEach(x => ITEMS.push({id:x.id, t:x.t, kinds:['par'], x}));
+K.velg.forEach(x => ITEMS.push({id:x.id, t:x.t, kinds:['velg'], x}));
+K.skriv.forEach(x => ITEMS.push({id:x.id, t:x.t, kinds:['skriv'], x}));
+ITEMS.push({id:K.tabell.id, t:K.tabell.t, kinds:['tabell'], x:K.tabell});
+const GTEMA = {hyp:'kjertler', skj:'kjertler', bin:'adrenalin', buk:'insulin', kjo:'kjertler'};
+Object.keys(GLANDS).forEach(g => ITEMS.push({id:'k-' + g, t:GTEMA[g], kinds:['kropp','kroppSkriv'], g}));
+[['a','insulin'],['b','insulin'],['c','insulin']].forEach(([c,t]) => ITEMS.push({id:'c-' + c, t, kinds:['celle'], c}));
+ITEMS.push({id:'l1', t:'intro', kinds:['laas']});
+const ITEM = Object.fromEntries(ITEMS.map(i => [i.id, i]));
+
+/* Hvilke oppgaver hører til hver kjertel på kjertelkartet */
+const GLAND_IDS = {
+  hyp:['b10','s10','s11','s15','s18','m10','m13','f10','w10','v4','k-hyp','tab1'],
+  skj:['b11','b19','s12','m11','f13','w13','k-skj'],
+  bin:['b12','s16','k-bin', ...ITEMS.filter(i => i.t === 'adrenalin').map(i => i.id)],
+  buk:ITEMS.filter(i => i.t === 'insulin').map(i => i.id),
+  kjo:['b13','b14','b15','b16','b17','b18','s13','s14','s17','m12','f11','f12','w11','k-kjo','p1'],
+  blod:ITEMS.filter(i => i.t === 'intro').map(i => i.id),
+};
+const pct = ids => ids.length ? ids.filter(mastered).length / ids.length : 0;
+const topicIds = t => ITEMS.filter(i => i.t === t).map(i => i.id);
+const allIds = () => ITEMS.map(i => i.id);
+
+const KIND = {
+  sant:{navn:'Sant eller usant', e:'⚖️', xp:8, slot:'q'},
+  mc:{navn:'Hvorfor?', e:'🤔', xp:10, slot:'q'},
+  begrep:{navn:'Begrep', e:'🏷️', xp:8, slot:'q'},
+  fyll:{navn:'Skriv ordet', e:'✏️', xp:12, slot:'w'},
+  skrivBegrep:{navn:'Skriv begrepet', e:'✏️', xp:12, slot:'w'},
+  kroppSkriv:{navn:'Figur: skriv navnet', e:'🧍', xp:12, slot:'w'},
+  rekke:{navn:'Rekkefølge', e:'🔢', xp:15, slot:'i'},
+  sorter:{navn:'Sorter', e:'🗂️', xp:15, slot:'i'},
+  par:{navn:'Finn parene', e:'🔗', xp:15, slot:'i'},
+  velg:{navn:'Velg alle', e:'☑️', xp:15, slot:'i'},
+  kropp:{navn:'Kjertelkartet', e:'🧍', xp:12, slot:'i'},
+  celle:{navn:'Figur: sukkerdøra', e:'🔬', xp:12, slot:'i'},
+  laas:{navn:'Nøkkel og lås', e:'🔑', xp:10, slot:'i'},
+  tabell:{navn:'Tabell (oppg. 11)', e:'📋', xp:25, slot:'i'},
+  skriv:{navn:'Forklar med egne ord', e:'📝', xp:22, slot:'W'},
+};
+
+/* =====================================================================
+   OPPGAVETYPER   RUN[kind](el, item, done)  →  done({ok, del?})
+   del = andel riktig (0–1) for oppgaver med flere deler
+   ===================================================================== */
+function head(kind, item, extra = ''){
+  const k = KIND[kind], t = TEMA[item.t];
+  return `<div class="kind"><span>${k.e} ${k.navn}</span><span>· ${t.e} ${esc(t.navn)}</span>${extra}</div>`;
+}
+function fbHtml(ok, title, body){ return `<div class="fb ${ok === true ? 'ok' : ok === 'near' ? 'near' : 'bad'}"><b class="h">${title}</b>${body || ''}</div>`; }
+function nextBtn(el, cb, label = 'Videre ➜'){ const r = document.createElement('div'); r.className = 'row'; r.innerHTML = `<span style="flex:1"></span><button class="btn primary">${label}</button>`; el.appendChild(r); const b = r.querySelector('button'); b.onclick = cb; setTimeout(() => b.focus(), 50); }
+
+function mcRun(el, html, options, correctIdx, after){
+  el.innerHTML = html + `<div class="opts">${options.map((o,i) => `<button class="opt" data-i="${i}">${esc(o)}</button>`).join('')}</div><div id="fb"></div>`;
+  el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+    const i = +b.dataset.i, ok = i === correctIdx;
+    el.querySelectorAll('.opt').forEach(x => { x.disabled = true; if(+x.dataset.i === correctIdx) x.classList.add('ok'); });
+    if(!ok) b.classList.add('bad');
+    after(ok);
+  });
+}
+const RUN = {
+  sant(el, item, done){
+    const x = item.x;
+    el.innerHTML = head('sant', item) + `<div class="q">${esc(x.p)}</div><div class="tf"><button class="opt" data-v="1">👍 Sant</button><button class="opt" data-v="0">👎 Usant</button></div><div id="fb"></div>`;
+    el.querySelectorAll('.opt').forEach(b => b.onclick = () => {
+      const ok = (b.dataset.v === '1') === x.sann;
+      el.querySelectorAll('.opt').forEach(y => { y.disabled = true; if((y.dataset.v === '1') === x.sann) y.classList.add('ok'); });
+      if(!ok) b.classList.add('bad');
+      $('#fb').innerHTML = fbHtml(ok, ok ? 'Riktig!' : `Det er ${x.sann ? 'sant' : 'usant'}.`, esc(x.fork));
+      done({ok});
+    });
+  },
+  mc(el, item, done){
+    const x = item.x, order = shuffle(x.svar.map((s,i) => i));
+    mcRun(el, head('mc', item, x.tenk ? '<span class="tenk">💭 Tenk selv</span>' : '') + `<div class="q">${esc(x.spm)}</div>`, order.map(i => x.svar[i]), order.indexOf(0), ok => {
+      $('#fb').innerHTML = fbHtml(ok, ok ? 'Riktig!' : 'Ikke helt.', esc(x.fork)); done({ok}); });
+  },
+  begrep(el, item, done){
+    const b = item.b, same = BEG.filter(o => o.id !== b.id && o.t === b.t), other = BEG.filter(o => o.id !== b.id && o.t !== b.t);
+    const wrong = shuffle(same).slice(0, 3); while(wrong.length < 3) wrong.push(other[Math.floor(Math.random()*other.length)]);
+    const opts = shuffle([b, ...wrong]);
+    if(Math.random() < 0.5){
+      mcRun(el, head('begrep', item) + `<div class="q">Hvilket begrep passer?</div><div class="card" style="margin-bottom:12px;font-size:18px">${esc(b.fork)}</div>`, opts.map(o => o.navn), opts.indexOf(b), ok => {
+        $('#fb').innerHTML = fbHtml(ok, ok ? 'Riktig!' : `Det var «${esc(b.navn)}».`); done({ok}); });
+    } else {
+      mcRun(el, head('begrep', item) + `<div class="q">Hva betyr «${esc(b.navn)}»?</div>`, opts.map(o => o.fork), opts.indexOf(b), ok => {
+        $('#fb').innerHTML = fbHtml(ok, ok ? 'Riktig!' : 'Se det grønne svaret.'); done({ok}); });
+    }
+  },
+  fyll(el, item, done){
+    const x = item.x;
+    oneWord(el, head('fyll', item) + `<div class="fill">${esc(x.for_)} <input class="answer" id="w" ${WRITE_ATTR} placeholder="skriv her"> ${esc(x.etter)}</div>`, x.svar, done);
+  },
+  skrivBegrep(el, item, done){
+    const b = item.b;
+    oneWord(el, head('skrivBegrep', item) + `<div class="q">Hvilket begrep er dette?</div><div class="card" style="margin-bottom:12px;font-size:18px">${esc(b.fork)}</div><input class="answer" id="w" ${WRITE_ATTR} placeholder="Skriv begrepet">`, b.v, done);
+  },
+  kroppSkriv(el, item, done){
+    const G = GLANDS[item.g];
+    oneWord(el, head('kroppSkriv', item) + `<div class="q">Hva heter kjertelen som blinker?</div><div class="figwrap">${bodySvg({}, {blink:item.g, w:170})}</div><input class="answer" id="w" ${WRITE_ATTR} placeholder="Skriv navnet">`, G.svar, done,
+      () => `Riktig svar: <b>${esc(G.navn)}</b>.`);
+  },
+  kropp(el, item, done){
+    const G = GLANDS[item.g], hint = pick(G.hint);
+    el.innerHTML = head('kropp', item) + `<div class="q">Trykk på ${esc(hint)}.</div><div class="figwrap" id="fig">${bodySvg({}, {tap:true, w:210})}</div><div id="fb"></div>`;
+    el.querySelectorAll('.tap').forEach(t => t.onclick = () => {
+      const g = t.dataset.g, ok = g === item.g, color = {[item.g]:'var(--ok)'}; if(!ok) color[g] = 'var(--bad)';
+      const labels = {[item.g]:GLANDS[item.g].navn.split(' /')[0]}; if(!ok) labels[g] = GLANDS[g].navn.split(' /')[0];
+      $('#fig').innerHTML = bodySvg({}, {color, labels, w:210});
+      $('#fb').innerHTML = fbHtml(ok, ok ? 'Riktig!' : 'Ikke den.', ok ? `Det er ${esc(G.navn)}.` : `Du trykket på ${esc(GLANDS[g].navn)}. Den grønne er ${esc(G.navn)}.`);
+      done({ok});
+    });
+  },
+  celle(el, item, done){
+    const Q = {a:'Hvilken figur viser en frisk celle, der insulinet åpner «sukkerdøra»?', b:'Hvilken figur viser diabetes type 1?', c:'Hvilken figur viser diabetes type 2?'};
+    const F = {a:'Frisk: insulin åpner sukkerdøra, og druesukkeret kommer inn.', b:'Type 1: bukspyttkjertelen lager ikke insulin, så sukkeret kommer ikke inn.', c:'Type 2: det finnes insulin, men sukkerdøra virker ikke som den skal.'};
+    const order = shuffle(['a','b','c']);
+    el.innerHTML = head('celle', item) + `<div class="q">${Q[item.c]}</div><div class="figs">${order.map((c,i) => `<button data-c="${c}">${cellSvg(c)}<b>${'ABC'[i]}</b></button>`).join('')}</div><div id="fb"></div>`;
+    el.querySelectorAll('.figs button').forEach(b => b.onclick = () => {
+      const ok = b.dataset.c === item.c;
+      el.querySelectorAll('.figs button').forEach(x => { x.disabled = true; if(x.dataset.c === item.c) x.classList.add('ok'); });
+      if(!ok) b.classList.add('bad');
+      $('#fb').innerHTML = fbHtml(ok, ok ? 'Riktig!' : 'Ikke den.', order.map((c,i) => `<div><b>${'ABC'[i]}:</b> ${F[c]}</div>`).join(''));
+      done({ok});
+    });
+  },
+  laas(el, item, done){
+    const names = shuffle(Object.keys(SHAPES)).slice(0, 3), key = pick(names), col = pick(['#1f7a6e','#7c3aed','#d9480f']);
+    const cell = (n, i) => `<button data-n="${n}"><svg viewBox="0 0 100 100" width="100%"><circle cx="50" cy="58" r="36" fill="#f2b8c6" stroke="#c97a92" stroke-width="2"/><ellipse cx="44" cy="62" rx="9" ry="6" fill="#9c6aa8"/>${SHAPES[n](50, 24, 10, 'fill="var(--card)" stroke="#555" stroke-width="2.5" stroke-dasharray="4 2"')}</svg><b>Celle ${i+1}</b></button>`;
+    el.innerHTML = head('laas', item) + `<div class="q">Blodet frakter hormonet til alle cellene. Hvilken celle reagerer på det?</div>
+      <div class="card" style="display:flex;gap:12px;align-items:center;margin-bottom:12px;padding:12px"><svg viewBox="0 0 60 60" width="56">${SHAPES[key](30, 30, 18, `fill="${col}"`)}</svg><span>Dette er hormonet («nøkkelen»). Cellene har ulike «låser» på overflaten.</span></div>
+      <div class="figs">${names.map(cell).join('')}</div><div id="fb"></div>`;
+    el.querySelectorAll('.figs button').forEach(b => b.onclick = () => {
+      const ok = b.dataset.n === key;
+      el.querySelectorAll('.figs button').forEach(x => { x.disabled = true; if(x.dataset.n === key) x.classList.add('ok'); });
+      if(!ok) b.classList.add('bad');
+      $('#fb').innerHTML = fbHtml(ok, ok ? 'Riktig!' : 'Ikke den.', 'Hormonet er som en nøkkel som bare passer i én lås. Bare cellene med riktig lås setter i gang en prosess (s. 76).');
+      done({ok});
+    });
+  },
+  rekke(el, item, done){
+    const x = item.x, order = shuffle(x.steg.map((s,i) => i)); let picked = [];
+    el.innerHTML = head('rekke', item) + `<div class="q">${esc(x.spm)}</div><p class="muted" style="margin:-6px 0 10px">Trykk i riktig rekkefølge. Trykk igjen for å angre.</p>
+      <div class="seq">${order.map(i => `<button class="opt" data-i="${i}"><span class="n"></span><span>${esc(x.steg[i])}</span></button>`).join('')}</div><div id="fb"></div>
+      <div class="row"><span style="flex:1"></span><button class="btn primary" id="chk" disabled>Sjekk</button></div>`;
+    const draw = () => { el.querySelectorAll('.seq .opt').forEach(b => { const p = picked.indexOf(+b.dataset.i); b.classList.toggle('sel', p >= 0); b.querySelector('.n').textContent = p >= 0 ? p + 1 : ''; }); $('#chk').disabled = picked.length !== x.steg.length; };
+    el.querySelectorAll('.seq .opt').forEach(b => b.onclick = () => { const i = +b.dataset.i, p = picked.indexOf(i); if(p >= 0) picked.splice(p, 1); else picked.push(i); draw(); });
+    $('#chk').onclick = () => {
+      const right = picked.filter((v, p) => v === p).length, ok = right === x.steg.length;
+      el.querySelectorAll('.seq .opt').forEach(b => { b.disabled = true; const i = +b.dataset.i; b.classList.remove('sel'); b.classList.add(picked.indexOf(i) === i ? 'ok' : 'bad'); });
+      $('#chk').remove();
+      $('#fb').innerHTML = fbHtml(ok ? true : right >= 3 ? 'near' : false, ok ? 'Perfekt rekkefølge!' : `${right} av ${x.steg.length} på riktig plass.`, ok ? '' : '<ol style="margin:6px 0 0;padding-left:22px">' + x.steg.map(s => `<li>${esc(s)}</li>`).join('') + '</ol>');
+      done({ok, del:right / x.steg.length});
+    };
+  },
+  sorter(el, item, done){
+    const x = item.x, all = shuffle([...x.A.map(s => [s,'a']), ...x.B.map(s => [s,'b'])]), put = {};
+    el.innerHTML = head('sorter', item) + `<div class="q">${esc(x.spm)}</div><p class="muted" style="margin:-6px 0 10px">Trykk på et kort, og så på riktig boks.</p>
+      <div class="chips" id="pool"></div><div class="bins"><button class="bin" data-b="a"><h4>${esc(x.a)}</h4><div class="chips"></div></button><button class="bin" data-b="b"><h4>${esc(x.b)}</h4><div class="chips"></div></button></div>
+      <div id="fb"></div><div class="row"><span style="flex:1"></span><button class="btn primary" id="chk" disabled>Sjekk</button></div>`;
+    let sel = null;
+    const draw = () => {
+      $('#pool').innerHTML = all.map((c,i) => put[i] ? '' : `<button class="chipb ${sel === i ? 'sel' : ''}" data-i="${i}">${esc(c[0])}</button>`).join('');
+      el.querySelectorAll('.bin').forEach(bn => bn.querySelector('.chips').innerHTML = all.map((c,i) => put[i] === bn.dataset.b ? `<span class="chipb" data-i="${i}" data-back="1">${esc(c[0])}</span>` : '').join(''));
+      $('#pool').querySelectorAll('.chipb').forEach(c => c.onclick = e => { e.stopPropagation(); sel = +c.dataset.i; draw(); });
+      el.querySelectorAll('[data-back]').forEach(c => c.onclick = e => { e.stopPropagation(); delete put[+c.dataset.i]; sel = null; draw(); });
+      $('#chk').disabled = Object.keys(put).length !== all.length;
+    };
+    el.querySelectorAll('.bin').forEach(bn => bn.onclick = () => { if(sel === null) return; put[sel] = bn.dataset.b; sel = null; const left = all.findIndex((c,i) => !put[i]); if(left >= 0) sel = left; draw(); });
+    sel = 0; draw();
+    $('#chk').onclick = () => {
+      let right = 0;
+      el.querySelectorAll('.bin [data-i]').forEach(c => { const i = +c.dataset.i, ok = all[i][1] === put[i]; if(ok) right++; c.classList.add(ok ? 'ok' : 'bad'); c.onclick = null; c.removeAttribute('data-back'); });
+      el.querySelectorAll('.bin').forEach(bn => bn.onclick = null);
+      $('#chk').remove();
+      const ok = right === all.length, wrongs = all.filter((c,i) => c[1] !== put[i]);
+      $('#fb').innerHTML = fbHtml(ok ? true : right >= all.length - 2 ? 'near' : false, ok ? 'Alt riktig!' : `${right} av ${all.length} riktig.`,
+        wrongs.map(c => `<div>«${esc(c[0])}» hører til <b>${esc(c[1] === 'a' ? x.a : x.b)}</b>.</div>`).join(''));
+      done({ok, del:right / all.length});
+    };
+  },
+  par(el, item, done){
+    const x = item.x, idx = x.L.map((_, i) => i), L = shuffle(idx), R = shuffle(idx); let selL = null, wrong = 0, got = new Set();
+    el.innerHTML = head('par', item) + `<div class="q">${esc(x.spm)}</div><p class="muted" style="margin:-6px 0 10px">Trykk på én til venstre og én til høyre.</p>
+      <div class="match"><div class="opts" id="L">${L.map(i => `<button class="opt" data-i="${i}">${esc(x.L[i])}</button>`).join('')}</div>
+      <div class="opts" id="R">${R.map(i => `<button class="opt" data-i="${i}">${esc(x.R[i])}</button>`).join('')}</div></div><div id="fb"></div>`;
+    el.querySelectorAll('#L .opt').forEach(b => b.onclick = () => { if(b.disabled) return; selL = +b.dataset.i; el.querySelectorAll('#L .opt').forEach(y => y.classList.toggle('sel', y === b)); });
+    el.querySelectorAll('#R .opt').forEach(b => b.onclick = () => {
+      if(selL === null || b.disabled) return;
+      const i = +b.dataset.i;
+      if(i === selL){ got.add(i); beep('ok'); [el.querySelector(`#L .opt[data-i="${i}"]`), b].forEach(y => { y.classList.remove('sel'); y.classList.add('done'); y.disabled = true; }); selL = null;
+        if(got.size === x.L.length){ const ok = wrong <= 1; $('#fb').innerHTML = fbHtml(ok ? true : 'near', wrong === 0 ? 'Alle par uten feil!' : `Ferdig! ${wrong} feil underveis.`); done({ok, del:Math.max(0, 1 - wrong / x.L.length)}); } }
+      else { wrong++; beep('bad'); b.classList.add('bad'); setTimeout(() => b.classList.remove('bad'), 500); }
+    });
+  },
+  velg(el, item, done){
+    const x = item.x, all = shuffle([...x.rett.map(s => [s,1]), ...x.feil.map(s => [s,0])]), sel = new Set();
+    el.innerHTML = head('velg', item) + `<div class="q">${esc(x.spm)}</div>${x.kart ? '<div id="kart"></div>' : ''}<div class="chips" id="ch">${all.map((c,i) => `<button class="chipb" data-i="${i}">${esc(c[0])}</button>`).join('')}</div><div id="fb"></div>
+      <div class="row"><span style="flex:1"></span><button class="btn primary" id="chk">Sjekk</button></div>`;
+    const drawMap = (words) => { if(!x.kart) return; const n = words.length, cx = 160, cy = 110;
+      $('#kart').innerHTML = `<svg viewBox="0 0 320 220" width="100%" style="max-width:420px;display:block;margin:0 auto 10px">${words.map((w,i) => { const a = (Math.PI*2*i)/Math.max(n,1) - Math.PI/2, x2 = cx + Math.cos(a)*120, y2 = cy + Math.sin(a)*86;
+        return `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="var(--brand)" stroke-width="2"/><text x="${x2}" y="${y2 + (y2 > cy ? 12 : -4)}" text-anchor="middle" font-size="11" fill="var(--ink)" font-weight="700">${esc(w)}</text>`; }).join('')}
+        <ellipse cx="${cx}" cy="${cy}" rx="48" ry="24" fill="var(--card)" stroke="var(--brand)" stroke-width="2.5"/><text x="${cx}" y="${cy + 5}" text-anchor="middle" font-size="15" font-weight="800" fill="var(--ink)">${esc(x.kart)}</text></svg>`; };
+    drawMap([]);
+    el.querySelectorAll('#ch .chipb').forEach(b => b.onclick = () => { const i = +b.dataset.i; sel.has(i) ? sel.delete(i) : sel.add(i); b.classList.toggle('sel'); drawMap([...sel].map(j => all[j][0])); });
+    $('#chk').onclick = () => {
+      let right = 0;
+      el.querySelectorAll('#ch .chipb').forEach(b => { const i = +b.dataset.i, c = all[i]; b.disabled = true; b.classList.remove('sel');
+        if(sel.has(i) && c[1]){ b.classList.add('ok'); right++; } else if(sel.has(i)) b.classList.add('bad'); else if(c[1]) b.classList.add('miss'); else right++; });
+      $('#chk').remove(); drawMap(x.rett);
+      const ok = right === all.length;
+      $('#fb').innerHTML = fbHtml(ok ? true : right >= all.length - 2 ? 'near' : false, ok ? 'Helt riktig!' : `${right} av ${all.length} riktig.`, ok ? '' : 'Grønn = riktig valgt. Rød = skulle ikke vært med. Stiplet = manglet.');
+      done({ok, del:right / all.length});
+    };
+  },
+  tabell(el, item, done){
+    const x = item.x;
+    el.innerHTML = head('tabell', item) + `<div class="q">${esc(x.spm)}</div><div class="guard"></div>
+      <table class="tab"><tr>${x.kol.map(k => `<th>${esc(k)}</th>`).join('')}</tr>
+      ${x.rader.map((r, ri) => `<tr>${r.map((c, ci) => c.fast ? `<td class="fast">${esc(c.fast)}</td>` : `<td><input data-k="${ri}-${ci}" ${WRITE_ATTR}><div class="fas"></div></td>`).join('')}</tr>`).join('')}</table>
+      <div id="fb"></div><div class="row"><span style="flex:1"></span><button class="btn primary" id="chk">Sjekk tabellen</button></div>`;
+    el.querySelectorAll('table input').forEach(i => guardInput(i, el.querySelector('.guard')));
+    $('#chk').onclick = () => {
+      let right = 0, total = 0, empty = 0;
+      el.querySelectorAll('table input').forEach(i => { if(!i.value.trim()) empty++; });
+      if(empty > 2){ el.querySelector('.guard').textContent = 'Fyll inn flere ruter først (du kan gjette).'; return; }
+      el.querySelectorAll('table input').forEach(i => { const [ri, ci] = i.dataset.k.split('-').map(Number), c = x.rader[ri][ci]; total++;
+        const ok = i.value.trim() && c.stammer.some(s => hasStem(i.value, s)); if(ok) right++;
+        i.classList.add(ok ? 'ok' : 'bad'); i.readOnly = true; i.nextElementSibling.textContent = ok ? '' : 'Fasit: ' + c.fasit; });
+      $('#chk').remove();
+      const ok = right === total;
+      $('#fb').innerHTML = fbHtml(ok ? true : right >= total - 2 ? 'near' : false, ok ? 'Hele tabellen riktig!' : `${right} av ${total} ruter riktig.`);
+      done({ok, del:right / total});
+    };
+  },
+  skriv(el, item, done){
+    const x = item.x; let tries = 0;
+    el.innerHTML = head('skriv', item, x.kilde ? `<span>· ${esc(x.kilde)}</span>` : '') + `<div class="q">${esc(x.spm)}</div>
+      ${x.liste ? `<div class="opts">${Array.from({length:x.liste}, (_, i) => `<input class="answer" data-l="${i}" ${WRITE_ATTR} placeholder="${i+1}.">`).join('')}</div>`
+                : `<textarea id="txt" ${WRITE_ATTR} placeholder="Skriv svaret med egne ord …"></textarea>`}
+      <div class="guard"></div><div id="fb"></div><div id="stave"></div>
+      <div class="row"><button class="btn ghost" id="hjelp">💡 Hint</button><span style="flex:1"></span><button class="btn primary" id="chk">Sjekk svaret</button></div>`;
+    const inputs = [...el.querySelectorAll(x.liste ? 'input.answer' : 'textarea')];
+    inputs.forEach(i => guardInput(i, el.querySelector('.guard'))); inputs[0].focus();
+    const text = () => inputs.map(i => i.value.trim()).filter(Boolean).join(x.liste ? '\n' : ' ');
+    $('#hjelp').onclick = () => { const c = conceptCheck(x, text()), miss = c.found.filter(f => !f.ok); $('#hjelp').disabled = true;
+      el.querySelector('.guard').innerHTML = `<span style="color:var(--muted)">💡 Ta gjerne med noe om: <b>${esc(pick(miss.length ? miss : c.found).navn)}</b></span>`; };
+    $('#chk').onclick = () => {
+      const t = text();
+      if(x.liste ? inputs.filter(i => i.value.trim()).length < x.liste : wordCount(t) < 3){ el.querySelector('.guard').textContent = x.liste ? `Skriv ${x.liste} ting, én på hver linje.` : 'Skriv minst en hel setning.'; return; }
+      tries++;
+      const c = conceptCheck(x, t), list = `<div class="checks">${c.found.filter(f => f.ok).map(f => `<div>✅ ${esc(f.navn)}</div>`).join('')}</div>`;
+      if(!c.ok && tries === 1){
+        const miss = c.found.filter(f => !f.ok);
+        $('#fb').innerHTML = fbHtml('near', `Godt i gang! Du har ${c.n} av ${x.min} viktige poeng.`, list + `<div>💡 Prøv å legge til noe om: <b>${miss.slice(0, 2).map(m => esc(m.navn)).join('</b> eller <b>')}</b></div>`);
+        $('#chk').textContent = 'Sjekk igjen'; return;
+      }
+      inputs.forEach(i => i.readOnly = true); $('#chk').remove(); $('#hjelp').remove();
+      const del = c.ok ? (tries === 1 ? 1 : 0.8) : Math.min(0.6, c.n / x.min * 0.6);
+      $('#fb').innerHTML = fbHtml(c.ok ? true : 'near', c.ok ? (tries === 1 ? 'Supert svar! 🎯' : 'Bra, nå er det med!') : 'Bra forsøk! Se eksempelet.', list
+        + `<details ${c.ok ? '' : 'open'}><summary>Eksempel på svar</summary><div class="model">${esc(x.modell)}</div></details>`);
+      if(c.ok){ S.skrevet++; }
+      staveBoks(t, $('#stave'));
+      done({ok:c.ok, del});
+    };
+  },
+};
+function oneWord(el, html, answers, done, fasitFn){
+  el.innerHTML = html + `<div class="guard"></div><div id="fb"></div><div class="row"><span style="flex:1"></span><button class="btn primary" id="chk">Sjekk</button></div>`;
+  const inp = $('#w'); guardInput(inp, el.querySelector('.guard')); inp.focus();
+  const go = () => {
+    if(!inp.value.trim()){ inp.focus(); return; }
+    const r = gradeWord(inp.value, answers); inp.readOnly = true; $('#chk').remove();
+    $('#fb').innerHTML = r.ok ? (r.exact ? fbHtml(true, 'Riktig!') : fbHtml('near', 'Riktig! Men pass på skrivemåten:', `<b>${esc(r.best)}</b>`))
+                              : fbHtml(false, 'Ikke helt.', fasitFn ? fasitFn() : `Riktig svar: <b>${esc(answers[0])}</b>`);
+    done({ok:r.ok});
+  };
+  $('#chk').onclick = go; inp.addEventListener('keydown', e => { if(e.key === 'Enter' && !inp.readOnly){ e.preventDefault(); go(); } });
+}
+
+/* =====================================================================
+   ØKT
+   ===================================================================== */
+const SLOTS = {q:['sant','mc','begrep'], w:['skrivBegrep','fyll','kroppSkriv'], i:['rekke','sorter','par','velg','kropp','celle','laas','tabell'], W:['skriv']};
+const PLAN = {
+  runde:['q','i','w','q','W','i','q','w','i','W'],
+  prove:['q','W','i','q','w','i','W','q','i','w','W','i','q','W'],
+};
+let R = null;   // pågående økt
+function weightOf(it){ const x = st(it.id); return x.w * (x.n === 0 ? 1.6 : 1) * (x.last === false ? 2.2 : 1) * (mastered(it.id) ? 0.5 : 1); }
+function weighted(arr){ const tot = arr.reduce((n, a) => n + a.w, 0); let r = Math.random()*tot; for(const a of arr){ if((r -= a.w) <= 0) return a; } return arr[arr.length-1]; }
+function chooseTask(slot){
+  const kinds = SLOTS[slot];
+  const cand = [];
+  ITEMS.forEach(it => { if(R.topic && it.t !== R.topic) return; if(R.used.has(it.id)) return;
+    it.kinds.filter(k => kinds.includes(k)).forEach(k => {
+      let w = weightOf(it); if(k === R.lastKind) w *= 0.15;
+      if(!R.topic) w *= 1.4 - pct(topicIds(it.t));   // svakeste tema oftest i blandet runde
+      if(k === 'tabell' && R.mode !== 'prove') w *= 0.5;
+      cand.push({it, k, w}); }); });
+  if(!cand.length) return slot === 'q' ? null : chooseTask('q');
+  return weighted(cand);
+}
+function startSession(mode, topic = null){
+  R = {mode, topic, plan:[...PLAN[mode === 'prove' ? 'prove' : 'runde']], i:0, score:0, n:0, used:new Set(), retry:[], combo:0, best:0, xp:0, lastKind:null, start:Date.now(),
+       before: topic ? pct(topicIds(topic)) : pct(allIds()), wrong:[]};
+  nextTask();
+}
+function nextTask(){
+  if(R.i >= R.plan.length && !R.retry.length) return endSession();
+  let task = null;
+  const due = R.retry.findIndex(r => r.at <= R.i);
+  if(due >= 0 && (R.i >= R.plan.length || Math.random() < 0.8)){ task = R.retry.splice(due, 1)[0]; task.again = true; }
+  else if(R.i < R.plan.length){ task = chooseTask(R.plan[R.i]); }
+  else { task = R.retry.shift(); task.again = true; }
+  R.i++;
+  if(!task) return nextTask();
+  R.used.add(task.it.id); R.lastKind = task.k; R.cur = task;
+  const total = R.plan.length, done = Math.min(R.n, total);
+  $('#app').innerHTML = `<div class="hud"><button class="icon" id="quit" title="Avslutt">✕</button><div class="bar"><i style="width:${Math.round(100*done/total)}%"></i></div>
+    <span class="combo">${R.combo >= 3 ? '🔥 ' + R.combo : `${done}/${total}`}</span></div>
+    <div class="card" id="task">${task.again ? '<div class="pill" style="margin-bottom:8px">🔁 Den kommer tilbake. Prøv igjen!</div>' : ''}<div id="tb"></div></div>`;
+  $('#quit').onclick = () => { if(confirm('Avslutte runden? Det du har svart, er lagret.')) { save(); renderHome(); } };
+  RUN[task.k]($('#tb'), task.it, res => onResult(task, res));
+}
+const PRAISE = ['Riktig!','Supert!','Bra jobba!','Kjempebra!','Rått!','Sånn ja!'];
+function onResult(task, res){
+  const del = res.del !== undefined ? res.del : (res.ok ? 1 : 0);
+  record(task.it.id, res.ok);
+  R.n++; R.score += task.again ? del * 0.5 : del;
+  if(res.ok){ R.combo++; R.best = Math.max(R.best, R.combo); } else { R.combo = 0; R.wrong.push(task.it.id); }
+  const mult = R.combo >= 6 ? 3 : R.combo >= 3 ? 2 : 1;
+  const gain = Math.round(KIND[task.k].xp * Math.max(del, res.ok ? 1 : 0.25) * mult);
+  const lvBefore = level(); S.xp += gain; R.xp += gain; S.maxCombo = Math.max(S.maxCombo, R.combo); markDay();
+  if(!res.ok && R.mode !== 'prove' && !task.again && ['q','w'].includes(KIND[task.k].slot)) R.retry.push({it:task.it, k:task.k, at:R.i + 2});
+  save();
+  beep(res.ok ? 'ok' : 'bad');
+  if(res.ok && (R.combo === 3 || R.combo === 6 || R.combo === 10)){ setTimeout(() => { popup(`🔥 ${R.combo} på rad! XP ×${mult}`); beep('combo'); burst(10, ['🔥','⚡','⭐']); }, 250); }
+  else if(res.ok && Math.random() < 0.25) popup(pick(PRAISE) + ` +${gain} XP`);
+  if(level() > lvBefore){ setTimeout(() => { popup(`⬆️ Nivå ${level()}: ${levelInfo().rank}!`); beep('up'); burst(24); }, 600); }
+  const comboEl = document.querySelector('.combo'); if(comboEl) comboEl.textContent = R.combo >= 3 ? '🔥 ' + R.combo : `${Math.min(R.n, R.plan.length)}/${R.plan.length}`;
+  const bar = document.querySelector('.hud .bar i'); if(bar) bar.style.width = Math.round(100*Math.min(R.n, R.plan.length)/R.plan.length) + '%';
+  nextBtn($('#tb'), nextTask, R.i >= R.plan.length && !R.retry.length ? 'Se resultatet 🏁' : 'Videre ➜');
+}
+function endSession(){
+  const key = R.mode === 'prove' ? 'prove' : (R.topic || 'blandet');
+  const total = R.plan.length, pts = Math.round(R.score * 10) / 10, pctNow = Math.round(100 * R.score / total);
+  const secs = Math.round((Date.now() - R.start) / 1000);
+  const prevBest = R.mode === 'prove' ? S.proveBest : (S.best[key] || 0);
+  const isRec = pctNow > prevBest;
+  S.sessions++; markDay();
+  if(S.dag.d !== dayKey()) S.dag = {d:dayKey(), runder:0}; S.dag.runder++;
+  if(R.mode === 'prove'){ S.prove.push({d:dayKey(), p:pctNow, s:secs}); S.prove = S.prove.slice(-12); S.proveBest = Math.max(S.proveBest, pctNow); }
+  else { S.best[key] = Math.max(prevBest, pctNow); (S.hist[key] = S.hist[key] || []).push(pctNow); S.hist[key] = S.hist[key].slice(-10); }
+  const after = R.topic ? pct(topicIds(R.topic)) : pct(allIds());
+  const newMedals = checkMedals(); save();
+  const hist = R.mode === 'prove' ? S.prove.map(p => p.p) : S.hist[key];
+  const grade = pctNow >= 90 ? ['🥇','Gull'] : pctNow >= 75 ? ['🥈','Sølv'] : pctNow >= 50 ? ['🥉','Bronse'] : ['💪','Øv litt til'];
+  const title = R.mode === 'prove' ? '🏆 Kapittelprøven' : R.topic ? `${TEMA[R.topic].e} ${TEMA[R.topic].navn}` : '🎲 Blandet runde';
+  $('#app').innerHTML = `<div class="card res">
+      <div class="muted" style="font-weight:700">${title}</div>
+      <div class="score" style="margin-top:8px">${pctNow}%</div>
+      <div class="muted">${pts} av ${total} poeng · ${Math.floor(secs/60)} min ${secs % 60} s · beste combo 🔥 ${R.best}</div>
+      ${R.mode === 'prove' ? `<div style="font-size:22px;font-weight:800;margin-top:8px">${grade[0]} ${grade[1]}</div>` : ''}
+      ${isRec && prevBest > 0 ? `<div class="rec pill gold">🏅 NY REKORD! (forrige: ${prevBest}%)</div>` : isRec ? `<div class="rec pill gold">🏅 Første rekord satt!</div>` : `<div class="rec pill">Rekorden din: ${prevBest}% · ${prevBest - pctNow <= 10 ? 'så nære!' : 'du slår den neste gang!'}</div>`}
+      <div class="hist">${hist.map((v, i) => `<div><i class="${i === hist.length - 1 ? 'now' : ''} ${v === Math.max(...hist) ? 'best' : ''}" style="height:${Math.max(4, v*0.7)}px"></i>${v}</div>`).join('')}</div>
+      <div class="muted" style="font-size:13px">Dine siste runder her (gull = beste)</div>
+      <div style="margin:16px 0 4px;text-align:left"><b>${R.topic ? 'Mestret i temaet' : 'Mestret i hele kapitlet'}</b>
+        <div class="bar" style="margin-top:6px"><i id="mb" style="width:${Math.round(R.before*100)}%"></i></div>
+        <div class="muted" style="font-size:14px;margin-top:4px">${Math.round(R.before*100)}% → <b>${Math.round(after*100)}%</b> ${after > R.before ? '📈' : ''}</div></div>
+      <div class="pill hot" style="margin-top:8px">+${R.xp} XP</div>
+      ${newMedals.map(m => `<div class="medal" style="justify-content:center;margin-top:10px"><span class="em">${m.e}</span><b>Ny medalje: ${esc(m.navn)}</b></div>`).join('')}
+      ${R.wrong.length ? `<details style="text-align:left;margin-top:14px"><summary>Dette kommer tilbake oftere (${R.wrong.length})</summary><div class="muted" style="font-size:15px;margin-top:6px">${[...new Set(R.wrong)].map(id => esc(itemLabel(id))).join('<br>')}</div></details>` : ''}
+      <div class="row" style="justify-content:center"><button class="btn primary" id="again">${R.mode === 'prove' ? 'Ta prøven igjen' : 'En runde til ⚡'}</button><button class="btn ghost" id="home">Hjem</button></div>
+    </div>`;
+  setTimeout(() => { const mb = $('#mb'); if(mb) mb.style.width = Math.round(after*100) + '%'; }, 120);
+  if(isRec || newMedals.length){ beep('up'); burst(26); } else beep('ok');
+  const m = R.mode, t = R.topic;
+  $('#again').onclick = () => startSession(m, t); $('#home').onclick = renderHome;
+}
+function itemLabel(id){ const it = ITEM[id]; if(!it) return id; return it.b ? it.b.navn : it.x ? (it.x.p || it.x.spm || (it.x.for_ ? it.x.for_ + ' …' : id)) : it.g ? 'Kjertelkartet: ' + GLANDS[it.g].navn : it.c ? 'Figur: sukkerdøra' : 'Nøkkel og lås'; }
+
+/* =====================================================================
+   ADRENALIN-SPRINT (60 sekunder)
+   ===================================================================== */
+let SP = null;
+function startSprint(){
+  const qs = shuffle([...SANT.map(x => ({k:'sant', x})), ...BEG.map(b => ({k:'beg', b}))]);
+  SP = {qs, qi:0, score:0, combo:0, t0:Date.now(), left:60, timer:null, best:S.sprintBest};
+  $('#app').innerHTML = `<div class="sprint-top"><button class="icon" id="quit">✕</button><div class="timer" id="tm">60</div><div class="pill hot" id="sc">0 ⚡</div></div>
+    <div class="bar"><i id="tb2" style="width:100%"></i></div><div class="ghost" id="gh"></div><div class="card" style="margin-top:12px" id="sq"></div>`;
+  $('#quit').onclick = () => { clearInterval(SP.timer); SP = null; renderHome(); };
+  SP.timer = setInterval(() => { SP.left = 60 - Math.floor((Date.now() - SP.t0)/1000); $('#tm').textContent = Math.max(0, SP.left); $('#tb2').style.width = Math.max(0, SP.left/60*100) + '%';
+    ghost(); if(SP.left <= 0) endSprint(); }, 250);
+  sprintQ();
+}
+function ghost(){ if(!SP.best){ $('#gh').textContent = 'Første forsøk: sett en rekord!'; return; } const pace = SP.best * (60 - SP.left) / 60, diff = SP.score - pace;
+  $('#gh').innerHTML = diff >= 0 ? `<span style="color:var(--ok)">🏃 Foran rekordtempo (${SP.best})</span>` : `<span style="color:var(--near)">👻 Rekordtempo: ${Math.ceil(pace)}. Gi gass!</span>`; }
+function sprintQ(){
+  if(SP.qi >= SP.qs.length){ SP.qs = shuffle(SP.qs); SP.qi = 0; }
+  const q = SP.qs[SP.qi++], el = $('#sq');
+  const answer = ok => { record(q.k === 'sant' ? q.x.id : q.b.id, ok); if(ok){ SP.score++; SP.combo++; beep('ok'); if(SP.combo % 5 === 0) popup(`🔥 ${SP.combo} på rad!`); } else { SP.combo = 0; beep('bad'); }
+    $('#sc').textContent = SP.score + ' ⚡'; el.style.outline = `3px solid ${ok ? 'var(--ok)' : 'var(--bad)'}`; setTimeout(() => { if(SP){ el.style.outline = ''; sprintQ(); } }, ok ? 250 : 900); };
+  if(q.k === 'sant'){
+    el.innerHTML = `<div class="kind">⚖️ Sant eller usant?</div><div class="q">${esc(q.x.p)}</div><div class="tf"><button class="opt" data-v="1">👍 Sant</button><button class="opt" data-v="0">👎 Usant</button></div>`;
+    el.querySelectorAll('.opt').forEach(b => b.onclick = () => { el.querySelectorAll('.opt').forEach(y => { y.disabled = true; if((y.dataset.v === '1') === q.x.sann) y.classList.add('ok'); });
+      const ok = (b.dataset.v === '1') === q.x.sann; if(!ok) b.classList.add('bad'); answer(ok); });
+  } else {
+    const opts = shuffle([q.b, ...shuffle(BEG.filter(o => o.id !== q.b.id && o.t === q.b.t)).slice(0, 2)]);
+    el.innerHTML = `<div class="kind">🏷️ Hvilket begrep?</div><div class="q" style="font-size:18px">${esc(q.b.fork)}</div><div class="opts">${opts.map(o => `<button class="opt" data-id="${o.id}">${esc(o.navn)}</button>`).join('')}</div>`;
+    el.querySelectorAll('.opt').forEach(b => b.onclick = () => { el.querySelectorAll('.opt').forEach(y => { y.disabled = true; if(y.dataset.id === q.b.id) y.classList.add('ok'); });
+      const ok = b.dataset.id === q.b.id; if(!ok) b.classList.add('bad'); answer(ok); });
+  }
+}
+function endSprint(){
+  clearInterval(SP.timer); const sc = SP.score, prev = S.sprintBest; SP = null;
+  S.sprint.push(sc); S.sprint = S.sprint.slice(-10); S.sprintBest = Math.max(prev, sc); S.xp += sc * 3; markDay(); S.sessions++;
+  if(S.dag.d !== dayKey()) S.dag = {d:dayKey(), runder:0}; S.dag.runder++;
+  const nm = checkMedals(); save();
+  const rec = sc > prev;
+  $('#app').innerHTML = `<div class="card res"><div class="muted" style="font-weight:700">⚡ Adrenalin-sprint</div><div class="score" style="margin-top:8px">${sc}</div><div class="muted">riktige på 60 sekunder · +${sc*3} XP</div>
+    ${rec ? `<div class="rec pill gold">🏅 NY REKORD!${prev ? ` (forrige: ${prev})` : ''}</div>` : `<div class="rec pill">Rekord: ${prev} · ${prev - sc <= 2 ? 'bare ' + (prev - sc + 1) + ' til for ny rekord!' : 'prøv igjen!'}</div>`}
+    <div class="hist">${S.sprint.map((v, i) => `<div><i class="${i === S.sprint.length - 1 ? 'now' : ''} ${v === S.sprintBest ? 'best' : ''}" style="height:${Math.max(4, v/Math.max(S.sprintBest,1)*70)}px"></i>${v}</div>`).join('')}</div>
+    <div class="muted" style="font-size:13px">Dine siste sprinter</div>
+    ${nm.map(m => `<div class="medal" style="justify-content:center;margin-top:10px"><span class="em">${m.e}</span><b>Ny medalje: ${esc(m.navn)}</b></div>`).join('')}
+    <div class="row" style="justify-content:center"><button class="btn primary" id="again">Igjen! ⚡</button><button class="btn ghost" id="home">Hjem</button></div></div>`;
+  if(rec || nm.length){ beep('up'); burst(26); }
+  $('#again').onclick = startSprint; $('#home').onclick = renderHome;
+}
+
+/* =====================================================================
+   MEDALJER
+   ===================================================================== */
+const MEDALS = [
+  {id:'forste', e:'🌱', navn:'Første runde', test:() => S.sessions >= 1},
+  {id:'combo5', e:'🔥', navn:'5 på rad', test:() => S.maxCombo >= 5},
+  {id:'combo10', e:'☄️', navn:'10 på rad', test:() => S.maxCombo >= 10},
+  {id:'sprint10', e:'⚡', navn:'Sprint 10', test:() => S.sprintBest >= 10},
+  {id:'sprint20', e:'🚀', navn:'Sprint 20', test:() => S.sprintBest >= 20},
+  {id:'skriv5', e:'✍️', navn:'5 gode forklaringer', test:() => S.skrevet >= 5},
+  {id:'skriv15', e:'📜', navn:'15 gode forklaringer', test:() => S.skrevet >= 15},
+  {id:'kart', e:'🧍', navn:'Fant alle kjertlene', test:() => Object.keys(GLANDS).every(g => st('k-' + g).s >= 1)},
+  ...K.temaer.map(t => ({id:'tema_' + t.id, e:t.e, navn:'Mester: ' + t.navn, test:() => pct(topicIds(t.id)) >= 1})),
+  {id:'prove75', e:'🥈', navn:'Kapittelprøven: sølv', test:() => S.proveBest >= 75},
+  {id:'prove90', e:'🥇', navn:'Kapittelprøven: gull', test:() => S.proveBest >= 90},
+  {id:'dager3', e:'📅', navn:'3 dager på rad', test:() => S.dayStreak >= 3},
+];
+function checkMedals(){ const n = []; MEDALS.forEach(m => { if(!S.medals.includes(m.id) && m.test()){ S.medals.push(m.id); n.push(m); } }); return n; }
+
+/* =====================================================================
+   HJEM
+   ===================================================================== */
+function stars(p){ return p >= 1 ? '⭐⭐⭐' : p >= 0.6 ? '⭐⭐☆' : p > 0 ? '⭐☆☆' : '☆☆☆'; }
+function spark(arr, best){ if(!arr || !arr.length) return ''; const m = Math.max(...arr, 1); return `<div class="spark">${arr.map((v, i) => `<i class="${v === best ? 'best' : ''} ${i === arr.length - 1 ? 'last' : ''}" style="height:${Math.max(3, v/m*30)}px"></i>`).join('')}</div>`; }
+function renderHome(){
+  R = null; checkMedals(); save();
+  const L = levelInfo(), streak = streakNow(), today = runderIDag(), all = pct(allIds());
+  const glow = Object.fromEntries(Object.entries(GLAND_IDS).map(([g, ids]) => [g, pct(ids)]));
+  const GN = [['hyp','Hypofysen'],['skj','Skjoldbruskkjertelen'],['bin','Binyrene'],['buk','Bukspyttkjertelen'],['kjo','Eggstokker/testikler'],['blod','Blodet (transport)']];
+  $('#app').innerHTML = `
+    <div class="top"><a class="icon" href="../../" title="Til naturfag">←</a><div class="brand">🧪 Hormonsystemet</div><button class="icon" id="snd" title="Lyd">${S.sound ? '🔊' : '🔇'}</button></div>
+    <div class="card"><div class="hero"><div class="lvl"><div><small>NIVÅ</small>${L.l}</div></div>
+      <div><b style="font-size:18px">${L.rank}</b><div class="bar" style="margin:6px 0 4px"><i style="width:${Math.round(100*L.cur/L.need)}%"></i></div><div class="muted" style="font-size:14px">${S.xp} XP · ${L.need - L.cur} XP til nivå ${L.l + 1}</div></div></div>
+      <div class="stats3"><div><b>${streak ? '🔥 ' + streak : '–'}</b>dager på rad</div><div><b>${today >= 2 ? '✅' : today + '/2'}</b>dagens mål</div><div><b>${Math.round(all*100)}%</b>av kapitlet</div></div></div>
+
+    <h2 class="sec">🧍 Kjertelkartet: lås opp kroppen</h2>
+    <div class="card mapwrap"><div>${bodySvg(glow, {w:150})}</div>
+      <div class="glist">${GN.map(([g, n]) => `<div><div><div class="gn">${n}</div><div class="bar small" style="margin-top:3px"><i style="width:${Math.round(glow[g]*100)}%;${glow[g] >= 1 ? 'background:var(--gold)' : ''}"></i></div></div><span class="p">${glow[g] >= 1 ? '⭐' : Math.round(glow[g]*100) + '%'}</span></div>`).join('')}
+      <div class="muted" style="font-size:13px">Kjertlene lyser opp når du mestrer det som hører til dem. Gull = ferdig!</div></div></div>
+
+    <div style="margin-top:16px"><button class="big" id="go"><span class="em">▶️</span><span><b>Start runde</b><span style="opacity:.9">10 oppgaver · ca. 4 min · blander alt</span></span></button></div>
+
+    <h2 class="sec">📚 Temaer</h2>
+    <div class="grid">${K.temaer.map(t => { const p = pct(topicIds(t.id)), b = S.best[t.id];
+      return `<button class="tile" data-t="${t.id}"><span class="em">${t.e}</span><b>${esc(t.navn)}</b><small>${esc(t.desc)}</small>
+        <div class="bar small"><i style="width:${Math.round(p*100)}%"></i></div><div style="display:flex;justify-content:space-between;align-items:center"><span class="stars">${stars(p)}</span><small>${b !== undefined ? 'Rekord ' + b + '%' : 'Ny!'}</small></div></button>`; }).join('')}</div>
+
+    <h2 class="sec">🏁 Utfordringer</h2>
+    <div style="display:grid;gap:10px">
+      <button class="chal" id="sprint"><span class="em">⚡</span><span><b>Adrenalin-sprint</b><br><small class="muted">Så mange riktige du klarer på 60 sekunder. Slå din egen rekord!</small>
+        <div style="margin-top:4px"><span class="pill ${S.sprintBest ? 'gold' : ''}">🏅 Rekord: ${S.sprintBest}</span></div>${spark(S.sprint, S.sprintBest)}</span></button>
+      <button class="chal" id="prove"><span class="em">🏆</span><span><b>Kapittelprøven</b><br><small class="muted">14 oppgaver som på prøven, med mange skriveoppgaver fra boka. Gull, sølv eller bronse?</small>
+        <div style="margin-top:4px"><span class="pill ${S.proveBest >= 75 ? 'gold' : ''}">${S.proveBest >= 90 ? '🥇' : S.proveBest >= 75 ? '🥈' : S.proveBest >= 50 ? '🥉' : '🎯'} Beste: ${S.proveBest}%</span></div>${spark(S.prove.map(p => p.p), S.proveBest)}</span></button>
+    </div>
+
+    <h2 class="sec">🏅 Medaljer (${S.medals.length}/${MEDALS.length})</h2>
+    <div class="medals">${MEDALS.map(m => `<div class="medal ${S.medals.includes(m.id) ? '' : 'off'}"><span class="em">${m.e}</span>${esc(m.navn)}</div>`).join('')}</div>
+
+    <h2 class="sec">📖 Slå opp</h2>
+    <button class="btn ghost" id="ord" style="width:100%">Begrepene i kapitlet (${BEG.length})</button>
+    <p class="muted" style="font-size:13px;margin-top:18px">Eureka 9, kapittel 4 Hormonsystemet, s. 75–83. Oppgaver merket «💭 Tenk selv» står ikke rett ut i boka, men kan tenkes ut fra det boka sier.</p>`;
+  $('#snd').onclick = () => { S.sound = !S.sound; save(); renderHome(); };
+  $('#go').onclick = () => startSession('runde');
+  document.querySelectorAll('.tile').forEach(b => b.onclick = () => startSession('runde', b.dataset.t));
+  $('#sprint').onclick = startSprint;
+  $('#prove').onclick = () => startSession('prove');
+  $('#ord').onclick = renderGlossary;
+}
+function renderGlossary(){
+  $('#app').innerHTML = `<div class="top"><button class="icon" id="back">←</button><div class="brand">📖 Begreper</div><span></span></div>
+    ${K.temaer.map(t => `<h2 class="sec">${t.e} ${esc(t.navn)}</h2><div class="gloss">${BEG.filter(b => b.t === t.id).map(b => `<div><b>${mastered(b.id) ? '✅ ' : ''}${esc(b.navn)}</b><br><span class="muted">${esc(b.fork)}</span></div>`).join('')}</div>`).join('')}
+    <h2 class="sec">🧍 Kjertlene</h2><div class="card figwrap">${bodySvg({}, {w:260, labels:{hyp:'hypofysen', skj:'skjoldbrusk', bin:'binyrene', buk:'bukspytt', kjo:'eggstokker/testikler'}})}</div>`;
+  $('#back').onclick = renderHome; window.scrollTo(0, 0);
+}
+renderHome();
+</script>
+</body>
+</html>
